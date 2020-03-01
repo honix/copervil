@@ -5,6 +5,16 @@ typedef struct {
 	int *data;
 } sized_array_t;
 
+/*
+
+typedef struct {
+	int size;
+	type_t item_type;
+	void *data;
+} sized_array_t;
+
+*/
+
 sized_array_t *allocate_array (int size);
 
 sized_array_t *make_array (int size, int from, int inc);

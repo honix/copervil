@@ -10,6 +10,8 @@ int mul (const int a, const int b) {
 
 /*
 
+// https://www.geeksforgeeks.org/function-pointer-in-c/
+
 void *sum (const void *a, const void *b) {
 	int a = * (int*) a;
 	int b = * (int*) b;
