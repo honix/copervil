@@ -4,8 +4,8 @@
 
 typedef struct node_t {
 	void (*func) (struct node_t*);
-	link_t *in1;
-	link_t *in2;
+	link_t *in1; // do i really need link abstraction?
+	link_t *in2; // we can store void* here
 	link_t *out1;
 	link_t *out2;
 } node_t;
