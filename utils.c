@@ -1,11 +1,20 @@
 #include "utils.h"
 
+#include <stdio.h>
+
 // (int, int) -> int
 void sum (node_t *node) 
 {
 	int a = * (int*) node->in_pins[0]->data;
 	int b = * (int*) node->in_pins[1]->data;
 	* (int*) node->out_pins[0]->data = a + b;
+}
+
+
+void print_int (node_t *node)
+{
+	int a = * (int*) node->in_pins[0]->data;
+	printf("%d\n", a);
 }
 
 /*

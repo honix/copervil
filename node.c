@@ -6,6 +6,11 @@ node_t *make_node (void (*func) (node_t*))
 {
 	node_t *node = malloc(sizeof(node_t));
 	node->func = func;
+
+	// for (int i = 0; i < PINS_NUM; i++) {
+	// 	node->in_pins[i] = NULL;
+	// 	node->out_pins[i] = NULL;
+	// }
 	
 	return node;
 }
@@ -14,9 +19,11 @@ void execute_node (node_t *node)
 {
 	node->func(node);
 
-	node_t *next_node = node->out_pins[0]->receiver;
-	if (next_node != NULL)
-		execute_node(next_node);
+	if (node->out_pins[0] != NULL) {
+		node_t *next_node = node->out_pins[0]->receiver;
+		if (next_node != NULL)
+			execute_node(next_node);
+	}
 }
 
 void connect_nodes (

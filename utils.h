@@ -7,3 +7,5 @@
 
 // (int, int) -> int
 void sum (node_t *node);
+// (int)
+void print_int (node_t *node);

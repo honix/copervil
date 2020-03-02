@@ -28,35 +28,31 @@
 
 void test_nodes () 
 {
-	node_t *node1 = make_node(sum);
 	int h1 = 100;
 	int h2 = 25;
+	node_t *node1 = make_node(sum);
 	connect_nodes(make_link(&h1), NULL, 0, node1, 0);
 	connect_nodes(make_link(&h2), NULL, 0, node1, 1);
 
-	node_t *node2 = make_node(sum);
 	int h3 = 25;
+	node_t *node2 = make_node(sum);
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
 	connect_nodes(make_link(&h3), NULL, 0, node2, 1);
 
-	node2->out_pins[0] = make_link(malloc(sizeof(int)));
-	connect_nodes(make_link(malloc(sizeof(int))), node2, 0, NULL, 0);
+	node_t *node3 = make_node(print_int);
+	connect_nodes(make_link(malloc(sizeof(int))), node2, 0, node3, 0);
 
 	execute_node(node1); // connected node will be executed
-
-	printf("%d\n", * (int*) node2->out_pins[0]->data);
-	
-	// node->in2 = link_out1;
-	// execute_node(node);
-	// print_array(node->out1->data);
 }
 
 int main (int acount, char **args) 
 {
+	printf("=== start ===\n");
+	
 	//test_arrays();
 	test_nodes();
 	
-	printf("hello\n");
+	printf("=== end ===\n");
 	return 0;
 }
 
