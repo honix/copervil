@@ -26,34 +26,33 @@
 // 	// print_array(array_c);
 // }
 
-void test_nodes () {
-	// sized_array_t *array_a = make_array(10, 0 , 1);
-	// sized_array_t *array_b = make_array(2, 0 , 1);
-	
+void test_nodes () 
+{
 	node_t *node1 = make_node(sum);
 	int h1 = 100;
-	node1->in1 = make_link(&h1);
 	int h2 = 25;
-	node1->in2 = make_link(&h2);
-	node1->out1 = make_link(malloc(sizeof(int)));
+	connect_nodes(make_link(&h1), NULL, 0, node1, 0);
+	connect_nodes(make_link(&h2), NULL, 0, node1, 1);
 
 	node_t *node2 = make_node(sum);
-	node2->in1 = node1->out1;
 	int h3 = 25;
-	node2->in2 = make_link(&h3);
-	node2->out1 = make_link(malloc(sizeof(int)));
+	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
+	connect_nodes(make_link(&h3), NULL, 0, node2, 1);
 
-	execute_node(node1);
-	execute_node(node2);
+	node2->out_pins[0] = make_link(malloc(sizeof(int)));
+	connect_nodes(make_link(malloc(sizeof(int))), node2, 0, NULL, 0);
 
-	printf("%d\n", * (int*) node2->out1->data);
+	execute_node(node1); // connected node will be executed
+
+	printf("%d\n", * (int*) node2->out_pins[0]->data);
 	
 	// node->in2 = link_out1;
 	// execute_node(node);
 	// print_array(node->out1->data);
 }
 
-int main (int acount, char **args) {
+int main (int acount, char **args) 
+{
 	//test_arrays();
 	test_nodes();
 	
