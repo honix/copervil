@@ -1,11 +1,10 @@
 #include "utils.h"
 
-int sum (const int a, const int b) {
-	return a + b;
-}
-
-int mul (const int a, const int b) {
-	return a * b;
+// (int, int) -> int
+void sum (node_t *node) {
+	int a = * (int*) node->in1->data;
+	int b = * (int*) node->in2->data;
+	* (int*) node->out1->data = a + b;
 }
 
 /*
