@@ -7,10 +7,10 @@ node_t *make_node (void (*func) (node_t*))
 	node_t *node = malloc(sizeof(node_t));
 	node->func = func;
 
-	// for (int i = 0; i < PINS_NUM; i++) {
-	// 	node->in_pins[i] = NULL;
-	// 	node->out_pins[i] = NULL;
-	// }
+	for (int i = 0; i < PINS_NUM; i++) {
+		node->in_pins[i] = NULL;
+		node->out_pins[i] = NULL;
+	}
 	
 	return node;
 }
