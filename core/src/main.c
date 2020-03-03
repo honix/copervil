@@ -67,6 +67,6 @@ int main (int acount, char **args)
 	test_do_times();
 	
 	printf("=== end ===\n");
-	return 0;
+	return EXIT_SUCCESS;
 }
 
