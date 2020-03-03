@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-// (int, int) -> int
+// (int, int) -> (int)
 void sum (node_t *node) 
 {
 	int a = * (int*) node->in_pins[0]->data;
@@ -10,11 +10,21 @@ void sum (node_t *node)
 	* (int*) node->out_pins[0]->data = a + b;
 }
 
-
+// (int) -> ()
 void print_int (node_t *node)
 {
-	int a = * (int*) node->in_pins[0]->data;
-	printf("%d\n", a);
+	int number = * (int*) node->in_pins[0]->data;
+	printf("%d\n", number);
+}
+
+// () -> (trigger, int)
+void do_times (node_t *node)
+{
+	int count = * (int*) node->in_pins[0]->data;
+	for (int i = 0; i < count; i++) {
+		* (int*) node->out_pins[1]->data = i; 
+		execute_node(node->out_pins[0]->receiver);
+	}
 }
 
 /*
