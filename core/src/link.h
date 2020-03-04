@@ -1,12 +1,12 @@
 #pragma once
 
-struct node_t;
+struct node;
 
-struct link_t {
+struct link {
 	void *data;
-	struct node_t *sender;
-	struct node_t *receiver;
+	struct node *sender;
+	struct node *receiver;
 };
 
-struct link_t *make_link (void *data);
-// void set_data (link_t *this, const struct sized_array_t *data);
+struct link *make_link (void *data);
+// void set_data (link *this, const struct sized_array *data);

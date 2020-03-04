@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-struct link_t *make_link (void *data) 
+struct link *make_link (void *data) 
 {
-	struct link_t *link = malloc(sizeof(struct link_t));
+	struct link *link = malloc(sizeof(struct link));
 	link->data = data;
 	link->sender = NULL;
 	link->receiver = NULL;

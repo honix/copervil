@@ -6,24 +6,24 @@ enum node_flags {
 	CALL_NEXT = 0b00000001
 };
 
-struct link_t;
+struct link;
 
-struct node_t {
+struct node {
 	char *name;
-	void (*func) (struct node_t*);
-	struct link_t *in_pins[NODE_PINS_COUNT];
-	struct link_t *out_pins[NODE_PINS_COUNT];
+	void (*func) (struct node*);
+	struct link *in_pins[NODE_PINS_COUNT];
+	struct link *out_pins[NODE_PINS_COUNT];
 	unsigned char flags;
 };
 
-struct node_t *make_node (char *name, void (*func) (struct node_t*));
+struct node *make_node (char *name, void (*func) (struct node*));
 
-void direct_call_node (struct node_t *node);
+void direct_call_node (struct node *node);
 
 void connect_nodes (
-	struct link_t *link, 
-	struct node_t *sender,
+	struct link *link, 
+	struct node *sender,
 	unsigned char sender_pin,
-	struct node_t *receiver,
+	struct node *receiver,
 	unsigned char reciever_pin
 );

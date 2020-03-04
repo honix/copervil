@@ -7,7 +7,7 @@
 #include "node.h"
 
 // (int, int) -> (int)
-void sum (struct node_t *node) 
+void sum (struct node *node) 
 {
 	int a = * (int*) node->in_pins[0]->data;
 	int b = * (int*) node->in_pins[1]->data;
@@ -15,14 +15,14 @@ void sum (struct node_t *node)
 }
 
 // (int) -> ()
-void print_int (struct node_t *node)
+void print_int (struct node *node)
 {
 	int number = * (int*) node->in_pins[0]->data;
 	printf("%d\n", number);
 }
 
 // () -> (trigger, int)
-void do_times (struct node_t *node)
+void do_times (struct node *node)
 {
 	int count = * (int*) node->in_pins[0]->data;
 	for (int i = 0; i < count; i++) {
@@ -33,7 +33,7 @@ void do_times (struct node_t *node)
 }
 
 // () -> (int/trigger)
-void do_times_inderect (struct node_t *node)
+void do_times_inderect (struct node *node)
 {
 	int count = * (int*) node->in_pins[0]->data;
 	int do_count;

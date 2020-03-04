@@ -1,7 +1,7 @@
 #pragma once
 
-struct node_t;
+struct node;
 
-void inderect_call_node (struct node_t *node, long usec);
+void inderect_call_node (struct node *node, long usec);
 
 void run_loop ();

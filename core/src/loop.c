@@ -11,11 +11,11 @@
 struct list_cell *inderect_node_list = NULL;
 
 struct inderect_node {
-	struct node_t *node;
+	struct node *node;
 	long call_time;
 };
 
-struct inderect_node *make_inderect_node (struct node_t *node, long call_time)
+struct inderect_node *make_inderect_node (struct node *node, long call_time)
 {
 	struct inderect_node *i_node = malloc(sizeof(struct inderect_node));
 	i_node->node = node;
@@ -29,7 +29,7 @@ long current_time ()
 	return 0;
 }
 
-void inderect_call_node (struct node_t *node, long usec)
+void inderect_call_node (struct node *node, long usec)
 {
 	// TODO: apply usec arg
 	struct list_cell *cell = make_list_cell(
