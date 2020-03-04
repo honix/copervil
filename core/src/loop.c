@@ -9,8 +9,8 @@ struct node_t *next_inderect_node = NULL;
 
 void inderect_call_node (struct node_t *node, long usec)
 {
-    // TODO: apply usec arg
-    next_inderect_node = node;
+	// TODO: apply usec arg
+	next_inderect_node = node;
 }
 
 void run_loop ()

@@ -23,7 +23,7 @@ void direct_call_node (struct node_t *node);
 void connect_nodes (
 	struct link_t *link, 
 	struct node_t *sender,
-    unsigned char sender_pin,
+	unsigned char sender_pin,
 	struct node_t *receiver,
 	unsigned char reciever_pin
 );
