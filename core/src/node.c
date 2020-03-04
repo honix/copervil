@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-node_t *make_node (char *name, void (*func) (node_t*)) 
+#include "link.h"
+ 
+struct node_t *make_node (char *name, void (*func) (struct node_t*)) 
 {
-	node_t *node = malloc(sizeof(node_t));
+	struct node_t *node = malloc(sizeof(struct node_t));
 
 	node->name = name;
 	node->func = func;
@@ -21,24 +23,24 @@ node_t *make_node (char *name, void (*func) (node_t*))
 	return node;
 }
 
-void execute_node (node_t *node) 
+void direct_call_node (struct node_t *node) 
 {
-	printf("// execute_node %s\n", node->name);
+	printf("// direct_call_node %s\n", node->name);
 
 	node->func(node);
 
 	if (node->flags & CALL_NEXT && node->out_pins[0] != NULL) {
-		node_t *next_node = node->out_pins[0]->receiver;
+		struct node_t *next_node = node->out_pins[0]->receiver;
 		if (next_node != NULL)
-			execute_node(next_node);
+			direct_call_node(next_node);
 	}
 }
 
 void connect_nodes (
-	link_t *link, 
-	node_t *sender,
+	struct link_t *link, 
+	struct node_t *sender,
 	unsigned char sender_pin,
-	node_t *receiver,
+	struct node_t *receiver,
 	unsigned char reciever_pin
 ) 
 {

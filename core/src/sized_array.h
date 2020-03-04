@@ -1,29 +1,19 @@
 #pragma once
 
-typedef struct {
+struct sized_array_t {
 	int size;
 	int *data;
-} sized_array_t;
+};
 
-/*
+struct sized_array_t *allocate_array (int size);
 
-typedef struct {
-	int size;
-	type_t item_type;
-	void *data;
-} sized_array_t;
+struct sized_array_t *make_array (int size, int from, int inc);
 
-*/
-
-sized_array_t *allocate_array (int size);
-
-sized_array_t *make_array (int size, int from, int inc);
-
-void print_array (sized_array_t *array) ;
+void print_array (struct sized_array_t *array) ;
 
 void apply_arrays (
 	const int (*func) (int, int),
-	const sized_array_t *array_a, 
-	const sized_array_t *array_b,
-	sized_array_t *array_out
+	const struct sized_array_t *array_a, 
+	const struct sized_array_t *array_b,
+	struct sized_array_t *array_out
 );

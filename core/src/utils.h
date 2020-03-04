@@ -1,13 +1,13 @@
 #pragma once
 
-#include "node.h"
-
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
+struct node_t;
+
 // (int, int) -> (int)
-void sum (node_t *node);
+void sum (struct node_t *node);
 // (int) -> ()
-void print_int (node_t *node);
+void print_int (struct node_t *node);
 // () -> (trigger, int)
-void do_times (node_t *node);
+void do_times (struct node_t *node);
