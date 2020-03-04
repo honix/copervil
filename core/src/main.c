@@ -48,13 +48,15 @@ void test_nodes ()
 
 void test_do_times ()
 {
-	int h1 = 10;
-	struct node_t *node1 = make_node("node1", do_times);
-	connect_nodes(make_link(&h1), NULL, 0, node1, 0);
+	int *h1 = malloc(sizeof(int));
+	*h1 = 3;
+
+	// struct node_t *node1 = make_node("node1", do_times);
+	struct node_t *node1 = make_node("node1", do_times_inderect);
+	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
 	struct node_t *node2 = make_node("node2", print_int);
-	connect_nodes(make_link(NULL), node1, 0, node2, 15);
-	connect_nodes(make_link(malloc(sizeof(int))), node1, 1, node2, 0);
+	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
 
 	direct_call_node(node1);
 }

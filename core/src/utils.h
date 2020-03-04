@@ -11,3 +11,5 @@ void sum (struct node_t *node);
 void print_int (struct node_t *node);
 // () -> (trigger, int)
 void do_times (struct node_t *node);
+// () -> (int/trigger)
+void do_times_inderect (struct node_t *node);
