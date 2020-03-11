@@ -1,8 +1,8 @@
 #include <GLFW/glfw3.h>
 
-#include "../../nanovg/src/nanovg.h"
+#include "../nanovg/src/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
-#include "../../nanovg/src/nanovg_gl.h"
+#include "../nanovg/src/nanovg_gl.h"
 
 int main(void)
 {
