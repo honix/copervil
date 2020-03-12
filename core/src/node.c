@@ -5,11 +5,19 @@
 
 #include "link.h"
  
-struct node *make_node (char *name, void (*func) (struct node*)) 
+void init_nodes()
+{
+	nodes = malloc(sizeof(struct node*) * 16);
+	nodes_pointer = 0;
+}
+
+struct node *make_node (char *name, int x, int y, void (*func) (struct node*)) 
 {
 	struct node *node = malloc(sizeof(struct node));
 
 	node->name = name;
+	node->x = x;
+	node->y = y;
 	node->func = func;
 
 	for (int i = 0; i < NODE_PINS_COUNT; i++) {
@@ -19,6 +27,9 @@ struct node *make_node (char *name, void (*func) (struct node*))
 	
 	node->flags = 0;
 	//node->flags = 0 | CALL_NEXT;
+
+	nodes[nodes_pointer] = node;
+	nodes_pointer++;
 
 	return node;
 }

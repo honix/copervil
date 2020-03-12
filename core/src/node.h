@@ -10,13 +10,20 @@ struct link;
 
 struct node {
 	char *name;
+	int x;
+	int y;
 	void (*func) (struct node*);
 	struct link *in_pins[NODE_PINS_COUNT];
 	struct link *out_pins[NODE_PINS_COUNT];
 	unsigned char flags;
 };
 
-struct node *make_node (char *name, void (*func) (struct node*));
+struct node **nodes; // TODO: dynamic
+unsigned int nodes_pointer;
+
+void init_nodes();
+
+struct node *make_node (char *name, int x, int y, void (*func) (struct node*));
 
 void direct_call_node (struct node *node);
 
