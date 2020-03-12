@@ -1,4 +1,5 @@
 #include <GLFW/glfw3.h>
+#include <stdio.h>
 
 #include "../nanovg/src/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
@@ -7,7 +8,26 @@
 #include "../../core/src/node.h"
 #include "../../core/src/utils.h"
 
-void draw_node(struct NVGcontext *vg, struct node *node, int x, int y) // TODO: x and y will be in node
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    printf("key_callback: %s %d %d %d %d\n", 
+        glfwGetKeyName(key, scancode), 
+        key, scancode, action, mods);
+    switch (key)
+    {
+    case GLFW_KEY_Q:
+    case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
+
+void cursor_pos_callback(GLFWwindow *window, double x, double y)
+{
+    printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
+}
+
+// TODO: x and y will be in node
+void draw_node(struct NVGcontext *vg, struct node *node, int x, int y) 
 {
     const pin_size = 10;
     const pin_padding = 5;
@@ -25,14 +45,18 @@ void draw_node(struct NVGcontext *vg, struct node *node, int x, int y) // TODO: 
     for (int i = 0; i < 16; i++)
     {
         nvgBeginPath(vg);
-        nvgRect(vg, x + pin_padding + (pin_size + pin_padding) * i, y, pin_size, pin_size);
+        nvgRect(vg, 
+            x + pin_padding + (pin_size + pin_padding) * i, y, 
+            pin_size, pin_size);
         nvgFill(vg);
     }
 
     for (int i = 0; i < 16; i++)
     {
         nvgBeginPath(vg);
-        nvgRect(vg, x + pin_padding + (pin_size + pin_padding) * i, y + height - pin_size, pin_size, pin_size);
+        nvgRect(vg, 
+            x + pin_padding + (pin_size + pin_padding) * i, y + height - pin_size, 
+            pin_size, pin_size);
         nvgFill(vg);
     }
 
@@ -76,6 +100,9 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
 
     vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     if (vg == NULL)
