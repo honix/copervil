@@ -8,6 +8,9 @@
 #include "../../core/src/node.h"
 #include "../../core/src/utils.h"
 
+extern struct node **nodes;
+extern unsigned int nodes_pointer;
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     printf("key_callback: %s %d %d %d %d\n", 
@@ -27,13 +30,16 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
 }
 
 // TODO: x and y will be in node
-void draw_node(struct NVGcontext *vg, struct node *node, int x, int y) 
+void draw_node(struct NVGcontext *vg, struct node *node) 
 {
     const pin_size = 10;
     const pin_padding = 5;
 
     float width = pin_padding + (pin_size + pin_padding) * 16;
     const float height = 45;
+
+    int x = node->x;
+    int y = node->y;
 
     nvgBeginPath(vg);
     nvgRect(vg, x, y, width, height);
@@ -119,7 +125,8 @@ int main(void)
     // glDisable(GL_DEPTH_TEST);
     // end initialization
 
-    node = make_node("node_name", sum);
+    init_nodes();
+    make_node("node_name", 100, 100, sum);
 
     int frame = 0;
 
@@ -135,9 +142,9 @@ int main(void)
 
         nvgBeginFrame(vg, 512, 512, 1);
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < nodes_pointer; i++)
         {
-            draw_node(vg, node, 100 + 15 * i, 100 + 15 * i);
+            draw_node(vg, nodes[i]);
         }
 
         nvgEndFrame(vg);
