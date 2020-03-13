@@ -1,12 +1,12 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-#include "../nanovg/src/nanovg.h"
+#include "../../thirdparty/nanovg/src/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
-#include "../nanovg/src/nanovg_gl.h"
+#include "../../thirdparty/nanovg/src/nanovg_gl.h"
 
-#include "../../core/src/node.h"
-#include "../../core/src/utils.h"
+#include "../core/node.h"
+#include "../core/utils.h"
 
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
@@ -32,8 +32,8 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
 // TODO: x and y will be in node
 void draw_node(struct NVGcontext *vg, struct node *node) 
 {
-    const pin_size = 10;
-    const pin_padding = 5;
+    const int pin_size = 10;
+    const int pin_padding = 5;
 
     float width = pin_padding + (pin_size + pin_padding) * 16;
     const float height = 45;
@@ -117,7 +117,7 @@ int main(void)
         return -1;
     }
 
-    nvgCreateFont(vg, "sans", "../Roboto-Regular.ttf");
+    nvgCreateFont(vg, "sans", "./assets/Roboto-Regular.ttf");
 
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
