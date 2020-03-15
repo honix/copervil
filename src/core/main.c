@@ -65,13 +65,14 @@ int main (int acount, char **args)
 {
 	printf("=== start ===\n");
 
+	init_nodes();
 	//test_arrays();
 	//test_nodes();
 	test_do_times();
 	
 	printf("=== end ===\n");
 
-	run_loop();
+	loop_run();
 	
 	return EXIT_SUCCESS;
 }

@@ -44,7 +44,7 @@ void do_times_inderect (struct node *node)
 		do_count = * (int*) node->out_pins[0]->data;
 	}
 
-	// printf("count = %d, do_count = %d\n", count, do_count);
+	printf("count = %d, do_count = %d\n", count, do_count);
 	if (count > do_count) {
 		direct_call_node(node->out_pins[0]->receiver);
 		* (int*) node->out_pins[0]->data = do_count + 1;

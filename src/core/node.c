@@ -56,7 +56,9 @@ void connect_nodes (
 ) 
 {
 	link->sender = sender;
+	link->sender_pin = sender_pin;
 	link->receiver = receiver;
+	link->receiver_pin = reciever_pin;
 	if (sender != NULL)
 		sender->out_pins[sender_pin] = link;
 	if (receiver != NULL)

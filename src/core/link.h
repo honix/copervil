@@ -5,7 +5,9 @@ struct node;
 struct link {
 	void *data;
 	struct node *sender;
+	unsigned char sender_pin; 
 	struct node *receiver;
+	unsigned char receiver_pin;
 };
 
 struct link *make_link (void *data);

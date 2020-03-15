@@ -6,6 +6,8 @@
 #include "../../thirdparty/nanovg/src/nanovg_gl.h"
 
 #include "../core/node.h"
+#include "../core/link.h"
+#include "../core/loop.h"
 #include "../core/utils.h"
 
 extern struct node **nodes;
@@ -13,9 +15,9 @@ extern unsigned int nodes_pointer;
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    printf("key_callback: %s %d %d %d %d\n", 
-        glfwGetKeyName(key, scancode), 
-        key, scancode, action, mods);
+    // printf("key_callback: %s %d %d %d %d\n", 
+    //     glfwGetKeyName(key, scancode), 
+    //     key, scancode, action, mods);
     switch (key)
     {
     case GLFW_KEY_Q:
@@ -26,17 +28,43 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 void cursor_pos_callback(GLFWwindow *window, double x, double y)
 {
-    printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
+    // printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
+    nodes[1]->x = x; // TEST
+    nodes[1]->y = y;
 }
 
-// TODO: x and y will be in node
+
+const int pin_size = 10;
+const int pin_half_size = pin_size / 2;
+const int pin_padding = 5;
+
+const float width = pin_padding + (pin_size + pin_padding) * 16;
+const float height = 45;
+
+struct vector2i
+{
+    int x;
+    int y;
+};
+
+struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
+{
+    struct vector2i vec;
+    vec.x = node->x + pin_padding + (pin_size + pin_padding) * pin;
+    vec.y = node->y;
+    return vec;
+}
+
+struct vector2i calc_out_pin_pos(struct node *node, unsigned char pin)
+{
+    struct vector2i vec;
+    vec.x = node->x + pin_padding + (pin_size + pin_padding) * pin;
+    vec.y = node->y + height - pin_size;
+    return vec;
+}
+
 void draw_node(struct NVGcontext *vg, struct node *node) 
 {
-    const int pin_size = 10;
-    const int pin_padding = 5;
-
-    float width = pin_padding + (pin_size + pin_padding) * 16;
-    const float height = 45;
 
     int x = node->x;
     int y = node->y;
@@ -45,25 +73,48 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgRect(vg, x, y, width, height);
     nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
     nvgFill(vg);
+    nvgLineJoin(vg, NVG_BUTT);
+    nvgStrokeWidth(vg, 1);
+    nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
     nvgStroke(vg);
 
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 128));
     for (int i = 0; i < 16; i++)
     {
+        struct vector2i pin_pos = calc_in_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg, 
-            x + pin_padding + (pin_size + pin_padding) * i, y, 
+            pin_pos.x, pin_pos.y, 
             pin_size, pin_size);
         nvgFill(vg);
     }
 
     for (int i = 0; i < 16; i++)
     {
+        struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg, 
-            x + pin_padding + (pin_size + pin_padding) * i, y + height - pin_size, 
+            pin_pos.x, pin_pos.y, 
             pin_size, pin_size);
         nvgFill(vg);
+
+        struct link *out_link = node->out_pins[i];
+        if (out_link == NULL) continue;
+
+        struct vector2i other_pin_pos = calc_in_pin_pos(
+            out_link->receiver,
+            out_link->receiver_pin
+        );
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size);
+        nvgLineTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size * 2);
+        nvgLineTo(vg, other_pin_pos.x + pin_half_size, other_pin_pos.y - pin_size);
+        nvgLineTo(vg, other_pin_pos.x + pin_half_size, other_pin_pos.y);
+
+        nvgLineJoin(vg, NVG_ROUND);
+        nvgStrokeWidth(vg, 3);
+        nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 170));
+        nvgStroke(vg);
     }
 
     nvgFontSize(vg, 15.0f);
@@ -71,6 +122,25 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
     nvgText(vg, x + 10, y + height / 2, node->name, NULL);
+}
+
+void test_node_setup()
+{
+    init_nodes();
+
+	int *h1 = malloc(sizeof(int));
+	int *h2 = malloc(sizeof(int));
+	*h1 = 3;
+    *h2 = 0;
+
+	// struct node *node1 = make_node("node1", do_times);
+	struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
+	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+
+	struct node *node2 = make_node("print_int", 200, 200, print_int);
+	connect_nodes(make_link(h2), node1, 0, node2, 0);
+
+	direct_call_node(node1);
 }
 
 int main(void)
@@ -125,8 +195,8 @@ int main(void)
     // glDisable(GL_DEPTH_TEST);
     // end initialization
 
-    init_nodes();
-    make_node("node_name", 100, 100, sum);
+    test_node_setup();
+    loop_init();
 
     int frame = 0;
 
@@ -134,6 +204,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         frame++;
+        loop_step(); // TODO: maybe loop will push rendering frame too?
 
         /* Render here */
         glViewport(0, 0, 512, 512);
