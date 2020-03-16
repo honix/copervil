@@ -3,6 +3,7 @@ HEADERS_CORE = src/core/link.h \
 	src/core/loop.h \
 	src/core/node.h \
 	src/core/sized_array.h \
+	src/core/dl_loader.h 
 	#src/core/utils.h
 
 HEADERS_ALL = $(HEADERS_CORE)

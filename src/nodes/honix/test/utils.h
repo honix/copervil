@@ -13,3 +13,5 @@ void print_int (struct node *node);
 void do_times (struct node *node);
 // () -> (int/trigger)
 void do_times_inderect (struct node *node);
+
+void register_library (void (*reg) (char*, void (*) (struct node*)));

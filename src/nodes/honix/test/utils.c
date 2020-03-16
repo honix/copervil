@@ -52,6 +52,13 @@ void do_times_inderect (struct node *node)
 	}
 }
 
+void register_library (void (*reg) (char*, void (*) (struct node*)))
+{
+	reg("sum", sum);
+	reg("print_int", print_int);
+	reg("do_times", do_times);
+	reg("do_times_inderect", do_times_inderect);
+}
 /*
 
 // https://www.geeksforgeeks.org/function-pointer-in-c/
