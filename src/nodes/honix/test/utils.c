@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-#include "loop.h"
-#include "link.h"
-#include "node.h"
+#include "../../../core/loop.h"
+#include "../../../core/link.h"
+#include "../../../core/node.h"
 
 // (int, int) -> (int)
 void sum (struct node *node) 

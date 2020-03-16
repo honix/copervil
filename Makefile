@@ -3,7 +3,7 @@ HEADERS_CORE = src/core/link.h \
 	src/core/loop.h \
 	src/core/node.h \
 	src/core/sized_array.h \
-	src/core/utils.h
+	#src/core/utils.h
 
 HEADERS_ALL = $(HEADERS_CORE)
 
@@ -13,25 +13,29 @@ OBJECTS = $(addprefix obj/,$(objects_all_file))
 
 NANOVG_OBJ = thirdparty/nanovg/build/obj/Debug/nanovg/nanovg.o
 
-run: bin/editor
+run: bin/core
 	./$<
 
 
 bin:
 	mkdir bin
 
+bin/core: src/core/main.c $(OBJECTS) bin
+	gcc -Wall -g -rdynamic $< $(OBJECTS) -o $@ -lm -ldl
+
+# TODO: editor will plugin as shared library
 bin/editor: src/editor/main.c $(OBJECTS) $(NANOVG_OBJ) bin
-	gcc -g $< $(OBJECTS) $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw
+	gcc -Wall -g $< $(OBJECTS) $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw
 
 
 obj:
 	mkdir obj
 
 obj/%.o: src/core/%.c $(HEADERS_CORE) obj 
-	gcc -g -c $< -o $@
+	gcc -Wall -g -c $< -o $@
 
 obj/%.o: src/editor/%.c $(HEADERS_CORE) $(HEADERS_EDITOR) obj
-	gcc -g -c $< -o $@
+	gcc -Wall -g -c $< -o $@
 
 
 NANOVG_MAKE = thirdparty/nanovg/build/nanovg.make
@@ -43,3 +47,7 @@ NANOVG_PREMAKE = thirdparty/nanovg/premake4.lua
 
 $(NANOVG_MAKE): $(NANOVG_PREMAKE)
 	cd $(dir $(NANOVG_PREMAKE)) && premake4 gmake
+
+clean:
+	rm -rf bin
+	rm -rf obj
