@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#include "utils.h"
 
 struct sized_array *allocate_array(int size)
 {

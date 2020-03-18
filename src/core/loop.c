@@ -6,43 +6,45 @@
 
 #include "node.h"
 #include "list.h"
+#include "utils.h"
 
 // this list will be sorted by > call_time
-struct list_cell *inderect_node_list = NULL;
+struct list_cell *delayed_node_list = NULL;
 
-struct inderect_node
+struct delayed_node
 {
 	struct node *node;
-	long call_time;
+	double call_time;
 };
 
-struct inderect_node *make_inderect_node(struct node *node, long call_time)
+struct delayed_node *make_delayed_node(struct node *node, double call_time)
 {
-	struct inderect_node *i_node = malloc(sizeof(struct inderect_node));
+	struct delayed_node *i_node = malloc(sizeof(struct delayed_node));
 	i_node->node = node;
 	i_node->call_time = call_time;
 	return i_node;
 }
 
-// placeholder
-long current_time()
+double current_time()
 {
-	return 0;
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, &time);
+	return time.tv_sec + (double) time.tv_nsec / 1000000000;
 }
 
-void inderect_call_node(struct node *node, long usec)
+void delayed_call_node(struct node *node, double secs)
 {
-	// TODO: apply usec arg
 	struct list_cell *cell = make_list_cell(
-		make_inderect_node(node, current_time() + usec));
+		make_delayed_node(node, current_time() + secs));
 
-	if (inderect_node_list == NULL)
+	if (delayed_node_list == NULL)
 	{
-		inderect_node_list = cell;
+		delayed_node_list = cell;
 	}
 	else
 	{
-		insert_list_cell(inderect_node_list, cell);
+		// TODO: insert cell in order
+		insert_list_cell(delayed_node_list, cell);
 	}
 }
 
@@ -52,21 +54,39 @@ struct timespec time_rem;
 void loop_init()
 {
 	time_req.tv_sec = 0;
-	time_req.tv_nsec = 500000000;
+	time_req.tv_nsec = 0;
 }
 
 void loop_step()
 {
-	printf("// loop step\n");
+	printf("// loop step %f\n", current_time());
 
-	// TODO: smart sleep cycle to call nearest inderect nodes
+	double delay;
+
+	if (delayed_node_list != NULL)
+	{
+		struct delayed_node *i_node = delayed_node_list->data;
+		delay = current_time() - i_node->call_time;
+	}
+	else
+	{
+		delay = 1.0 / 30; 
+	}
+	
+	delay = MAX(0, delay);
+	printf("// sleep for %f\n", delay);
+
+	time_req.tv_sec = (long)delay;
+	time_req.tv_nsec = (delay - time_req.tv_sec) * 1000000000;
 	nanosleep(&time_req, &time_rem);
 
-	if (inderect_node_list != NULL)
+	if (delayed_node_list != NULL)
 	{
-		struct inderect_node *i_node = inderect_node_list->data;
+		struct delayed_node *i_node = delayed_node_list->data;
 		direct_call_node(i_node->node);
-		inderect_node_list = inderect_node_list->next;
+		// TODO: drop and free first cell
+		// drop first cell
+		delayed_node_list = delayed_node_list->next;
 	}
 }
 

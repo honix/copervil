@@ -5,6 +5,7 @@
 #include "core/link.h"
 #include "core/node.h"
 #include "core/loop.h"
+#include "core/utils.h"
 
 // (int, int) -> (int)
 void sum(struct node *node)
@@ -53,7 +54,7 @@ void do_times_inderect(struct node *node)
 	{
 		direct_call_node(node->out_pins[0]->receiver);
 		*(int *)node->out_pins[0]->data = do_count + 1;
-		inderect_call_node(node, 0); // self-loop (in same frame!)
+		delayed_call_node(node, 1.0); // self-loop (in next frame!)
 	}
 }
 

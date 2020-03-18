@@ -2,5 +2,5 @@
 
 struct node;
 
-void inderect_call_node(struct node *node, long usec);
+void delayed_call_node(struct node *node, double secs);
 void loop_run();
