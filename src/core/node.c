@@ -4,14 +4,14 @@
 #include <stdio.h>
 
 #include "link.h"
- 
+
 void init_nodes()
 {
-	nodes = malloc(sizeof(struct node*) * 16);
+	nodes = malloc(sizeof(struct node *) * 16);
 	nodes_pointer = 0;
 }
 
-struct node *make_node (char *name, int x, int y, void (*func) (struct node*)) 
+struct node *make_node(char *name, int x, int y, void (*func)(struct node *))
 {
 	struct node *node = malloc(sizeof(struct node));
 
@@ -20,11 +20,12 @@ struct node *make_node (char *name, int x, int y, void (*func) (struct node*))
 	node->y = y;
 	node->func = func;
 
-	for (int i = 0; i < NODE_PINS_COUNT; i++) {
+	for (int i = 0; i < NODE_PINS_COUNT; i++)
+	{
 		node->in_pins[i] = NULL;
 		node->out_pins[i] = NULL;
 	}
-	
+
 	node->flags = 0;
 	//node->flags = 0 | CALL_NEXT;
 
@@ -34,26 +35,26 @@ struct node *make_node (char *name, int x, int y, void (*func) (struct node*))
 	return node;
 }
 
-void direct_call_node (struct node *node) 
+void direct_call_node(struct node *node)
 {
 	printf("// direct_call_node %s\n", node->name);
 
 	node->func(node);
 
-	if (node->flags & CALL_NEXT && node->out_pins[0] != NULL) {
+	if (node->flags & CALL_NEXT && node->out_pins[0] != NULL)
+	{
 		struct node *next_node = node->out_pins[0]->receiver;
 		if (next_node != NULL)
 			direct_call_node(next_node);
 	}
 }
 
-void connect_nodes (
-	struct link *link, 
+void connect_nodes(
+	struct link *link,
 	struct node *sender,
 	unsigned char sender_pin,
 	struct node *receiver,
-	unsigned char reciever_pin
-) 
+	unsigned char reciever_pin)
 {
 	link->sender = sender;
 	link->sender_pin = sender_pin;

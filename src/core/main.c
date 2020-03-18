@@ -10,26 +10,26 @@
 // #include "utils.h"
 
 // void test_arrays () {
-// 	struct sized_array 
+// 	struct sized_array
 // 		*array_a = make_array(10, 0 , 1),
 // 		*array_b = make_array(2, 0, 1),
 // 		*array_c = allocate_array(MAX(array_a->size, array_b->size));
-		
+
 // 	printf("array a\n");
 // 	print_array(array_a);
 // 	printf("array b\n");
 // 	print_array(array_b);
-	
+
 // 	printf("sum\n");
 // 	apply_arrays(sum, array_a, array_b, array_c);
 // 	print_array(array_c);
-	
+
 // 	// printf("mul\n");
 // 	// apply_arrays(mul, array_a, array_b, array_c);
 // 	// print_array(array_c);
 // }
 
-// void test_nodes () 
+// void test_nodes ()
 // {
 // 	int h1 = 100;
 // 	int h2 = 25;
@@ -48,7 +48,7 @@
 // 	direct_call_node(node1); // connected node will be executed
 // }
 
-void test_do_times ()
+void test_do_times()
 {
 	// void *handle;
 	// handle = dlopen("./src/nodes/honix/test/utils.so", RTLD_LAZY);
@@ -72,7 +72,7 @@ void test_do_times ()
 	direct_call_node(node1);
 }
 
-int main (int acount, char **args) 
+int main(int acount, char **args)
 {
 	printf("=== start ===\n");
 
@@ -81,11 +81,10 @@ int main (int acount, char **args)
 	//test_arrays();
 	//test_nodes();
 	test_do_times();
-	
+
 	printf("=== end ===\n");
 
 	loop_run();
-	
+
 	return EXIT_SUCCESS;
 }
-

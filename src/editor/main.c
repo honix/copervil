@@ -13,10 +13,12 @@
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+void key_callback(
+    GLFWwindow *window, int key,
+    int scancode, int action, int mods)
 {
-    // printf("key_callback: %s %d %d %d %d\n", 
-    //     glfwGetKeyName(key, scancode), 
+    // printf("key_callback: %s %d %d %d %d\n",
+    //     glfwGetKeyName(key, scancode),
     //     key, scancode, action, mods);
     switch (key)
     {
@@ -32,7 +34,6 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
     nodes[1]->x = x; // TEST
     nodes[1]->y = y;
 }
-
 
 const int pin_size = 10;
 const int pin_half_size = pin_size / 2;
@@ -63,7 +64,7 @@ struct vector2i calc_out_pin_pos(struct node *node, unsigned char pin)
     return vec;
 }
 
-void draw_node(struct NVGcontext *vg, struct node *node) 
+void draw_node(struct NVGcontext *vg, struct node *node)
 {
 
     int x = node->x;
@@ -83,9 +84,9 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     {
         struct vector2i pin_pos = calc_in_pin_pos(node, i);
         nvgBeginPath(vg);
-        nvgRect(vg, 
-            pin_pos.x, pin_pos.y, 
-            pin_size, pin_size);
+        nvgRect(vg,
+                pin_pos.x, pin_pos.y,
+                pin_size, pin_size);
         nvgFill(vg);
     }
 
@@ -93,18 +94,18 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     {
         struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
-        nvgRect(vg, 
-            pin_pos.x, pin_pos.y, 
-            pin_size, pin_size);
+        nvgRect(vg,
+                pin_pos.x, pin_pos.y,
+                pin_size, pin_size);
         nvgFill(vg);
 
         struct link *out_link = node->out_pins[i];
-        if (out_link == NULL) continue;
+        if (out_link == NULL)
+            continue;
 
         struct vector2i other_pin_pos = calc_in_pin_pos(
             out_link->receiver,
-            out_link->receiver_pin
-        );
+            out_link->receiver_pin);
         nvgBeginPath(vg);
         nvgMoveTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size);
         nvgLineTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size * 2);
@@ -128,19 +129,19 @@ void test_node_setup()
 {
     init_nodes();
 
-	int *h1 = malloc(sizeof(int));
-	int *h2 = malloc(sizeof(int));
-	*h1 = 3;
+    int *h1 = malloc(sizeof(int));
+    int *h2 = malloc(sizeof(int));
+    *h1 = 3;
     *h2 = 0;
 
-	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
-	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+    // struct node *node1 = make_node("node1", do_times);
+    struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
+    connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
-	struct node *node2 = make_node("print_int", 200, 200, print_int);
-	connect_nodes(make_link(h2), node1, 0, node2, 0);
+    struct node *node2 = make_node("print_int", 200, 200, print_int);
+    connect_nodes(make_link(h2), node1, 0, node2, 0);
 
-	direct_call_node(node1);
+    direct_call_node(node1);
 }
 
 int main(void)
