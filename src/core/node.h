@@ -25,7 +25,7 @@ unsigned int nodes_pointer;
 
 void init_nodes();
 struct node *make_node(char *name, int x, int y, void (*func)(struct node *));
-extern void direct_call_node(struct node *node);
+void direct_call_node(struct node *node);
 void connect_nodes(
 	struct link *link,
 	struct node *sender,

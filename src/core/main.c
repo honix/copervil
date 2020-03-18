@@ -63,10 +63,27 @@ void test_do_times()
 	*h1 = 3;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node("node1", 0, 0, get_function("do_times_inderect"));
+	struct node *node1 = make_node("do_times_inderect", 300, 300, get_function("do_times_inderect"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
-	struct node *node2 = make_node("node2", 0, 0, get_function("print_int"));
+	struct node *node2 = make_node("print_int", 400, 400, get_function("print_int"));
+	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
+
+	direct_call_node(node1);
+}
+
+void test_patch_editor()
+{
+	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
+
+	int *h1 = malloc(sizeof(int));
+	*h1 = 100;
+
+	// struct node *node1 = make_node("node1", do_times);
+	struct node *node1 = make_node("do_times_inderect", 100, 100, get_function("do_times_inderect"));
+	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+
+	struct node *node2 = make_node("patch_editor", 200, 200, get_function("patch_editor"));
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
 
 	direct_call_node(node1);
@@ -81,6 +98,7 @@ int main(int acount, char **args)
 	//test_arrays();
 	//test_nodes();
 	test_do_times();
+	test_patch_editor();
 
 	printf("=== end ===\n");
 

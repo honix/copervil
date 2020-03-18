@@ -1,17 +1,33 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-#include "../../thirdparty/nanovg/src/nanovg.h"
+#include "nanovg/src/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
-#include "../../thirdparty/nanovg/src/nanovg_gl.h"
+#include "nanovg/src/nanovg_gl.h"
 
-#include "../core/node.h"
-#include "../core/link.h"
-#include "../core/loop.h"
-#include "../core/utils.h"
+#include "core/node.h"
+#include "core/link.h"
+#include "core/loop.h"
+// #include "../core/utils.h"
 
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
+
+const int pin_size = 10;
+const int pin_half_size = pin_size / 2;
+const int pin_padding = 5;
+
+const float width = pin_padding + (pin_size + pin_padding) * 16;
+const float height = 45;
+
+GLFWwindow *window;
+struct NVGcontext *vg;
+
+struct vector2i
+{
+    int x;
+    int y;
+};
 
 void key_callback(
     GLFWwindow *window, int key,
@@ -34,19 +50,6 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
     nodes[1]->x = x; // TEST
     nodes[1]->y = y;
 }
-
-const int pin_size = 10;
-const int pin_half_size = pin_size / 2;
-const int pin_padding = 5;
-
-const float width = pin_padding + (pin_size + pin_padding) * 16;
-const float height = 45;
-
-struct vector2i
-{
-    int x;
-    int y;
-};
 
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
 {
@@ -125,31 +128,29 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgText(vg, x + 10, y + height / 2, node->name, NULL);
 }
 
-void test_node_setup()
+// void test_node_setup()
+// {
+//     init_nodes();
+
+//     int *h1 = malloc(sizeof(int));
+//     int *h2 = malloc(sizeof(int));
+//     *h1 = 3;
+//     *h2 = 0;
+
+//     // struct node *node1 = make_node("node1", do_times);
+//     struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
+//     connect_nodes(make_link(h1), NULL, 0, node1, 0);
+
+//     struct node *node2 = make_node("print_int", 200, 200, print_int);
+//     connect_nodes(make_link(h2), node1, 0, node2, 0);
+
+//     direct_call_node(node1);
+// }
+
+char initialized = 0; // TODO: make node constructors / destructors
+void init()
 {
-    init_nodes();
-
-    int *h1 = malloc(sizeof(int));
-    int *h2 = malloc(sizeof(int));
-    *h1 = 3;
-    *h2 = 0;
-
-    // struct node *node1 = make_node("node1", do_times);
-    struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
-    connect_nodes(make_link(h1), NULL, 0, node1, 0);
-
-    struct node *node2 = make_node("print_int", 200, 200, print_int);
-    connect_nodes(make_link(h2), node1, 0, node2, 0);
-
-    direct_call_node(node1);
-}
-
-int main(void)
-{
-    GLFWwindow *window;
-    struct NVGcontext *vg;
-
-    struct node *node;
+    initialized = 1;
 
     /* Initialize the library */
     if (!glfwInit())
@@ -195,39 +196,50 @@ int main(void)
     // glEnable(GL_CULL_FACE);
     // glDisable(GL_DEPTH_TEST);
     // end initialization
+}
 
-    test_node_setup();
-    loop_init();
+void deinit()
+{
+    glfwTerminate();
+}
 
-    int frame = 0;
+void patch_editor(struct node *node)
+{
+    if (!initialized)
+        init();
+    // test_node_setup();
+    // loop_init();
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
+    // while (!glfwWindowShouldClose(window))
+    // {
+    // loop_step(); // TODO: maybe loop will push rendering frame too?
+
+    /* Render here */
+    glViewport(0, 0, 512, 512);
+    glClearColor(0.5f, 0.5f, 0.5f, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    nvgBeginFrame(vg, 512, 512, 1);
+
+    for (int i = 0; i < nodes_pointer; i++)
     {
-        frame++;
-        loop_step(); // TODO: maybe loop will push rendering frame too?
-
-        /* Render here */
-        glViewport(0, 0, 512, 512);
-        glClearColor(0.5f, 0.5f, 0.5f, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        nvgBeginFrame(vg, 512, 512, 1);
-
-        for (int i = 0; i < nodes_pointer; i++)
-        {
-            draw_node(vg, nodes[i]);
-        }
-
-        nvgEndFrame(vg);
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
+        draw_node(vg, nodes[i]);
     }
 
-    glfwTerminate();
-    return 0;
+    nvgEndFrame(vg);
+
+    /* Swap front and back buffers */
+    glfwSwapBuffers(window);
+
+    /* Poll for and process events */
+    glfwPollEvents();
+    // }
+
+    if (glfwWindowShouldClose(window)) glfwTerminate(); // TEMP
+}
+
+void register_library(void (*reg)(char *, void (*)(struct node *)))
+{
+    reg("patch_editor", patch_editor);
 }

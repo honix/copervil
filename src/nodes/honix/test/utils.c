@@ -53,7 +53,7 @@ void do_times_inderect(struct node *node)
 	{
 		direct_call_node(node->out_pins[0]->receiver);
 		*(int *)node->out_pins[0]->data = do_count + 1;
-		inderect_call_node(node, 0); // self-loop
+		inderect_call_node(node, 0); // self-loop (in same frame!)
 	}
 }
 
