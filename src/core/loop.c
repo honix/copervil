@@ -9,7 +9,7 @@
 #include "utils.h"
 
 // this list will be always sorted by > call_time
-struct list_cell *delayed_node_list = NULL;
+struct list delayed_node_list;
 
 struct delayed_node
 {
@@ -19,10 +19,10 @@ struct delayed_node
 
 struct delayed_node *make_delayed_node(struct node *node, double call_time)
 {
-	struct delayed_node *i_node = malloc(sizeof(struct delayed_node));
-	i_node->node = node;
-	i_node->call_time = call_time;
-	return i_node;
+	struct delayed_node *delayed_node = malloc(sizeof(struct delayed_node));
+	delayed_node->node = node;
+	delayed_node->call_time = call_time;
+	return delayed_node;
 }
 
 double current_time_secs()
@@ -34,19 +34,27 @@ double current_time_secs()
 	return time.tv_sec + (double) time.tv_nsec / 1000000000;
 }
 
+int ord(struct list_cell *a, struct list_cell *b)
+{
+	struct delayed_node *delayed_node_a = a->data;
+	struct delayed_node *delayed_node_b = b->data;
+	return delayed_node_a->call_time < delayed_node_b->call_time ? 1 : 0;
+}
+
 void delayed_call_node(struct node *node, double secs)
 {
 	struct list_cell *cell = make_list_cell(
 		make_delayed_node(node, current_time_secs() + secs));
 
-	if (delayed_node_list == NULL)
-	{
-		delayed_node_list = cell;
-	}
-	else
+	// if (delayed_node_list.first_cell == NULL)
+	// {
+	// 	delayed_node_list = cell;
+	// }
+	// else
 	{
 		// TODO: insert cell in order (see delayed_node_list comment)
-		insert_list_cell(delayed_node_list, cell);
+		// insert_list_cell(delayed_node_list, cell);
+		insert_list_cell_ordered(&delayed_node_list, cell, ord);
 	}
 }
 
@@ -65,10 +73,10 @@ void loop_step()
 
 	double delay;
 
-	if (delayed_node_list != NULL)
+	if (delayed_node_list.first_cell != NULL)
 	{
-		struct delayed_node *i_node = delayed_node_list->data;
-		delay = i_node->call_time - current_time_secs();
+		struct delayed_node *delayed_node = delayed_node_list.first_cell->data;
+		delay = delayed_node->call_time - current_time_secs();
 	}
 	else
 	{
@@ -84,13 +92,13 @@ void loop_step()
 		nanosleep(&time_req, &time_rem);
 	}
 
-	if (delayed_node_list != NULL)
+	if (delayed_node_list.first_cell != NULL)
 	{
-		struct delayed_node *i_node = delayed_node_list->data;
-		direct_call_node(i_node->node);
+		struct delayed_node *delayed_node = delayed_node_list.first_cell->data;
+		direct_call_node(delayed_node->node);
 		// TODO: drop and free first cell
 		// drop first cell
-		delayed_node_list = delayed_node_list->next;
+		delayed_node_list.first_cell = delayed_node_list.first_cell->next;
 	}
 }
 
