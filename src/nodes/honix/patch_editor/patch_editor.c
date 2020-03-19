@@ -18,7 +18,7 @@ const int pin_half_size = pin_size / 2;
 const int pin_padding = 5;
 
 const float width = pin_padding + (pin_size + pin_padding) * 16;
-const float height = 45;
+const float height = 30;
 
 GLFWwindow *window;
 struct NVGcontext *vg;
@@ -89,7 +89,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgBeginPath(vg);
         nvgRect(vg,
                 pin_pos.x, pin_pos.y,
-                pin_size, pin_size);
+                pin_size, pin_half_size);
         nvgFill(vg);
 
         struct link *in_link = node->in_pins[i];
@@ -108,8 +108,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg,
-                pin_pos.x, pin_pos.y,
-                pin_size, pin_size);
+                pin_pos.x, pin_pos.y + pin_half_size,
+                pin_size, pin_half_size);
         nvgFill(vg);
 
         struct link *out_link = node->out_pins[i];

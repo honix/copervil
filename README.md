@@ -15,5 +15,4 @@ make
 ```
 
 ### todo (topmost is priority)
-- place thirdparty things (nanovg) into global folder?
 - automatize nodes building from global main makefile
