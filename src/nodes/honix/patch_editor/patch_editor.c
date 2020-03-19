@@ -91,6 +91,16 @@ void draw_node(struct NVGcontext *vg, struct node *node)
                 pin_pos.x, pin_pos.y,
                 pin_size, pin_size);
         nvgFill(vg);
+
+        struct link *in_link = node->in_pins[i];
+        if (in_link == NULL)
+            continue;
+
+        nvgBeginPath(vg);
+        nvgRect(vg,
+            pin_pos.x, pin_pos.y - pin_half_size,
+            pin_size, pin_half_size);
+        nvgFill(vg);
     }
 
     for (int i = 0; i < 16; i++)
