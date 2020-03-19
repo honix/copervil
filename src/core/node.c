@@ -37,7 +37,7 @@ struct node *make_node(char *name, int x, int y, void (*func)(struct node *))
 
 void direct_call_node(struct node *node)
 {
-	printf("// direct_call_node %s\n", node->name);
+	// printf("// direct_call_node %s\n", node->name);
 
 	node->func(node);
 

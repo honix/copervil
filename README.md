@@ -14,6 +14,7 @@ cd src/nodes/honix/patch_editor
 make
 ```
 
-### todo
+### todo (topmost is priority)
+- make delayed_node inserts using sort
 - place thirdparty things (nanovg) into global folder?
 - automatize nodes building from global main makefile

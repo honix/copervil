@@ -8,7 +8,7 @@
 #include "list.h"
 #include "utils.h"
 
-// this list will be sorted by > call_time
+// this list will be always sorted by > call_time
 struct list_cell *delayed_node_list = NULL;
 
 struct delayed_node
@@ -25,8 +25,10 @@ struct delayed_node *make_delayed_node(struct node *node, double call_time)
 	return i_node;
 }
 
-double current_time()
+double current_time_secs()
 {
+	// TODO: this seems to work only on linux family
+	// need test this function on windows
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
 	return time.tv_sec + (double) time.tv_nsec / 1000000000;
@@ -35,7 +37,7 @@ double current_time()
 void delayed_call_node(struct node *node, double secs)
 {
 	struct list_cell *cell = make_list_cell(
-		make_delayed_node(node, current_time() + secs));
+		make_delayed_node(node, current_time_secs() + secs));
 
 	if (delayed_node_list == NULL)
 	{
@@ -43,7 +45,7 @@ void delayed_call_node(struct node *node, double secs)
 	}
 	else
 	{
-		// TODO: insert cell in order
+		// TODO: insert cell in order (see delayed_node_list comment)
 		insert_list_cell(delayed_node_list, cell);
 	}
 }
@@ -59,14 +61,14 @@ void loop_init()
 
 void loop_step()
 {
-	printf("// loop step %f\n", current_time());
+	// printf("// loop step %f\n", current_time_secs());
 
 	double delay;
 
 	if (delayed_node_list != NULL)
 	{
 		struct delayed_node *i_node = delayed_node_list->data;
-		delay = current_time() - i_node->call_time;
+		delay = i_node->call_time - current_time_secs();
 	}
 	else
 	{
@@ -74,11 +76,13 @@ void loop_step()
 	}
 	
 	delay = MAX(0, delay);
-	printf("// sleep for %f\n", delay);
+	// printf("// sleep for %f\n", delay);
 
-	time_req.tv_sec = (long)delay;
-	time_req.tv_nsec = (delay - time_req.tv_sec) * 1000000000;
-	nanosleep(&time_req, &time_rem);
+	if (delay != 0) {
+		time_req.tv_sec = (long)delay;
+		time_req.tv_nsec = (delay - time_req.tv_sec) * 1000000000;
+		nanosleep(&time_req, &time_rem);
+	}
 
 	if (delayed_node_list != NULL)
 	{

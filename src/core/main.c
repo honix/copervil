@@ -62,9 +62,13 @@ void test_do_times()
 	int *h1 = malloc(sizeof(int));
 	*h1 = 3;
 
+	double *h2 = malloc(sizeof(double));
+	*h2 = 1.0;
+
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node("do_times_inderect", 300, 300, get_function("do_times_inderect"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+	connect_nodes(make_link(h2), NULL, 0, node1, 1);
 
 	struct node *node2 = make_node("print_int", 400, 400, get_function("print_int"));
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
@@ -76,15 +80,15 @@ void test_patch_editor()
 {
 	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
 
-	int *h1 = malloc(sizeof(int));
-	*h1 = 100;
+	double *h1 = malloc(sizeof(double));
+	*h1 = 1.0 / 60;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node("do_times_inderect", 100, 100, get_function("do_times_inderect"));
+	struct node *node1 = make_node("loop", 100, 100, get_function("loop"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
 	struct node *node2 = make_node("patch_editor", 200, 200, get_function("patch_editor"));
-	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
+	connect_nodes(make_link(NULL), node1, 0, node2, 0);
 
 	direct_call_node(node1);
 }
@@ -100,9 +104,9 @@ int main(int acount, char **args)
 	test_do_times();
 	test_patch_editor();
 
-	printf("=== end ===\n");
-
 	loop_run();
 
+	printf("=== end ===\n");
+	
 	return EXIT_SUCCESS;
 }

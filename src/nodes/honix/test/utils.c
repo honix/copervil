@@ -22,7 +22,7 @@ void print_int(struct node *node)
 	printf("%d\n", number);
 }
 
-// () -> (trigger, int)
+// (int) -> (trigger, int)
 void do_times(struct node *node)
 {
 	int count = *(int *)node->in_pins[0]->data;
@@ -34,12 +34,14 @@ void do_times(struct node *node)
 	}
 }
 
-// () -> (int/trigger)
+// (int, double) -> (int/trigger)
 void do_times_inderect(struct node *node)
 {
 	int count = *(int *)node->in_pins[0]->data;
+	double time_step = *(double *)node->in_pins[1]->data;
 	int do_count;
 
+	// use out pin as cycle count state
 	if (node->out_pins[0]->data == NULL)
 	{
 		do_count = 0;
@@ -54,8 +56,17 @@ void do_times_inderect(struct node *node)
 	{
 		direct_call_node(node->out_pins[0]->receiver);
 		*(int *)node->out_pins[0]->data = do_count + 1;
-		delayed_call_node(node, 1.0); // self-loop (in next frame!)
+		delayed_call_node(node, time_step);
 	}
+}
+
+// (double) -> (trigger)
+void loop(struct node *node)
+{
+	double time_step = *(double *)node->in_pins[0]->data;
+
+	direct_call_node(node->out_pins[0]->receiver);
+	delayed_call_node(node, time_step);
 }
 
 void register_library(void (*reg)(char *, void (*)(struct node *)))
@@ -64,6 +75,7 @@ void register_library(void (*reg)(char *, void (*)(struct node *)))
 	reg("print_int", print_int);
 	reg("do_times", do_times);
 	reg("do_times_inderect", do_times_inderect);
+	reg("loop", loop);
 }
 /*
 
