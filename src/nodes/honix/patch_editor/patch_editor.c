@@ -222,7 +222,11 @@ void patch_editor(struct node *node)
     glfwPollEvents();
     // }
 
-    if (glfwWindowShouldClose(window)) glfwTerminate(); // TEMP
+    if (glfwWindowShouldClose(window))
+    {
+        glfwTerminate(); // TEMP
+        exit(0);
+    }
 }
 
 void register_library(void (*reg)(char *, void (*)(struct node *)))

@@ -46,16 +46,7 @@ void delayed_call_node(struct node *node, double secs)
 	struct list_cell *cell = make_list_cell(
 		make_delayed_node(node, current_time_secs() + secs));
 
-	// if (delayed_node_list.first_cell == NULL)
-	// {
-	// 	delayed_node_list = cell;
-	// }
-	// else
-	{
-		// TODO: insert cell in order (see delayed_node_list comment)
-		// insert_list_cell(delayed_node_list, cell);
-		insert_list_cell_ordered(&delayed_node_list, cell, ord);
-	}
+	insert_list_cell_ordered(&delayed_node_list, cell, ord);
 }
 
 struct timespec time_req;
