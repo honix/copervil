@@ -17,4 +17,5 @@ make
 ### todo (topmost is priority)
 - split nanovg, glfw context creation into nodes, so user can make another window
 - better, systematic error logging
+- patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - thirdparty libraries auto-wrap? (use header files to generate node functions)
