@@ -13,7 +13,7 @@ objects_all_file = $(headers_all_file:.h=.o)
 OBJECTS = $(addprefix obj/,$(objects_all_file))
 
 
-run: bin/core
+run: bin/core nodes
 	./$<
 
 
@@ -23,9 +23,9 @@ bin:
 bin/core: src/core/main.c $(OBJECTS) bin
 	gcc -Wall -g -rdynamic $< $(OBJECTS) -o $@ -lm -ldl
 
-# # TODO (done): editor will plugin as shared library
-# bin/editor: src/editor/main.c $(OBJECTS) $(NANOVG_OBJ) bin
-# 	gcc -Wall -g $< $(OBJECTS) $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw
+
+nodes:
+	cd src/nodes && for m in `find | grep Makefile`; do make -C `dirname $$m`; done
 
 
 obj:

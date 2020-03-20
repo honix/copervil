@@ -78,11 +78,10 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
     nvgFill(vg);
     nvgLineJoin(vg, NVG_BUTT);
-    nvgStrokeWidth(vg, 1);
+    nvgStrokeWidth(vg, 2);
     nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
     nvgStroke(vg);
 
-    nvgFillColor(vg, nvgRGBA(0, 0, 0, 128));
     for (int i = 0; i < 16; i++)
     {
         struct vector2i pin_pos = calc_in_pin_pos(node, i);
@@ -90,6 +89,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgRect(vg,
                 pin_pos.x, pin_pos.y,
                 pin_size, pin_half_size);
+        nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
         nvgFill(vg);
 
         struct link *in_link = node->in_pins[i];
@@ -100,6 +100,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgRect(vg,
             pin_pos.x, pin_pos.y - pin_half_size,
             pin_size, pin_half_size);
+        nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
         nvgFill(vg);
     }
 
@@ -110,6 +111,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgRect(vg,
                 pin_pos.x, pin_pos.y + pin_half_size,
                 pin_size, pin_half_size);
+        nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
         nvgFill(vg);
 
         struct link *out_link = node->out_pins[i];
@@ -127,7 +129,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
         nvgLineJoin(vg, NVG_ROUND);
         nvgStrokeWidth(vg, 3);
-        nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 170));
+        nvgStrokeColor(vg, nvgHSLA(0, 0, 128, 170));
         nvgStroke(vg);
     }
 
@@ -137,25 +139,6 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
     nvgText(vg, x + 10, y + height / 2, node->name, NULL);
 }
-
-// void test_node_setup()
-// {
-//     init_nodes();
-
-//     int *h1 = malloc(sizeof(int));
-//     int *h2 = malloc(sizeof(int));
-//     *h1 = 3;
-//     *h2 = 0;
-
-//     // struct node *node1 = make_node("node1", do_times);
-//     struct node *node1 = make_node("do_times_inderect", 100, 100, do_times_inderect);
-//     connect_nodes(make_link(h1), NULL, 0, node1, 0);
-
-//     struct node *node2 = make_node("print_int", 200, 200, print_int);
-//     connect_nodes(make_link(h2), node1, 0, node2, 0);
-
-//     direct_call_node(node1);
-// }
 
 char initialized = 0; // TODO: make node constructors / destructors
 void init()
@@ -217,17 +200,10 @@ void patch_editor(struct node *node)
 {
     if (!initialized)
         init();
-    // test_node_setup();
-    // loop_init();
-
-    /* Loop until the user closes the window */
-    // while (!glfwWindowShouldClose(window))
-    // {
-    // loop_step(); // TODO: maybe loop will push rendering frame too?
 
     /* Render here */
     glViewport(0, 0, 512, 512);
-    glClearColor(0.5f, 0.5f, 0.5f, 1);
+    glClearColor(0.25f, 0.25f, 0.25f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     nvgBeginFrame(vg, 512, 512, 1);
