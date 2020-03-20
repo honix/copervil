@@ -15,4 +15,5 @@ make
 ```
 
 ### todo (topmost is priority)
-- automatize nodes building from global main makefile
+- split nanovg, glfw context creation into nodes, so user can make another window
+- thirdparty libraries auto-wrap? (use header files to generate node functions)
