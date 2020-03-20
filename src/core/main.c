@@ -93,6 +93,16 @@ void test_patch_editor()
 	direct_call_node(node1);
 }
 
+void test_window()
+{
+	load_library("./src/nodes/honix/window/window.so");
+
+	struct node *node1 = make_node("make_window", 10, 10, get_function("make_window"));
+	connect_nodes(make_link(malloc(1)), node1, 0, NULL, 0);
+	
+	delayed_call_node(node1, 3);
+}
+
 int main(int acount, char **args)
 {
 	printf("=== start ===\n");
@@ -103,10 +113,11 @@ int main(int acount, char **args)
 	//test_nodes();
 	test_do_times();
 	test_patch_editor();
+	test_window();
 
 	loop_run();
 
 	printf("=== end ===\n");
-	
+
 	return EXIT_SUCCESS;
 }

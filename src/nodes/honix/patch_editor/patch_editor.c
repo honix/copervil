@@ -118,6 +118,9 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         if (out_link == NULL)
             continue;
 
+        if (out_link->receiver == NULL) 
+            continue;
+            
         struct vector2i other_pin_pos = calc_in_pin_pos(
             out_link->receiver,
             out_link->receiver_pin);
@@ -201,6 +204,8 @@ void patch_editor(struct node *node)
     if (!initialized)
         init();
 
+    glfwMakeContextCurrent(window);
+
     /* Render here */
     glViewport(0, 0, 512, 512);
     glClearColor(0.25f, 0.25f, 0.25f, 1);
@@ -220,7 +225,6 @@ void patch_editor(struct node *node)
 
     /* Poll for and process events */
     glfwPollEvents();
-    // }
 
     if (glfwWindowShouldClose(window))
     {

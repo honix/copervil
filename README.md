@@ -16,4 +16,5 @@ make
 
 ### todo (topmost is priority)
 - split nanovg, glfw context creation into nodes, so user can make another window
+- better, systematic error logging
 - thirdparty libraries auto-wrap? (use header files to generate node functions)

@@ -1,6 +1,7 @@
 #include "dl_loader.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <dlfcn.h>
 
@@ -31,14 +32,14 @@ void register_function(char *name, void (*func)(struct node *node))
 void load_library(char *path)
 {
     void *handle;
-    // handle = dlopen("./src/nodes/honix/test/utils.so", RTLD_LAZY);
     handle = dlopen(path, RTLD_LAZY);
-    // 	void (*do_times_inderect) (struct node *node);
-    // 	void (*print_int) (struct node *node);
-    // 	do_times_inderect = dlsym(handle, "do_times_inderect");
-    // 	print_int = dlsym(handle, "print_int");
     void (*register_library)(void (*)(char *, void (*)(struct node *)));
     register_library = dlsym(handle, "register_library");
+    if (register_library == NULL)
+    {
+        printf("Error: No register function in %s\n", path);
+        return;
+    }
     register_library(register_function);
 }
 
@@ -51,5 +52,6 @@ void (*get_function(char *name))(struct node *)
             return note->func;
     }
 
+    printf("Error: No such function %s\n", name);
     return NULL;
 }
