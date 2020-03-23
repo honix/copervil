@@ -52,12 +52,6 @@ void delayed_call_node(struct node *node, double secs)
 struct timespec time_req;
 struct timespec time_rem;
 
-void loop_init()
-{
-	time_req.tv_sec = 0;
-	time_req.tv_nsec = 0;
-}
-
 void loop_step()
 {
 	// printf("// loop step %f\n", current_time_secs());
@@ -93,9 +87,15 @@ void loop_step()
 	}
 }
 
+void init_timers()
+{
+	time_req.tv_sec = 0;
+	time_req.tv_nsec = 0;
+}
+
 void loop_run()
 {
-	loop_init();
+	init_timers();
 
 	while (1)
 	{

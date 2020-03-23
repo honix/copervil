@@ -6,8 +6,15 @@
 #include "core/node.h"
 #include "core/loop.h"
 #include "core/utils.h"
+#include "core/dl_loader.h"
 
 // (int, int) -> (int)
+void sum_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0 | 1 << 1;
+	node->out_pins_mask = 1 << 0;
+}
+
 void sum(struct node *node)
 {
 	int a = *(int *)node->in_pins[0]->data;
@@ -16,6 +23,11 @@ void sum(struct node *node)
 }
 
 // (int) -> ()
+void print_int_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0;
+}
+
 void print_int(struct node *node)
 {
 	int number = *(int *)node->in_pins[0]->data;
@@ -23,6 +35,12 @@ void print_int(struct node *node)
 }
 
 // (int) -> (trigger, int)
+void do_times_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0;
+	node->out_pins_mask = 1 << 0 | 1 << 1;
+}
+
 void do_times(struct node *node)
 {
 	int count = *(int *)node->in_pins[0]->data;
@@ -35,6 +53,12 @@ void do_times(struct node *node)
 }
 
 // (int, double) -> (int/trigger)
+void do_times_inderect_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0 | 1 << 1;
+	node->out_pins_mask = 1 << 0;
+}
+
 void do_times_inderect(struct node *node)
 {
 	int count = *(int *)node->in_pins[0]->data;
@@ -61,6 +85,12 @@ void do_times_inderect(struct node *node)
 }
 
 // (double) -> (trigger)
+void loop_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0;
+	node->out_pins_mask = 1 << 0;
+}
+
 void loop(struct node *node)
 {
 	double time_step = *(double *)node->in_pins[0]->data;
@@ -69,13 +99,13 @@ void loop(struct node *node)
 	delayed_call_node(node, time_step);
 }
 
-void register_library(void (*reg)(char *, void (*)(struct node *)))
+void register_library(reg_function_t reg)
 {
-	reg("sum", sum);
-	reg("print_int", print_int);
-	reg("do_times", do_times);
-	reg("do_times_inderect", do_times_inderect);
-	reg("loop", loop);
+	reg("sum", sum_init, sum, NULL);
+	reg("print_int", print_int_init, print_int, NULL);
+	reg("do_times", do_times_init, do_times, NULL);
+	reg("do_times_inderect", do_times_inderect_init, do_times_inderect, NULL);
+	reg("loop", loop_init, loop, NULL);
 }
 /*
 

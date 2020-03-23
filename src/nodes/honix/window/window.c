@@ -6,12 +6,18 @@
 
 #include "core/node.h"
 #include "core/link.h"
+#include "core/dl_loader.h"
 
 // TEMP
 // #include <GL/glut.h>
 //
 
 GLFWwindow *window;
+
+void make_window_init(struct node *node)
+{
+    node->out_pins_mask = 0b0000000000000001;
+}
 
 void make_window(struct node *node)
 {
@@ -75,7 +81,7 @@ void make_window(struct node *node)
     node->out_pins[0]->data = window;
 }
 
-void register_library(void (*reg)(char *, void (*)(struct node *)))
+void register_library(reg_function_t reg)
 {
-	reg("make_window", make_window);
+	reg("make_window", make_window_init, make_window, NULL);
 }

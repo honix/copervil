@@ -9,6 +9,7 @@
 #include "core/node.h"
 #include "core/link.h"
 #include "core/loop.h"
+#include "core/dl_loader.h"
 // #include "../core/utils.h"
 
 extern struct node **nodes;
@@ -83,8 +84,11 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
     nvgStroke(vg);
 
+    // Draw in pins
     for (int i = 0; i < 16; i++)
     {
+        if (! in_pin_is_active(node, i)) continue;
+
         struct vector2i pin_pos = calc_in_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg,
@@ -105,8 +109,11 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgFill(vg);
     }
 
+    // Draw out pins
     for (int i = 0; i < 16; i++)
     {
+        if (! out_pin_is_active(node, i)) continue;
+
         struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg,
@@ -115,6 +122,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
         nvgFill(vg);
 
+        // Draw link from this out pin
         struct link *out_link = node->out_pins[i];
         if (out_link == NULL)
             continue;
@@ -196,6 +204,11 @@ void deinit()
     glfwTerminate();
 }
 
+void patch_editor_init(struct node *node)
+{
+    node->in_pins_mask = 1 << 0;
+}
+
 void patch_editor(struct node *node)
 {
     if (!initialized)
@@ -230,7 +243,7 @@ void patch_editor(struct node *node)
     }
 }
 
-void register_library(void (*reg)(char *, void (*)(struct node *)))
+void register_library(reg_function_t reg)
 {
-    reg("patch_editor", patch_editor);
+    reg("patch_editor", patch_editor_init, patch_editor, NULL);
 }

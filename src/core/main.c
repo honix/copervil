@@ -66,11 +66,11 @@ void test_do_times()
 	*h2 = 1.0;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node("do_times_inderect", 300, 300, get_function("do_times_inderect"));
+	struct node *node1 = make_node("do_times_inderect", 300, 300, get_function_note("do_times_inderect"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 	connect_nodes(make_link(h2), NULL, 0, node1, 1);
 
-	struct node *node2 = make_node("print_int", 400, 400, get_function("print_int"));
+	struct node *node2 = make_node("print_int", 400, 400, get_function_note("print_int"));
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
 
 	direct_call_node(node1);
@@ -84,10 +84,10 @@ void test_patch_editor()
 	*h1 = 1.0 / 60;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node("loop", 100, 100, get_function("loop"));
+	struct node *node1 = make_node("loop", 100, 100, get_function_note("loop"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
-	struct node *node2 = make_node("patch_editor", 200, 200, get_function("patch_editor"));
+	struct node *node2 = make_node("patch_editor", 200, 200, get_function_note("patch_editor"));
 	connect_nodes(make_link(NULL), node1, 0, node2, 0);
 
 	direct_call_node(node1);
@@ -97,7 +97,7 @@ void test_window()
 {
 	load_library("./src/nodes/honix/window/window.so");
 
-	struct node *node1 = make_node("make_window", 10, 10, get_function("make_window"));
+	struct node *node1 = make_node("make_window", 10, 10, get_function_note("make_window"));
 	connect_nodes(make_link(malloc(1)), node1, 0, NULL, 0);
 	
 	direct_call_node(node1);
@@ -107,8 +107,8 @@ int main(int acount, char **args)
 {
 	printf("=== start ===\n");
 
-	init_nodes();
-	init_dl_loader();
+	init_nodes_subsystem();
+	init_dl_loader_subsystem();
 	//test_arrays();
 	//test_nodes();
 	test_do_times();
