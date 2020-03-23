@@ -93,7 +93,7 @@ void test_patch_editor()
 	direct_call_node(node1);
 }
 
-void test_window()
+void test_user_window()
 {
 	load_library("./src/nodes/honix/window/window.so");
 
@@ -113,7 +113,7 @@ int main(int acount, char **args)
 	//test_nodes();
 	test_do_times();
 	test_patch_editor();
-	test_window();
+	// test_user_window();
 
 	loop_run();
 

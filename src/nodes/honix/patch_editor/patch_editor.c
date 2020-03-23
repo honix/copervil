@@ -49,8 +49,8 @@ void key_callback(
 void cursor_pos_callback(GLFWwindow *window, double x, double y)
 {
     // printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
-    nodes[1]->x = x; // TEST
-    nodes[1]->y = y;
+    // nodes[1]->x = x; // TEST
+    // nodes[1]->y = y;
 }
 
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
@@ -152,11 +152,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgText(vg, x + 10, y + height / 2, node->name, NULL);
 }
 
-char initialized = 0; // TODO: make node constructors / destructors
 void init()
 {
-    initialized = 1;
-
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -207,13 +204,12 @@ void deinit()
 void patch_editor_init(struct node *node)
 {
     node->in_pins_mask = 1 << 0;
+
+    init();
 }
 
 void patch_editor(struct node *node)
 {
-    if (!initialized)
-        init();
-
     glfwMakeContextCurrent(window);
 
     /* Render here */
