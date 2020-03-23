@@ -98,9 +98,16 @@ void test_user_window()
 	load_library("./src/nodes/honix/window/window.so");
 
 	struct node *node1 = make_node("make_window", 10, 10, get_function_note("make_window"));
-	connect_nodes(make_link(malloc(1)), node1, 0, NULL, 0);
+	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 	
-	direct_call_node(node1);
+	double *h1 = malloc(sizeof(double));
+	*h1 = 1.0 / 60;
+
+	struct node *node2 = make_node("loop", -10, -10, get_function_note("loop"));
+	connect_nodes(make_link(NULL), node2, 0, node1, 0);
+	connect_nodes(make_link(h1), NULL, 0, node2, 0);
+
+	direct_call_node(node2);
 }
 
 int main(int acount, char **args)
@@ -113,7 +120,7 @@ int main(int acount, char **args)
 	//test_nodes();
 	test_do_times();
 	test_patch_editor();
-	// test_user_window();
+	test_user_window();
 
 	loop_run();
 

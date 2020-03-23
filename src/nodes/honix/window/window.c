@@ -1,23 +1,26 @@
+#include <stdlib.h>
 #include <stdio.h>
 
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
 
-
 #include "core/node.h"
 #include "core/link.h"
 #include "core/dl_loader.h"
 
+// WARN // WARN // WARN // WARN
+// THIS CODE IS SUPER EXPERIMTAL!
 
 GLFWwindow *window;
 
 void make_window_init(struct node *node)
 {
+    node->in_pins_mask = 1 << 0; // trigger
     node->out_pins_mask = 0b0000000000000001;
-}
 
-void make_window(struct node *node)
-{
+    node->in_pins[15] = make_link(malloc(sizeof(int))); // cozy API :(
+    * (int *) node->in_pins[15]->data = 0;
+
     /* Initialize the library */
     if (!glfwInit())
         return;
@@ -36,8 +39,6 @@ void make_window(struct node *node)
         return;
     }
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
     
     // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
@@ -47,7 +48,15 @@ void make_window(struct node *node)
     // glfwSetCursorPosCallback(window, cursor_pos_callback);
 
     // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+}
+
+void make_window(struct node *node)
+{
+    * (int *) node->in_pins[15]->data += 1;
     
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
     // Fill window with black
     glClearColor(0.5, 0.5, 0.5, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -60,6 +69,8 @@ void make_window(struct node *node)
     glOrtho(-1, 1, -1, 1, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glScalef(0.5, 0.5, 0.5);
+    glRotatef(* (int *) node->in_pins[15]->data * 2, 0, 0, 1);
 
     // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
