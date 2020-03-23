@@ -1,5 +1,6 @@
-#include <GLFW/glfw3.h>
 #include <stdio.h>
+
+#include <GLFW/glfw3.h>
 
 #include "nanovg/src/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
@@ -120,7 +121,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
         if (out_link->receiver == NULL) 
             continue;
-            
+
         struct vector2i other_pin_pos = calc_in_pin_pos(
             out_link->receiver,
             out_link->receiver_pin);
@@ -152,17 +153,13 @@ void init()
     if (!glfwInit())
         return -1;
 
-#ifndef _WIN32 // don't require this on win32, and works with more cards
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-
-#ifdef DEMO_MSAA
-    glfwWindowHint(GLFW_SAMPLES, 4);
-#endif
+    #ifndef _WIN32 // don't require this on win32, and works with more cards
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    #endif
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(512, 512, "World", NULL, NULL);

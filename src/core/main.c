@@ -100,7 +100,7 @@ void test_window()
 	struct node *node1 = make_node("make_window", 10, 10, get_function("make_window"));
 	connect_nodes(make_link(malloc(1)), node1, 0, NULL, 0);
 	
-	delayed_call_node(node1, 3);
+	direct_call_node(node1);
 }
 
 int main(int acount, char **args)

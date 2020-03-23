@@ -40,3 +40,5 @@ obj/%.o: src/editor/%.c $(HEADERS_CORE) $(HEADERS_EDITOR) obj
 clean:
 	rm -rf bin
 	rm -rf obj
+	cd src/nodes && for m in `find | grep Makefile`; do make -C `dirname $$m` clean; done
+
