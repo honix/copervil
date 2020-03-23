@@ -8,9 +8,6 @@
 #include "core/link.h"
 #include "core/dl_loader.h"
 
-// TEMP
-// #include <GL/glut.h>
-//
 
 GLFWwindow *window;
 
@@ -42,20 +39,20 @@ void make_window(struct node *node)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     
-    printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+    // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
     glViewport(0, 0, 256, 256);
 
     // glfwSetKeyCallback(window, key_callback);
     // glfwSetCursorPosCallback(window, cursor_pos_callback);
 
-    printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+    // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
     
     // Fill window with black
     glClearColor(0.5, 0.5, 0.5, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+    // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
     // TEMP
     glMatrixMode(GL_PROJECTION);
@@ -64,7 +61,7 @@ void make_window(struct node *node)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+    // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
     glBegin(GL_TRIANGLES); // glBegin/End depricated in gl >= 3.0
         glColor3f(1, 1, 1);
@@ -72,9 +69,8 @@ void make_window(struct node *node)
 		glVertex3f(1,-1,0);
 		glVertex3f(-1,-1,0);
 	glEnd();
-    //
 
-    printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+    // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
     glfwSwapBuffers(window);
 
