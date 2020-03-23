@@ -11,15 +11,19 @@
 // WARN // WARN // WARN // WARN
 // THIS CODE IS SUPER EXPERIMTAL!
 
-GLFWwindow *window;
+uint8_t windows_count = 0;
 
 void make_window_init(struct node *node)
 {
+    windows_count += 1;
+
     node->in_pins_mask = 1 << 0; // trigger
     node->out_pins_mask = 0b0000000000000001;
 
+    // TODO: ugh I want better node storage than unused in pins pointers
+    node->in_pins[14] = make_link(malloc(sizeof(GLFWwindow *)));
     node->in_pins[15] = make_link(malloc(sizeof(int))); // cozy API :(
-    * (int *) node->in_pins[15]->data = 0;
+    * (int *) node->in_pins[15]->data = rand() % 360;
 
     /* Initialize the library */
     if (!glfwInit())
@@ -32,8 +36,9 @@ void make_window_init(struct node *node)
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(256, 256, "Window", NULL, NULL);
-    if (!window)
+    node->in_pins[14]->data = glfwCreateWindow(256, 256, "Window", NULL, NULL);
+    glfwSetWindowPos(node->in_pins[14]->data, windows_count % 2 == 0 ? 100 : 400, 200);
+    if (!(GLFWwindow *) node->in_pins[14]->data)
     {
         glfwTerminate();
         return;
@@ -55,7 +60,7 @@ void make_window(struct node *node)
     * (int *) node->in_pins[15]->data += 1;
     
     /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent((GLFWwindow *) node->in_pins[14]->data);
 
     // Fill window with black
     glClearColor(0.5, 0.5, 0.5, 1);
@@ -83,9 +88,9 @@ void make_window(struct node *node)
 
     // printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers((GLFWwindow *) node->in_pins[14]->data);
 
-    node->out_pins[0]->data = window;
+    node->out_pins[0]->data = (GLFWwindow *) node->in_pins[14]->data;
 }
 
 void register_library(reg_function_t reg)

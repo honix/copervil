@@ -121,6 +121,7 @@ int main(int acount, char **args)
 	test_do_times();
 	test_patch_editor();
 	test_user_window();
+	test_user_window(); // make another one!
 
 	loop_run();
 
