@@ -75,6 +75,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     int x = node->x;
     int y = node->y;
 
+    // Draw body
     nvgBeginPath(vg);
     nvgRect(vg, x, y, width, height);
     nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
@@ -109,7 +110,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgFill(vg);
     }
 
-    // Draw out pins
+    // Draw out pins and out links
     for (int i = 0; i < 16; i++)
     {
         if (! out_pin_is_active(node, i)) continue;
@@ -145,6 +146,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgStroke(vg);
     }
 
+    // Draw node name
     nvgFontSize(vg, 15.0f);
     nvgFontFace(vg, "sans");
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
@@ -154,9 +156,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
 void init()
 {
-    /* Initialize the library */
     if (!glfwInit())
-        return -1;
+        return;
 
     #ifndef _WIN32 // don't require this on win32, and works with more cards
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -166,15 +167,13 @@ void init()
     #endif
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
-    /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(512, 512, "World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
-        return -1;
+        return;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     glfwSetKeyCallback(window, key_callback);
@@ -184,7 +183,7 @@ void init()
     if (vg == NULL)
     {
         printf("Could not init nanovg.\n");
-        return -1;
+        return;
     }
 
     nvgCreateFont(vg, "sans", "./assets/Roboto-Regular.ttf");

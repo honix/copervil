@@ -25,7 +25,6 @@ void make_window_init(struct node *node)
     node->in_pins[15] = make_link(malloc(sizeof(int))); // cozy API :(
     * (int *) node->in_pins[15]->data = rand() % 360;
 
-    /* Initialize the library */
     if (!glfwInit())
         return;
 
@@ -37,7 +36,6 @@ void make_window_init(struct node *node)
 
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    /* Create a windowed mode window and its OpenGL context */
     node->in_pins[14]->data = glfwCreateWindow(256, 256, "Window", NULL, NULL);
     glfwSetWindowPos(node->in_pins[14]->data, 100 + (windows_count - 1) * 280, 200);
     if (!(GLFWwindow *) node->in_pins[14]->data)
@@ -61,7 +59,6 @@ void make_window(struct node *node)
 {
     * (int *) node->in_pins[15]->data += 1;
     
-    /* Make the window's context current */
     glfwMakeContextCurrent((GLFWwindow *) node->in_pins[14]->data);
 
     // Fill window with black
