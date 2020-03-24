@@ -16,15 +16,20 @@ void init_dl_loader_subsystem()
 
 void register_function(
     char *name, 
-    void (*init_func)(struct node *node),
-    void (*main_func)(struct node *node),
-    void (*deinit_func)(struct node *node))
+    void (*init_func)   (struct node *),
+    void (*main_func)   (struct node *),
+    void (*deinit_func) (struct node *),
+    void (*draw_func)   (struct NVGcontext *vg, struct node *),
+    void (*input_func)  (struct node *)
+)
 {
     struct function_note *note = malloc(sizeof(struct function_note));
     note->name = name;
     note->init_func = init_func;
     note->main_func = main_func;
     note->deinit_func = deinit_func;
+    note->draw_func = draw_func;
+    note->input_func = input_func;
     loaded_functions[loaded_functions_pointer] = note;
     loaded_functions_pointer++;
 }

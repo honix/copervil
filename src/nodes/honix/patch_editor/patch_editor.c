@@ -85,6 +85,9 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
     nvgStroke(vg);
 
+    if (node->function_note.draw_func != NULL)
+        node->function_note.draw_func(vg, node);
+
     // Draw in pins
     for (int i = 0; i < 16; i++)
     {
