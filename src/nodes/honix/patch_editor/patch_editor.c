@@ -241,11 +241,13 @@ void patch_editor(struct node *node)
 
 void register_library(reg_function_t reg)
 {
-    reg("patch_editor", patch_editor_init, patch_editor, NULL);
+    reg("patch_editor", patch_editor_init, patch_editor, NULL, NULL, NULL);
 }
 
 // TEST API
 // void register_library_custom(reg_custom_t reg)
 // {
-//     reg("number_io", numner_io_init, number_io, number_io_deinit, number_io_draw);
+    // reg("number_io", 
+    //     numner_io_init, number_io, number_io_deinit, 
+    //     number_io_draw, number_io_input);
 // }

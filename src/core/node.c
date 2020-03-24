@@ -6,23 +6,25 @@
 #include "link.h"
 #include "dl_loader.h" // funtion_note
 
+#define NODES_MAX_COUNT 16 // TODO: this is bad temp code. rewrite
+
 void init_nodes_subsystem()
 {
-	nodes = malloc(sizeof(struct node *) * 16);
+	nodes = malloc(sizeof(struct node *) * NODES_MAX_COUNT);
 	nodes_pointer = 0;
 }
 
 void init_node(struct node *node)
 {
-	if (node->init_func == NULL) return; 
-	node->init_func(node);
+	if (node->function_note.init_func == NULL) return; 
+	node->function_note.init_func(node);
 }
 
 void direct_call_node(struct node *node)
 {
 	// printf("// direct_call_node %s\n", node->name);
 
-	node->main_func(node);
+	node->function_note.main_func(node);
 
 	// Do we need this CALL_NEXT feature?
 	// if (node->flags & CALL_NEXT && node->out_pins[0] != NULL)
@@ -35,8 +37,8 @@ void direct_call_node(struct node *node)
 
 void deinit_node(struct node *node)
 {
-	if (node->deinit_func == NULL) return; 
-	node->deinit_func(node);
+	if (node->function_note.deinit_func == NULL) return; 
+	node->function_note.deinit_func(node);
 	// TODO: free memory
 }
 
@@ -50,9 +52,7 @@ struct node *make_node(
 	node->name = name;
 	node->x = x;
 	node->y = y;
-	node->init_func = function_note->init_func;
-	node->main_func = function_note->main_func;
-	node->deinit_func = function_note->deinit_func;
+	node->function_note = *function_note;
 
 	for (int i = 0; i < NODE_PINS_COUNT; i++)
 	{
@@ -68,6 +68,9 @@ struct node *make_node(
 
 	nodes[nodes_pointer] = node;
 	nodes_pointer++;
+
+	if (nodes_pointer >= NODES_MAX_COUNT)
+		printf("Oops! NODES_MAX_COUNT exceeded!");
 
 	init_node(node);
 

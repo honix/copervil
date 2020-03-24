@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "dl_loader.h"
+
 #define NODE_PINS_COUNT 16
 
 struct link;
@@ -19,9 +21,7 @@ struct node
 	int x;
 	int y;
 
-	void (*init_func)(struct node *);
-	void (*main_func)(struct node *);
-	void (*deinit_func)(struct node *);
+	struct function_note function_note;
 
 	struct link *in_pins[NODE_PINS_COUNT];
 	struct link *out_pins[NODE_PINS_COUNT];

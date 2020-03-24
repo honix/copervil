@@ -122,6 +122,8 @@ int main(int acount, char **args)
 	test_patch_editor();
 	test_user_window();
 	test_user_window(); // make another one!
+	test_user_window(); // make another one!
+	test_user_window(); // make another one!
 
 	loop_run();
 

@@ -1,5 +1,5 @@
 # c (temporary name)
-Node-based programming with C language
+Node-based programming in C language
 
 ### status
 work in progress, early prototype

@@ -101,11 +101,11 @@ void loop(struct node *node)
 
 void register_library(reg_function_t reg)
 {
-	reg("sum", sum_init, sum, NULL);
-	reg("print_int", print_int_init, print_int, NULL);
-	reg("do_times", do_times_init, do_times, NULL);
-	reg("do_times_inderect", do_times_inderect_init, do_times_inderect, NULL);
-	reg("loop", loop_init, loop, NULL);
+	reg("sum", sum_init, sum, NULL, NULL, NULL);
+	reg("print_int", print_int_init, print_int, NULL, NULL, NULL);
+	reg("do_times", do_times_init, do_times, NULL, NULL, NULL);
+	reg("do_times_inderect", do_times_inderect_init, do_times_inderect, NULL, NULL, NULL);
+	reg("loop", loop_init, loop, NULL, NULL, NULL);
 }
 /*
 

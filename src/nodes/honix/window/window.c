@@ -35,9 +35,11 @@ void make_window_init(struct node *node)
     #endif
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     /* Create a windowed mode window and its OpenGL context */
     node->in_pins[14]->data = glfwCreateWindow(256, 256, "Window", NULL, NULL);
-    glfwSetWindowPos(node->in_pins[14]->data, windows_count % 2 == 0 ? 100 : 400, 200);
+    glfwSetWindowPos(node->in_pins[14]->data, 100 + (windows_count - 1) * 280, 200);
     if (!(GLFWwindow *) node->in_pins[14]->data)
     {
         glfwTerminate();
@@ -95,5 +97,5 @@ void make_window(struct node *node)
 
 void register_library(reg_function_t reg)
 {
-	reg("make_window", make_window_init, make_window, NULL);
+	reg("make_window", make_window_init, make_window, NULL, NULL, NULL);
 }
