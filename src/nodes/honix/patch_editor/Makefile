@@ -1,7 +1,7 @@
 THIRDPARTY = ../../../../thirdparty
 NANOVG_OBJ = $(THIRDPARTY)/nanovg/build/obj/Debug/nanovg/nanovg.o
 
-patch_editor.so:
+all: patch_editor.so number_io.so
 
 %.so: %.c
 	gcc -Wall -shared -fPIC -g -I../../.. -I$(THIRDPARTY) $< $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw

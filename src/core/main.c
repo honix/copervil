@@ -71,7 +71,7 @@ void test_do_times()
 	connect_nodes(make_link(h2), NULL, 0, node1, 1);
 
 	struct node *node2 = make_node("print_int", 400, 400, get_function_note("print_int"));
-	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, node2, 0);
+	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
 
 	direct_call_node(node1);
 }
@@ -110,6 +110,27 @@ void test_user_window()
 	direct_call_node(node2);
 }
 
+void test_number_io()
+{
+	load_library("./src/nodes/honix/patch_editor/number_io.so");
+
+	int *h1 = malloc(sizeof(int));
+	*h1 = 100;
+
+	double *h2 = malloc(sizeof(double));
+	*h2 = 0.1;
+
+	// struct node *node1 = make_node("node1", do_times);
+	struct node *node1 = make_node("do_times_inderect", 300, 300, get_function_note("do_times_inderect"));
+	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+	connect_nodes(make_link(h2), NULL, 0, node1, 1);
+	
+	struct node *node2 = make_node("number_io", 10, 450, get_function_note("number_io"));
+	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
+
+	direct_call_node(node1);
+}
+
 int main(int acount, char **args)
 {
 	printf("=== start ===\n");
@@ -120,10 +141,12 @@ int main(int acount, char **args)
 	//test_nodes();
 	test_do_times();
 	test_patch_editor();
-	test_user_window();
-	test_user_window(); // make another one!
-	test_user_window(); // make another one!
-	test_user_window(); // make another one!
+	// test_user_window();
+	// test_user_window(); // make another one!
+	// test_user_window(); // make another one!
+	// test_user_window(); // make another one!
+
+	test_number_io();
 
 	loop_run();
 

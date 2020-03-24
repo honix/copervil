@@ -86,7 +86,18 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     nvgStroke(vg);
 
     if (node->function_note.draw_func != NULL)
+    {
         node->function_note.draw_func(vg, node);
+    }
+    else
+    {
+        // Draw node name
+        nvgFontSize(vg, 15.0f);
+        nvgFontFace(vg, "sans");
+        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+        nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
+        nvgText(vg, x + 10, y + height / 2, node->name, NULL);
+    }
 
     // Draw in pins
     for (int i = 0; i < 16; i++)
@@ -148,13 +159,6 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgStrokeColor(vg, nvgHSLA(0, 0, 128, 170));
         nvgStroke(vg);
     }
-
-    // Draw node name
-    nvgFontSize(vg, 15.0f);
-    nvgFontFace(vg, "sans");
-    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-    nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
-    nvgText(vg, x + 10, y + height / 2, node->name, NULL);
 }
 
 void init()
@@ -245,11 +249,3 @@ void register_library(reg_function_t reg)
 {
     reg("patch_editor", patch_editor_init, patch_editor, NULL, NULL, NULL);
 }
-
-// TEST API
-// void register_library_custom(reg_custom_t reg)
-// {
-    // reg("number_io", 
-    //     numner_io_init, number_io, number_io_deinit, 
-    //     number_io_draw, number_io_input);
-// }

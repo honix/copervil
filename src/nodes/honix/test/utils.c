@@ -57,6 +57,9 @@ void do_times_inderect_init(struct node *node)
 {
 	node->in_pins_mask = 1 << 0 | 1 << 1;
 	node->out_pins_mask = 1 << 0;
+
+	// TODO: oh we cant initialize pins before link comes in
+	// *(int *)node->out_pins[0]->data = 0;
 }
 
 void do_times_inderect(struct node *node)
@@ -75,7 +78,7 @@ void do_times_inderect(struct node *node)
 		do_count = *(int *)node->out_pins[0]->data;
 	}
 
-	printf("count = %d, do_count = %d\n", count, do_count);
+	// printf("count = %d, do_count = %d\n", count, do_count);
 	if (count > do_count)
 	{
 		direct_call_node(node->out_pins[0]->receiver);
