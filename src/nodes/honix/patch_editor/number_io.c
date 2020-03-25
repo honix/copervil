@@ -19,8 +19,8 @@ void number_io(struct node *node)
 
 void number_io_draw(struct NVGcontext *vg, struct node *node)
 {
-    int x = node->x;
-    int y = node->y;
+    int x = node->rect.pos.x;
+    int y = node->rect.pos.y;
 
     int number = *(int *)node->in_pins[0]->data;
 

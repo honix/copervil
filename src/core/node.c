@@ -43,15 +43,15 @@ void deinit_node(struct node *node)
 }
 
 struct node *make_node(
-	char *name, 
 	int x, int y, 
 	struct function_note *function_note)
 {
 	struct node *node = malloc(sizeof(struct node));
 
-	node->name = name;
-	node->x = x;
-	node->y = y;
+	node->rect.pos.x = x;
+	node->rect.pos.y = y;
+	node->rect.size.x = NODE_WIDTH;
+	node->rect.size.y = NODE_HEIGHT;
 	node->function_note = *function_note;
 
 	for (int i = 0; i < NODE_PINS_COUNT; i++)

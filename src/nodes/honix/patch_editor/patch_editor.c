@@ -10,26 +10,13 @@
 #include "core/link.h"
 #include "core/loop.h"
 #include "core/dl_loader.h"
-// #include "../core/utils.h"
+#include "core/geometry.h"
 
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
-const int pin_size = 10;
-const int pin_half_size = pin_size / 2;
-const int pin_padding = 5;
-
-const float width = pin_padding + (pin_size + pin_padding) * 16;
-const float height = 30;
-
 GLFWwindow *window;
 struct NVGcontext *vg;
-
-struct vector2i
-{
-    int x;
-    int y;
-};
 
 void key_callback(
     GLFWwindow *window, int key,
@@ -53,31 +40,47 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
     // nodes[1]->y = y;
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    double cursor_pos_x, cursor_pos_y;
+    glfwGetCursorPos(window, &cursor_pos_x, &cursor_pos_y);
+    struct vector2i cursor_pos;
+    cursor_pos.x = cursor_pos_x;
+    cursor_pos.y = cursor_pos_y;
+
+    printf("mouse_button_callback: %d %d %d\n", button, cursor_pos.x, cursor_pos.y);
+
+    if (is_point_in_rect(cursor_pos, nodes[0]->rect))
+        nodes[0]->rect.pos.x += 10;
+}
+
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
 {
     struct vector2i vec;
-    vec.x = node->x + pin_padding + (pin_size + pin_padding) * pin;
-    vec.y = node->y;
+    vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+    vec.y = node->rect.pos.y;
     return vec;
 }
 
 struct vector2i calc_out_pin_pos(struct node *node, unsigned char pin)
 {
     struct vector2i vec;
-    vec.x = node->x + pin_padding + (pin_size + pin_padding) * pin;
-    vec.y = node->y + height - pin_size;
+    vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+    vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_SIZE;
     return vec;
 }
 
 void draw_node(struct NVGcontext *vg, struct node *node)
 {
 
-    int x = node->x;
-    int y = node->y;
+    int x = node->rect.pos.x;
+    int y = node->rect.pos.y;
+    int width = node->rect.size.x;
+    int height = node->rect.size.y;
 
     // Draw body
     nvgBeginPath(vg);
-    nvgRect(vg, x, y, width, height);
+    nvgRect(vg, x, y, NODE_WIDTH, NODE_HEIGHT);
     nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
     nvgFill(vg);
     nvgLineJoin(vg, NVG_BUTT);
@@ -96,7 +99,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgFontFace(vg, "sans");
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
-        nvgText(vg, x + 10, y + height / 2, node->name, NULL);
+        nvgText(vg, x + 10, y + height / 2, node->function_note.name, NULL);
     }
 
     // Draw in pins
@@ -108,7 +111,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         nvgBeginPath(vg);
         nvgRect(vg,
                 pin_pos.x, pin_pos.y,
-                pin_size, pin_half_size);
+                PIN_SIZE, PIN_HALF_SIZE);
         nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
         nvgFill(vg);
 
@@ -118,8 +121,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
         nvgBeginPath(vg);
         nvgRect(vg,
-            pin_pos.x, pin_pos.y - pin_half_size,
-            pin_size, pin_half_size);
+            pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
+            PIN_SIZE, PIN_HALF_SIZE);
         nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
         nvgFill(vg);
     }
@@ -132,8 +135,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
         nvgRect(vg,
-                pin_pos.x, pin_pos.y + pin_half_size,
-                pin_size, pin_half_size);
+                pin_pos.x, pin_pos.y + PIN_HALF_SIZE,
+                PIN_SIZE, PIN_HALF_SIZE);
         nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
         nvgFill(vg);
 
@@ -149,10 +152,10 @@ void draw_node(struct NVGcontext *vg, struct node *node)
             out_link->receiver,
             out_link->receiver_pin);
         nvgBeginPath(vg);
-        nvgMoveTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size);
-        nvgLineTo(vg, pin_pos.x + pin_half_size, pin_pos.y + pin_size * 2);
-        nvgLineTo(vg, other_pin_pos.x + pin_half_size, other_pin_pos.y - pin_size);
-        nvgLineTo(vg, other_pin_pos.x + pin_half_size, other_pin_pos.y);
+        nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE);
+        nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE * 2);
+        nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
+        nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
 
         nvgLineJoin(vg, NVG_ROUND);
         nvgStrokeWidth(vg, 3);
@@ -185,6 +188,7 @@ void init()
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     if (vg == NULL)

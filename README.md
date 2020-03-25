@@ -19,4 +19,6 @@ make
 - better pins interface (NULL link handling)
 - rethink node creation API from C
 - better, systematic error logging
+- patch_editor *.so objects is too big, they staticly linked with nanovg
+- patch_editor redraw on event, not every 1/60 seconds
 - thirdparty libraries auto-wrap? (use header files to generate node functions)
