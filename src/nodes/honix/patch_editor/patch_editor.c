@@ -15,6 +15,10 @@
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
+// TODO: move this data to local node starage
+int window_width = 512;
+int window_height = 512;
+
 GLFWwindow *window;
 struct NVGcontext *vg;
 
@@ -53,6 +57,18 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (is_point_in_rect(cursor_pos, nodes[0]->rect))
         nodes[0]->rect.pos.x += 10;
 }
+
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    window_width = width;
+    window_height = height;
+
+    printf("window_size_callback: %d %d\n", width, height);
+
+    glfwMakeContextCurrent(window);
+    glViewport(0, 0, width, height);
+}
+
 
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
 {
@@ -177,7 +193,7 @@ void init()
     #endif
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
-    window = glfwCreateWindow(512, 512, "World", NULL, NULL);
+    window = glfwCreateWindow(window_width, window_height, "World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -186,6 +202,7 @@ void init()
 
     glfwMakeContextCurrent(window);
 
+    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -223,11 +240,11 @@ void patch_editor(struct node *node)
     glfwMakeContextCurrent(window);
 
     /* Render here */
-    glViewport(0, 0, 512, 512);
+    // glViewport(0, 0, window_width, window_height);
     glClearColor(0.25f, 0.25f, 0.25f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    nvgBeginFrame(vg, 512, 512, 1);
+    nvgBeginFrame(vg, window_width, window_height, 1);
 
     for (int i = 0; i < nodes_pointer; i++)
     {
