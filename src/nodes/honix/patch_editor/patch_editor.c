@@ -155,7 +155,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	}
 
 	// Draw in pins
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NODE_PINS_COUNT; i++)
 	{
 		if (!in_pin_is_active(node, i))
 			continue;
@@ -181,7 +181,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	}
 
 	// Draw out pins and out links
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NODE_PINS_COUNT; i++)
 	{
 		if (!out_pin_is_active(node, i))
 			continue;
@@ -233,7 +233,7 @@ void init()
 
 	window = glfwCreateWindow(
 		window_width, window_height, "World", NULL, NULL);
-		
+
 	if (!window)
 	{
 		glfwTerminate();
