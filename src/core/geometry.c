@@ -10,6 +10,14 @@ struct vector2i vector_add(struct vector2i a, struct vector2i b)
     return result;
 }
 
+struct vector2i vector_sub(struct vector2i a, struct vector2i b)
+{
+    struct vector2i result;
+    result.x = a.x - b.x;
+    result.y = a.y - b.y;
+    return result;
+}
+
 int distance(struct vector2i from, struct vector2i to)
 {
     int dx = from.x - to.x;

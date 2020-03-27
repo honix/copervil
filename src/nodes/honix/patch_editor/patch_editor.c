@@ -22,6 +22,25 @@ int window_height = 512;
 GLFWwindow *window;
 struct NVGcontext *vg;
 
+// TODO: able to select group of nodes
+struct node *selected_node;
+struct node *dragged_node;
+struct vector2i dragged_node_offset;
+
+struct node *node_under_cursor(struct vector2i cursor_pos)
+{
+    struct node *node = NULL;
+    for (int i = 0; i < nodes_pointer; i++)
+    {
+        if (is_point_in_rect(cursor_pos, nodes[i]->rect))
+        {
+            node = nodes[i];
+            break;
+        }
+    }
+    return node;
+}
+
 void key_callback(
     GLFWwindow *window, int key,
     int scancode, int action, int mods)
@@ -42,23 +61,38 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
     // printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
     // nodes[1]->x = x; // TEST
     // nodes[1]->y = y;
+
+    if (dragged_node != NULL)
+    {
+        struct vector2i cursor_pos = {.x = x, .y = y};
+        dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
+    }
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
-    double cursor_pos_x, cursor_pos_y;
-    glfwGetCursorPos(window, &cursor_pos_x, &cursor_pos_y);
-    struct vector2i cursor_pos;
-    cursor_pos.x = cursor_pos_x;
-    cursor_pos.y = cursor_pos_y;
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+    struct vector2i cursor_pos = {.x = x, .y = y};
 
-    printf("mouse_button_callback: %d %d %d\n", button, cursor_pos.x, cursor_pos.y);
+    printf("mouse_button_callback: %d %d %d %d\n", button, action, cursor_pos.x, cursor_pos.y);
 
-    if (is_point_in_rect(cursor_pos, nodes[0]->rect))
-        nodes[0]->rect.pos.x += 10;
+    switch (action)
+    {
+    case GLFW_PRESS:
+        dragged_node = node_under_cursor(cursor_pos);
+        if (dragged_node != NULL)
+            dragged_node_offset = vector_sub(
+                dragged_node->rect.pos, 
+                cursor_pos);
+        break;
+    case GLFW_RELEASE:
+        dragged_node = NULL;
+        break;
+    }
 }
 
-void window_size_callback(GLFWwindow* window, int width, int height)
+void window_size_callback(GLFWwindow *window, int width, int height)
 {
     window_width = width;
     window_height = height;
@@ -68,7 +102,6 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     glfwMakeContextCurrent(window);
     glViewport(0, 0, width, height);
 }
-
 
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
 {
@@ -121,7 +154,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     // Draw in pins
     for (int i = 0; i < 16; i++)
     {
-        if (! in_pin_is_active(node, i)) continue;
+        if (!in_pin_is_active(node, i))
+            continue;
 
         struct vector2i pin_pos = calc_in_pin_pos(node, i);
         nvgBeginPath(vg);
@@ -137,8 +171,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
         nvgBeginPath(vg);
         nvgRect(vg,
-            pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
-            PIN_SIZE, PIN_HALF_SIZE);
+                pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
+                PIN_SIZE, PIN_HALF_SIZE);
         nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
         nvgFill(vg);
     }
@@ -146,7 +180,8 @@ void draw_node(struct NVGcontext *vg, struct node *node)
     // Draw out pins and out links
     for (int i = 0; i < 16; i++)
     {
-        if (! out_pin_is_active(node, i)) continue;
+        if (!out_pin_is_active(node, i))
+            continue;
 
         struct vector2i pin_pos = calc_out_pin_pos(node, i);
         nvgBeginPath(vg);
@@ -161,7 +196,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
         if (out_link == NULL)
             continue;
 
-        if (out_link->receiver == NULL) 
+        if (out_link->receiver == NULL)
             continue;
 
         struct vector2i other_pin_pos = calc_in_pin_pos(
@@ -185,13 +220,13 @@ void init()
     if (!glfwInit())
         return;
 
-    #ifndef _WIN32 // don't require this on win32, and works with more cards
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #endif
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+#ifndef _WIN32 // don't require this on win32, and works with more cards
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
     window = glfwCreateWindow(window_width, window_height, "World", NULL, NULL);
     if (!window)

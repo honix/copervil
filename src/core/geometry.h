@@ -15,6 +15,7 @@ struct rect
 };
 
 struct vector2i vector_add(struct vector2i a, struct vector2i b);
+struct vector2i vector_sub(struct vector2i a, struct vector2i b);
 int distance(struct vector2i from, struct vector2i to);
 
 bool is_point_in_rect(struct vector2i point, struct rect rect);
