@@ -16,7 +16,7 @@ extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
 // TODO: move this data to local node starage
-int window_width = 512;
+int window_width = 700;
 int window_height = 512;
 
 GLFWwindow *window;
