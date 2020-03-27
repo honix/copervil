@@ -31,7 +31,7 @@ double current_time_secs()
 	// need test this function on windows
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-	return time.tv_sec + (double) time.tv_nsec / 1000000000;
+	return time.tv_sec + (double)time.tv_nsec / 1000000000;
 }
 
 int ord(struct list_cell *a, struct list_cell *b)
@@ -60,18 +60,20 @@ void loop_step()
 
 	if (delayed_node_list.first_cell != NULL)
 	{
-		struct delayed_node *delayed_node = delayed_node_list.first_cell->data;
+		struct delayed_node *delayed_node =
+			delayed_node_list.first_cell->data;
 		delay = delayed_node->call_time - current_time_secs();
 	}
 	else
 	{
-		delay = 1.0 / 30; 
+		delay = 1.0 / 30;
 	}
-	
+
 	delay = MAX(0, delay);
 	// printf("// sleep for %f\n", delay);
 
-	if (delay != 0) {
+	if (delay != 0)
+	{
 		time_req.tv_sec = (long)delay;
 		time_req.tv_nsec = (delay - time_req.tv_sec) * 1000000000;
 		nanosleep(&time_req, &time_rem);
@@ -79,11 +81,13 @@ void loop_step()
 
 	if (delayed_node_list.first_cell != NULL)
 	{
-		struct delayed_node *delayed_node = delayed_node_list.first_cell->data;
+		struct delayed_node *delayed_node =
+			delayed_node_list.first_cell->data;
 		direct_call_node(delayed_node->node);
 		// TODO: drop and free first cell
 		// drop first cell
-		delayed_node_list.first_cell = delayed_node_list.first_cell->next;
+		delayed_node_list.first_cell =
+			delayed_node_list.first_cell->next;
 	}
 }
 

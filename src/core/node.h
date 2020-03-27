@@ -32,7 +32,7 @@ struct node
 
 	struct link *in_pins[NODE_PINS_COUNT];
 	struct link *out_pins[NODE_PINS_COUNT];
-	uint16_t in_pins_mask;  
+	uint16_t in_pins_mask;
 	uint16_t out_pins_mask;
 
 	uint8_t flags;
@@ -43,7 +43,7 @@ unsigned int nodes_pointer;
 
 void init_nodes_subsystem();
 struct node *make_node(
-	int x, int y, 
+	int x, int y,
 	struct function_note *function_note);
 void direct_call_node(struct node *node);
 void connect_nodes(
@@ -54,4 +54,4 @@ void connect_nodes(
 	uint8_t reciever_pin);
 
 bool in_pin_is_active(struct node *node, uint8_t pin);
-bool out_pin_is_active(struct node *node, uint8_t pin); 
+bool out_pin_is_active(struct node *node, uint8_t pin);

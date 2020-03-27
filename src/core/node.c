@@ -16,7 +16,8 @@ void init_nodes_subsystem()
 
 void init_node(struct node *node)
 {
-	if (node->function_note.init_func == NULL) return; 
+	if (node->function_note.init_func == NULL)
+		return;
 	node->function_note.init_func(node);
 }
 
@@ -37,13 +38,14 @@ void direct_call_node(struct node *node)
 
 void deinit_node(struct node *node)
 {
-	if (node->function_note.deinit_func == NULL) return; 
+	if (node->function_note.deinit_func == NULL)
+		return;
 	node->function_note.deinit_func(node);
 	// TODO: free memory
 }
 
 struct node *make_node(
-	int x, int y, 
+	int x, int y,
 	struct function_note *function_note)
 {
 	struct node *node = malloc(sizeof(struct node));
@@ -60,7 +62,7 @@ struct node *make_node(
 		node->out_pins[i] = NULL;
 	}
 
-	node->in_pins_mask  = 0b0000000000000000;
+	node->in_pins_mask = 0b0000000000000000;
 	node->out_pins_mask = 0b0000000000000000;
 
 	node->flags = 0b00000000;
@@ -94,12 +96,12 @@ void connect_nodes(
 		receiver->in_pins[reciever_pin] = link;
 }
 
-bool in_pin_is_active(struct node *node, uint8_t pin) 
+bool in_pin_is_active(struct node *node, uint8_t pin)
 {
-    return node->in_pins_mask & 1 << pin;
+	return node->in_pins_mask & 1 << pin;
 }
 
-bool out_pin_is_active(struct node *node, uint8_t pin) 
+bool out_pin_is_active(struct node *node, uint8_t pin)
 {
-    return node->out_pins_mask & 1 << pin;
+	return node->out_pins_mask & 1 << pin;
 }

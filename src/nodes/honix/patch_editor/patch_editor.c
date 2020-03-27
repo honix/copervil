@@ -29,279 +29,284 @@ struct vector2i dragged_node_offset;
 
 struct node *node_under_cursor(struct vector2i cursor_pos)
 {
-    struct node *node = NULL;
-    for (int i = 0; i < nodes_pointer; i++)
-    {
-        if (is_point_in_rect(cursor_pos, nodes[i]->rect))
-        {
-            node = nodes[i];
-            break;
-        }
-    }
-    return node;
+	struct node *node = NULL;
+	for (int i = 0; i < nodes_pointer; i++)
+	{
+		if (is_point_in_rect(cursor_pos, nodes[i]->rect))
+		{
+			node = nodes[i];
+			break;
+		}
+	}
+	return node;
 }
 
 void key_callback(
-    GLFWwindow *window, int key,
-    int scancode, int action, int mods)
+	GLFWwindow *window, int key,
+	int scancode, int action, int mods)
 {
-    // printf("key_callback: %s %d %d %d %d\n",
-    //     glfwGetKeyName(key, scancode),
-    //     key, scancode, action, mods);
-    switch (key)
-    {
-    case GLFW_KEY_Q:
-    case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
+	// printf("key_callback: %s %d %d %d %d\n",
+	//     glfwGetKeyName(key, scancode),
+	//     key, scancode, action, mods);
+	switch (key)
+	{
+	case GLFW_KEY_Q:
+	case GLFW_KEY_ESCAPE:
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
 }
 
 void cursor_pos_callback(GLFWwindow *window, double x, double y)
 {
-    // printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
-    // nodes[1]->x = x; // TEST
-    // nodes[1]->y = y;
+	// printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
+	// nodes[1]->x = x; // TEST
+	// nodes[1]->y = y;
 
-    if (dragged_node != NULL)
-    {
-        struct vector2i cursor_pos = {.x = x, .y = y};
-        dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
-    }
+	if (dragged_node != NULL)
+	{
+		struct vector2i cursor_pos = {.x = x, .y = y};
+		dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
+	}
 }
 
-void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+void mouse_button_callback(
+	GLFWwindow *window,
+	int button, int action, int mods)
 {
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
-    struct vector2i cursor_pos = {.x = x, .y = y};
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
+	struct vector2i cursor_pos = {.x = x, .y = y};
 
-    printf("mouse_button_callback: %d %d %d %d\n", button, action, cursor_pos.x, cursor_pos.y);
+	printf("mouse_button_callback: %d %d %d %d\n",
+		   button, action, cursor_pos.x, cursor_pos.y);
 
-    switch (action)
-    {
-    case GLFW_PRESS:
-        dragged_node = node_under_cursor(cursor_pos);
-        if (dragged_node != NULL)
-            dragged_node_offset = vector_sub(
-                dragged_node->rect.pos, 
-                cursor_pos);
-        break;
-    case GLFW_RELEASE:
-        dragged_node = NULL;
-        break;
-    }
+	switch (action)
+	{
+	case GLFW_PRESS:
+		dragged_node = node_under_cursor(cursor_pos);
+		if (dragged_node != NULL)
+			dragged_node_offset = vector_sub(
+				dragged_node->rect.pos,
+				cursor_pos);
+		break;
+	case GLFW_RELEASE:
+		dragged_node = NULL;
+		break;
+	}
 }
 
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
-    window_width = width;
-    window_height = height;
+	window_width = width;
+	window_height = height;
 
-    printf("window_size_callback: %d %d\n", width, height);
+	printf("window_size_callback: %d %d\n", width, height);
 
-    glfwMakeContextCurrent(window);
-    glViewport(0, 0, width, height);
+	glfwMakeContextCurrent(window);
+	glViewport(0, 0, width, height);
 }
 
 struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
 {
-    struct vector2i vec;
-    vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
-    vec.y = node->rect.pos.y;
-    return vec;
+	struct vector2i vec;
+	vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+	vec.y = node->rect.pos.y;
+	return vec;
 }
 
 struct vector2i calc_out_pin_pos(struct node *node, unsigned char pin)
 {
-    struct vector2i vec;
-    vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
-    vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_SIZE;
-    return vec;
+	struct vector2i vec;
+	vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+	vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_SIZE;
+	return vec;
 }
 
 void draw_node(struct NVGcontext *vg, struct node *node)
 {
 
-    int x = node->rect.pos.x;
-    int y = node->rect.pos.y;
-    int width = node->rect.size.x;
-    int height = node->rect.size.y;
+	int x = node->rect.pos.x;
+	int y = node->rect.pos.y;
+	int width = node->rect.size.x;
+	int height = node->rect.size.y;
 
-    // Draw body
-    nvgBeginPath(vg);
-    nvgRect(vg, x, y, NODE_WIDTH, NODE_HEIGHT);
-    nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
-    nvgFill(vg);
-    nvgLineJoin(vg, NVG_BUTT);
-    nvgStrokeWidth(vg, 2);
-    nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
-    nvgStroke(vg);
+	// Draw body
+	nvgBeginPath(vg);
+	nvgRect(vg, x, y, NODE_WIDTH, NODE_HEIGHT);
+	nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
+	nvgFill(vg);
+	nvgLineJoin(vg, NVG_BUTT);
+	nvgStrokeWidth(vg, 2);
+	nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
+	nvgStroke(vg);
 
-    if (node->function_note.draw_func != NULL)
-    {
-        node->function_note.draw_func(vg, node);
-    }
-    else
-    {
-        // Draw node name
-        nvgFontSize(vg, 15.0f);
-        nvgFontFace(vg, "sans");
-        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-        nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
-        nvgText(vg, x + 10, y + height / 2, node->function_note.name, NULL);
-    }
+	if (node->function_note.draw_func != NULL)
+	{
+		node->function_note.draw_func(vg, node);
+	}
+	else
+	{
+		// Draw node name
+		nvgFontSize(vg, 15.0f);
+		nvgFontFace(vg, "sans");
+		nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+		nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
+		nvgText(vg, x + 10, y + height / 2, node->function_note.name, NULL);
+	}
 
-    // Draw in pins
-    for (int i = 0; i < 16; i++)
-    {
-        if (!in_pin_is_active(node, i))
-            continue;
+	// Draw in pins
+	for (int i = 0; i < 16; i++)
+	{
+		if (!in_pin_is_active(node, i))
+			continue;
 
-        struct vector2i pin_pos = calc_in_pin_pos(node, i);
-        nvgBeginPath(vg);
-        nvgRect(vg,
-                pin_pos.x, pin_pos.y,
-                PIN_SIZE, PIN_HALF_SIZE);
-        nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
-        nvgFill(vg);
+		struct vector2i pin_pos = calc_in_pin_pos(node, i);
+		nvgBeginPath(vg);
+		nvgRect(vg,
+				pin_pos.x, pin_pos.y,
+				PIN_SIZE, PIN_HALF_SIZE);
+		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
+		nvgFill(vg);
 
-        struct link *in_link = node->in_pins[i];
-        if (in_link == NULL)
-            continue;
+		struct link *in_link = node->in_pins[i];
+		if (in_link == NULL)
+			continue;
 
-        nvgBeginPath(vg);
-        nvgRect(vg,
-                pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
-                PIN_SIZE, PIN_HALF_SIZE);
-        nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
-        nvgFill(vg);
-    }
+		nvgBeginPath(vg);
+		nvgRect(vg,
+				pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
+				PIN_SIZE, PIN_HALF_SIZE);
+		nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
+		nvgFill(vg);
+	}
 
-    // Draw out pins and out links
-    for (int i = 0; i < 16; i++)
-    {
-        if (!out_pin_is_active(node, i))
-            continue;
+	// Draw out pins and out links
+	for (int i = 0; i < 16; i++)
+	{
+		if (!out_pin_is_active(node, i))
+			continue;
 
-        struct vector2i pin_pos = calc_out_pin_pos(node, i);
-        nvgBeginPath(vg);
-        nvgRect(vg,
-                pin_pos.x, pin_pos.y + PIN_HALF_SIZE,
-                PIN_SIZE, PIN_HALF_SIZE);
-        nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
-        nvgFill(vg);
+		struct vector2i pin_pos = calc_out_pin_pos(node, i);
+		nvgBeginPath(vg);
+		nvgRect(vg,
+				pin_pos.x, pin_pos.y + PIN_HALF_SIZE,
+				PIN_SIZE, PIN_HALF_SIZE);
+		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
+		nvgFill(vg);
 
-        // Draw link from this out pin
-        struct link *out_link = node->out_pins[i];
-        if (out_link == NULL)
-            continue;
+		// Draw link from this out pin
+		struct link *out_link = node->out_pins[i];
+		if (out_link == NULL)
+			continue;
 
-        if (out_link->receiver == NULL)
-            continue;
+		if (out_link->receiver == NULL)
+			continue;
 
-        struct vector2i other_pin_pos = calc_in_pin_pos(
-            out_link->receiver,
-            out_link->receiver_pin);
-        nvgBeginPath(vg);
-        nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE);
-        nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE * 2);
-        nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
-        nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
+		struct vector2i other_pin_pos = calc_in_pin_pos(
+			out_link->receiver,
+			out_link->receiver_pin);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE);
+		nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE * 2);
+		nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
+		nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
 
-        nvgLineJoin(vg, NVG_ROUND);
-        nvgStrokeWidth(vg, 3);
-        nvgStrokeColor(vg, nvgHSLA(0, 0, 128, 170));
-        nvgStroke(vg);
-    }
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgStrokeWidth(vg, 3);
+		nvgStrokeColor(vg, nvgHSLA(0, 0, 128, 170));
+		nvgStroke(vg);
+	}
 }
 
 void init()
 {
-    if (!glfwInit())
-        return;
+	if (!glfwInit())
+		return;
 
 #ifndef _WIN32 // don't require this on win32, and works with more cards
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
-    window = glfwCreateWindow(window_width, window_height, "World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return;
-    }
+	window = glfwCreateWindow(
+		window_width, window_height, "World", NULL, NULL);
+		
+	if (!window)
+	{
+		glfwTerminate();
+		return;
+	}
 
-    glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(window);
 
-    glfwSetWindowSizeCallback(window, window_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetWindowSizeCallback(window, window_size_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, cursor_pos_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-    vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-    if (vg == NULL)
-    {
-        printf("Could not init nanovg.\n");
-        return;
-    }
+	vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+	if (vg == NULL)
+	{
+		printf("Could not init nanovg.\n");
+		return;
+	}
 
-    nvgCreateFont(vg, "sans", "./assets/Roboto-Regular.ttf");
+	nvgCreateFont(vg, "sans", "./assets/Roboto-Regular.ttf");
 
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glEnable(GL_CULL_FACE);
-    // glDisable(GL_DEPTH_TEST);
-    // end initialization
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_CULL_FACE);
+	// glDisable(GL_DEPTH_TEST);
+	// end initialization
 }
 
 void deinit()
 {
-    glfwTerminate();
+	glfwTerminate();
 }
 
 void patch_editor_init(struct node *node)
 {
-    node->in_pins_mask = 1 << 0;
+	node->in_pins_mask = 1 << 0;
 
-    init();
+	init();
 }
 
 void patch_editor(struct node *node)
 {
-    glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(window);
 
-    /* Render here */
-    // glViewport(0, 0, window_width, window_height);
-    glClearColor(0.25f, 0.25f, 0.25f, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	/* Render here */
+	// glViewport(0, 0, window_width, window_height);
+	glClearColor(0.25f, 0.25f, 0.25f, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    nvgBeginFrame(vg, window_width, window_height, 1);
+	nvgBeginFrame(vg, window_width, window_height, 1);
 
-    for (int i = 0; i < nodes_pointer; i++)
-    {
-        draw_node(vg, nodes[i]);
-    }
+	for (int i = 0; i < nodes_pointer; i++)
+	{
+		draw_node(vg, nodes[i]);
+	}
 
-    nvgEndFrame(vg);
+	nvgEndFrame(vg);
 
-    /* Swap front and back buffers */
-    glfwSwapBuffers(window);
+	/* Swap front and back buffers */
+	glfwSwapBuffers(window);
 
-    /* Poll for and process events */
-    glfwPollEvents();
+	/* Poll for and process events */
+	glfwPollEvents();
 
-    if (glfwWindowShouldClose(window))
-    {
-        glfwTerminate(); // TEMP
-        exit(0);
-    }
+	if (glfwWindowShouldClose(window))
+	{
+		glfwTerminate(); // TEMP
+		exit(0);
+	}
 }
 
 void register_library(reg_function_t reg)
 {
-    reg("patch_editor", patch_editor_init, patch_editor, NULL, NULL, NULL);
+	reg("patch_editor", patch_editor_init, patch_editor, NULL, NULL, NULL);
 }

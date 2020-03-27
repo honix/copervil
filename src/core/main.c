@@ -99,7 +99,7 @@ void test_user_window()
 
 	struct node *node1 = make_node(10, 10, get_function_note("make_window"));
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
-	
+
 	double *h1 = malloc(sizeof(double));
 	*h1 = 1.0 / 60;
 
@@ -124,7 +124,7 @@ void test_number_io()
 	struct node *node1 = make_node(10, 300, get_function_note("do_times_inderect"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 	connect_nodes(make_link(h2), NULL, 0, node1, 1);
-	
+
 	struct node *node2 = make_node(10, 450, get_function_note("number_io"));
 	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
 
