@@ -4,13 +4,15 @@ Node-based programming in C language
 ### status
 work in progress, early prototype
 
-### build
+developed and tested to work on linux, but will be easy to port on windows and other platforms
+
+### dependencies to run from sources
+common deps: make, gcc
+nanovg deps: premake4
+
+### build and run
+run this commands in project root folder:
 ```
-make
-```
-but before it each node will be compiled by its makefile:
-```
-cd src/nodes/honix/patch_editor
 make
 ```
 
