@@ -94,5 +94,8 @@ void make_window(struct node *node)
 
 void register_library(reg_function_t reg)
 {
-	reg("make_window", make_window_init, make_window, NULL, NULL, NULL);
+	reg((struct function_note){
+		"make_window",
+		make_window_init,
+		make_window});
 }

@@ -54,6 +54,13 @@ void key_callback(
 	case GLFW_KEY_ESCAPE:
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
+
+	if (selected_node != NULL &&
+		selected_node->function_note.input_key_func != NULL)
+	{
+		selected_node->function_note.input_key_func(
+			selected_node, key, scancode, action, mods);
+	}
 }
 
 void cursor_pos_callback(GLFWwindow *window, double x, double y)
@@ -77,13 +84,13 @@ void mouse_button_callback(
 	glfwGetCursorPos(window, &x, &y);
 	struct vector2i cursor_pos = {.x = x, .y = y};
 
-	printf("mouse_button_callback: %d %d %d %d\n",
-		   button, action, cursor_pos.x, cursor_pos.y);
+	// printf("mouse_button_callback: %d %d %d %d\n",
+	// 	   button, action, cursor_pos.x, cursor_pos.y);
 
 	switch (action)
 	{
 	case GLFW_PRESS:
-		dragged_node = node_under_cursor(cursor_pos);
+		dragged_node = selected_node = node_under_cursor(cursor_pos);
 		if (dragged_node != NULL)
 			dragged_node_offset = vector_sub(
 				dragged_node->rect.pos,
@@ -137,7 +144,9 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	nvgFill(vg);
 	nvgLineJoin(vg, NVG_BUTT);
 	nvgStrokeWidth(vg, 2);
-	nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
+	nvgStrokeColor(
+		vg,
+		node == selected_node ? nvgHSLA(0.5f, 0.75f, 0.75f, 200) : nvgHSLA(0, 0, 0, 100));
 	nvgStroke(vg);
 
 	if (node->function_note.draw_func != NULL)
@@ -308,5 +317,8 @@ void patch_editor(struct node *node)
 
 void register_library(reg_function_t reg)
 {
-	reg("patch_editor", patch_editor_init, patch_editor, NULL, NULL, NULL);
+	reg((struct function_note){
+		.name = "patch_editor",
+		.init_func = patch_editor_init,
+		.main_func = patch_editor});
 }

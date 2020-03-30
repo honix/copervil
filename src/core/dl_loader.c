@@ -14,22 +14,11 @@ void init_dl_loader_subsystem()
 	loaded_functions_pointer = 0;
 }
 
-void register_function(
-	char *name,
-	void (*init_func)(struct node *),
-	void (*main_func)(struct node *),
-	void (*deinit_func)(struct node *),
-	void (*draw_func)(struct NVGcontext *vg, struct node *),
-	void (*input_func)(struct node *))
+void register_function(struct function_note function_note)
 {
-	struct function_note *note = malloc(sizeof(struct function_note));
-	note->name = name;
-	note->init_func = init_func;
-	note->main_func = main_func;
-	note->deinit_func = deinit_func;
-	note->draw_func = draw_func;
-	note->input_func = input_func;
-	loaded_functions[loaded_functions_pointer] = note;
+	struct function_note *copy = malloc(sizeof(struct function_note));
+	memcpy(copy, &function_note, sizeof(struct function_note));
+	loaded_functions[loaded_functions_pointer] = copy;
 	loaded_functions_pointer++;
 }
 
