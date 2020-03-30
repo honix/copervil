@@ -27,20 +27,47 @@ struct node *selected_node;
 struct node *dragged_node;
 struct vector2i dragged_node_offset;
 
-enum pin_hold_type
+enum pin_type
 {
-	PIN_HOLD_INPUT,
-	PIN_HOLD_OUTPUT
+	PIN_NONE,
+	PIN_INPUT,
+	PIN_OUTPUT
 };
 
 struct pin_hold
 {
 	struct node *node;
-	enum pin_hold_type type;
+	enum pin_type type;
 	uint8_t pin;
 };
 
 struct pin_hold pin_hold;
+
+struct vector2i calc_pin_pos(struct node *node, enum pin_type pin_type, uint8_t pin)
+{
+	struct vector2i vec;
+	switch (pin_type)
+	{
+	case PIN_INPUT:
+		/* code */
+		vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+		vec.y = node->rect.pos.y;
+		break;
+
+	case PIN_OUTPUT:
+		vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
+		vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_HALF_SIZE;
+		break;
+	}
+	return vec;
+}
+
+struct rect calc_pin_rect(struct node *node, enum pin_type pin_type, uint8_t pin)
+{
+	return (struct rect){
+		.pos = calc_pin_pos(node, pin_type, pin),
+		.size = (struct vector2i){.x = PIN_SIZE, .y = PIN_HALF_SIZE}};
+}
 
 struct node *node_under_cursor(struct vector2i cursor_pos)
 {
@@ -67,20 +94,30 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 
 	if (cursor_pos.x < x && cursor_pos.x > x + width)
 		return none;
+
+	enum pin_type pin_type = PIN_NONE;
+
 	if (cursor_pos.y > y && cursor_pos.y < y + PIN_HALF_SIZE)
+		pin_type = PIN_INPUT;
+	else if (cursor_pos.y > y + height - PIN_HALF_SIZE &&
+			 cursor_pos.y < y + height)
+		pin_type = PIN_OUTPUT;
+
+	if (pin_type == PIN_NONE)
+		return none;
+
+	for (int i = 0; i < NODE_PINS_COUNT; i++)
 	{
-		return (struct pin_hold){
-			.node = node,
-			.type = PIN_HOLD_INPUT,
-			.pin = 0}; // TODO: calc pin
+		if (is_point_in_rect(cursor_pos,
+							 calc_pin_rect(node, pin_type, i)))
+		{
+			return (struct pin_hold){
+				.node = node,
+				.type = pin_type,
+				.pin = i};
+		}
 	}
-	if (cursor_pos.y > y + height - PIN_HALF_SIZE && cursor_pos.y < y + height)
-	{
-		return (struct pin_hold){
-			.node = node,
-			.type = PIN_HOLD_OUTPUT,
-			.pin = 0}; // TODO: calc pin
-	}
+
 	return none;
 }
 
@@ -126,6 +163,11 @@ struct vector2i get_cursor_pos()
 	return (struct vector2i){.x = x, .y = y};
 }
 
+void clear_pin_hold()
+{
+	pin_hold = (struct pin_hold){.node = NULL};
+}
+
 void mouse_button_callback(
 	GLFWwindow *window,
 	int button, int action, int mods)
@@ -152,11 +194,19 @@ void mouse_button_callback(
 				// TODO: this code is broken!
 				// Top down connection
 				connect_nodes(
-					make_link(malloc(128)), 
-					pin_hold.node, pin_hold.pin, 
+					make_link(malloc(128)),
+					pin_hold.node, pin_hold.pin,
 					new_pin_hold.node, new_pin_hold.pin);
+				clear_pin_hold();
 			}
-			pin_hold = new_pin_hold;
+			else
+			{
+				pin_hold = new_pin_hold;
+			}
+		}
+		else
+		{
+			clear_pin_hold();
 		}
 		break;
 	case GLFW_RELEASE:
@@ -176,25 +226,9 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-struct vector2i calc_in_pin_pos(struct node *node, unsigned char pin)
-{
-	struct vector2i vec;
-	vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
-	vec.y = node->rect.pos.y;
-	return vec;
-}
-
-struct vector2i calc_out_pin_pos(struct node *node, unsigned char pin)
-{
-	struct vector2i vec;
-	vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
-	vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_SIZE;
-	return vec;
-}
-
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 {
-	struct vector2i pin_pos = calc_out_pin_pos(node, pin);
+	struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, pin);
 	struct link *out_link = node->out_pins[pin];
 	if (out_link == NULL)
 		return;
@@ -202,12 +236,12 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 	if (out_link->receiver == NULL)
 		return;
 
-	struct vector2i other_pin_pos = calc_in_pin_pos(
-		out_link->receiver,
+	struct vector2i other_pin_pos = calc_pin_pos(
+		out_link->receiver, PIN_INPUT,
 		out_link->receiver_pin);
 	nvgBeginPath(vg);
-	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE);
-	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE * 2);
+	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
+	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
 	nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
 	nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
 
@@ -217,15 +251,15 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 	nvgStroke(vg);
 }
 
-void draw_node_link_hold_output(
-	struct NVGcontext *vg,
-	struct node *node, uint8_t pin, struct vector2i cursor_pos)
+void draw_pin_hold(struct NVGcontext *vg)
 {
-	struct vector2i pin_pos = calc_out_pin_pos(node, pin);
+	struct vector2i cursor_pos = get_cursor_pos();
+	struct vector2i pin_pos =
+		calc_pin_pos(pin_hold.node, pin_hold.type, pin_hold.pin);
 
 	nvgBeginPath(vg);
-	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE);
-	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_SIZE * 2);
+	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
+	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
 	nvgLineTo(vg, cursor_pos.x + PIN_HALF_SIZE, cursor_pos.y - PIN_SIZE);
 	nvgLineTo(vg, cursor_pos.x + PIN_HALF_SIZE, cursor_pos.y);
 
@@ -275,7 +309,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 		if (!in_pin_is_active(node, i))
 			continue;
 
-		struct vector2i pin_pos = calc_in_pin_pos(node, i);
+		struct vector2i pin_pos = calc_pin_pos(node, PIN_INPUT, i);
 		nvgBeginPath(vg);
 		nvgRect(vg,
 				pin_pos.x, pin_pos.y,
@@ -302,10 +336,10 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 			continue;
 
 		// Draw out pin
-		struct vector2i pin_pos = calc_out_pin_pos(node, i);
+		struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, i);
 		nvgBeginPath(vg);
 		nvgRect(vg,
-				pin_pos.x, pin_pos.y + PIN_HALF_SIZE,
+				pin_pos.x, pin_pos.y,
 				PIN_SIZE, PIN_HALF_SIZE);
 		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
@@ -390,8 +424,7 @@ void patch_editor(struct node *node)
 
 	if (pin_hold.node != NULL)
 	{
-		draw_node_link_hold_output(
-			vg, pin_hold.node, pin_hold.pin, get_cursor_pos());
+		draw_pin_hold(vg);
 	}
 
 	nvgEndFrame(vg);
