@@ -7,8 +7,10 @@ work in progress, early prototype
 developed and tested to work on linux, but will be easy to port on windows and other platforms
 
 ### dependencies to run from sources
-common deps: make, gcc
-nanovg deps: premake4
+- core deps: ```make, gcc```
+
+thirdparty libs:
+- nanovg deps: ```premake4, make, gcc```
 
 ### build and run
 run this commands in project root folder:
