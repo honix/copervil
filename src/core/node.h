@@ -31,8 +31,9 @@ struct node
 	struct function_note function_note;
 
 	struct link *in_pins[NODE_PINS_COUNT];
-	struct link *out_pins[NODE_PINS_COUNT];
 	uint16_t in_pins_mask;
+
+	struct link *out_pins[NODE_PINS_COUNT];
 	uint16_t out_pins_mask;
 
 	uint8_t flags;
