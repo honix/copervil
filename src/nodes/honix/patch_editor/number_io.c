@@ -11,6 +11,14 @@
 #include "core/loop.h"
 #include "core/dl_loader.h"
 
+void number_io_init(struct node *node)
+{
+	node->in_pins_mask = 1 << 0;
+	node->out_pins_mask = 1 << 0;
+
+	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
+}
+
 void number_io(struct node *node)
 {
 }
@@ -50,11 +58,21 @@ void number_io_input_key_func(
 	case GLFW_KEY_UP:
 	case GLFW_KEY_KP_8:
 		*(int *)node->in_pins[0]->data += 1;
+		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		try_direct_call_next(node);
 		break;
 
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_KP_2:
 		*(int *)node->in_pins[0]->data -= 1;
+		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		try_direct_call_next(node);
+		break;
+
+	case GLFW_KEY_R:
+		*(int *)node->in_pins[0]->data = 0;
+		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		try_direct_call_next(node);
 		break;
 
 	default:
@@ -66,6 +84,7 @@ void register_library(reg_function_t reg)
 {
 	reg((struct function_note){
 		.name = "number_io",
+		.init_func = number_io_init,
 		.main_func = number_io,
 		.draw_func = number_io_draw,
 		.input_key_func = number_io_input_key_func});

@@ -12,6 +12,8 @@
 #include "core/dl_loader.h"
 #include "core/geometry.h"
 
+#define HIT_RECT_EXPAND_AMOUNT 10
+
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
@@ -74,7 +76,10 @@ struct node *node_under_cursor(struct vector2i cursor_pos)
 	struct node *node = NULL;
 	for (int i = 0; i < nodes_pointer; i++)
 	{
-		if (is_point_in_rect(cursor_pos, nodes[i]->rect))
+		struct rect expanded_rect =
+			expand_rect(nodes[i]->rect, HIT_RECT_EXPAND_AMOUNT);
+
+		if (is_point_in_rect(cursor_pos, expanded_rect))
 		{
 			node = nodes[i];
 			break;
@@ -97,10 +102,11 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 
 	enum pin_type pin_type = PIN_NONE;
 
-	if (cursor_pos.y > y && cursor_pos.y < y + PIN_HALF_SIZE)
+	if (cursor_pos.y > y - HIT_RECT_EXPAND_AMOUNT &&
+		cursor_pos.y < y + PIN_HALF_SIZE)
 		pin_type = PIN_INPUT;
 	else if (cursor_pos.y > y + height - PIN_HALF_SIZE &&
-			 cursor_pos.y < y + height)
+			 cursor_pos.y < y + height + HIT_RECT_EXPAND_AMOUNT)
 		pin_type = PIN_OUTPUT;
 
 	if (pin_type == PIN_NONE)
@@ -108,8 +114,11 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 
 	for (int i = 0; i < NODE_PINS_COUNT; i++)
 	{
-		if (is_point_in_rect(cursor_pos,
-							 calc_pin_rect(node, pin_type, i)))
+		struct rect expanded_rect =
+			expand_rect(calc_pin_rect(node, pin_type, i),
+						HIT_RECT_EXPAND_AMOUNT);
+
+		if (is_point_in_rect(cursor_pos, expanded_rect))
 		{
 			return (struct pin_hold){
 				.node = node,
@@ -194,7 +203,7 @@ void mouse_button_callback(
 				// TODO: this code is broken!
 				// Top down connection
 				connect_nodes(
-					make_link(malloc(128)),
+					make_link(calloc(1, 128)),
 					pin_hold.node, pin_hold.pin,
 					new_pin_hold.node, new_pin_hold.pin);
 				clear_pin_hold();

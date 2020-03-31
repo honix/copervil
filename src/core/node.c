@@ -28,12 +28,20 @@ void direct_call_node(struct node *node)
 	node->function_note.main_func(node);
 
 	// Do we need this CALL_NEXT feature?
-	// if (node->flags & CALL_NEXT && node->out_pins[0] != NULL)
+	// if (node->flags & CALL_NEXT)
 	// {
-	// 	struct node *next_node = node->out_pins[0]->receiver;
-	// 	if (next_node != NULL)
-	// 		direct_call_node(next_node);
+	// 	try_call_next(node);
 	// }
+}
+
+void try_direct_call_next(struct node *node)
+{
+	if (node->out_pins[0] == NULL)
+		return;
+	struct node *next_node = node->out_pins[0]->receiver;
+	if (next_node == NULL)
+		return;
+	direct_call_node(next_node);
 }
 
 void deinit_node(struct node *node)

@@ -84,7 +84,7 @@ void test_patch_editor()
 	*h1 = 1.0 / 60;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node(100, 100, get_function_note("loop"));
+	struct node *node1 = make_node(200, 100, get_function_note("loop"));
 	connect_nodes(make_link(h1), NULL, 0, node1, 0);
 
 	struct node *node2 = make_node(200, 200, get_function_note("patch_editor"));
@@ -131,6 +131,18 @@ void test_number_io()
 	direct_call_node(node1);
 }
 
+void test_sum_node()
+{
+	load_library("./src/nodes/honix/patch_editor/number_io.so");
+
+	make_node(10, 10, get_function_note("number_io"));
+	make_node(200, 10, get_function_note("number_io"));
+
+	make_node(10, 100, get_function_note("sum"));
+
+	make_node(10, 200, get_function_note("number_io"));
+}
+
 int main(int acount, char **args)
 {
 	printf("=== start ===\n");
@@ -141,6 +153,7 @@ int main(int acount, char **args)
 	//test_nodes();
 	test_do_times();
 	test_patch_editor();
+	test_sum_node();
 	// test_user_window();
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!

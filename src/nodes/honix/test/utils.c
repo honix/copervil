@@ -13,6 +13,9 @@ void sum_init(struct node *node)
 {
 	node->in_pins_mask = 1 << 0 | 1 << 1;
 	node->out_pins_mask = 1 << 0;
+
+	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
+	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 1);
 }
 
 void sum(struct node *node)
