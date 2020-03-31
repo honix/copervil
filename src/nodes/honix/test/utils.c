@@ -11,46 +11,60 @@
 // (int, int) -> (int)
 void sum_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0 | 1 << 1;
-	node->out_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0 | 1 << 1;
+	// node->out_pins_mask = 1 << 0;
 
-	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
-	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 1);
+	// connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
+	// connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 1);
+
+	init_pins(node, 2, 1);
+
+	reg_pin(node, PIN_INPUT, 0, "number a", "int");
+	reg_pin(node, PIN_INPUT, 1, "number b", "int");
+
+	reg_pin(node, PIN_OUTPUT, 0, "result", "int");
 }
 
 void sum(struct node *node)
 {
-	int a = *(int *)node->in_pins[0]->data;
-	int b = *(int *)node->in_pins[1]->data;
-	*(int *)node->out_pins[0]->data = a + b;
+	int a = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
+	int b = *(int *)get_link_on_pin(node, PIN_INPUT, 1)->data;
+	*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data = a + b;
 }
 
 // (int) -> ()
 void print_int_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0;
+	init_pins(node, 1, 0);
+	reg_pin(node, PIN_INPUT, 0, "number", "int");
 }
 
 void print_int(struct node *node)
 {
-	int number = *(int *)node->in_pins[0]->data;
+	int number = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 	printf("%d\n", number);
 }
 
 // (int) -> (trigger, int)
 void do_times_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0;
-	node->out_pins_mask = 1 << 0 | 1 << 1;
+	// node->in_pins_mask = 1 << 0;
+	// node->out_pins_mask = 1 << 0 | 1 << 1;
+	init_pins(node, 1, 2);
+	reg_pin(node, PIN_INPUT, 0, "times", "int");
+
+	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
+	reg_pin(node, PIN_OUTPUT, 1, "times", "int");
 }
 
 void do_times(struct node *node)
 {
-	int count = *(int *)node->in_pins[0]->data;
+	int count = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 	for (int i = 0; i < count; i++)
 	{
-		*(int *)node->out_pins[1]->data = i;
-		direct_call_node(node->out_pins[0]->receiver);
+		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data = i;
+		direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
 		// inderect_call_node(node->out_pins[0]->receiver, 0);
 	}
 }
@@ -58,34 +72,40 @@ void do_times(struct node *node)
 // (int, double) -> (int/trigger)
 void do_times_inderect_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0 | 1 << 1;
-	node->out_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0 | 1 << 1;
+	// node->out_pins_mask = 1 << 0;
 
 	// TODO: oh we cant initialize pins before link comes in
 	// *(int *)node->out_pins[0]->data = 0;
+	
+	init_pins(node, 2, 1);
+	reg_pin(node, PIN_INPUT, 0, "times", "int");
+	reg_pin(node, PIN_INPUT, 1, "delay", "double");
+
+	reg_pin(node, PIN_OUTPUT, 0, "int/trigger", "int");
 }
 
 void do_times_inderect(struct node *node)
 {
-	int count = *(int *)node->in_pins[0]->data;
-	double time_step = *(double *)node->in_pins[1]->data;
+	int count = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
+	double time_step = *(double *)get_link_on_pin(node, PIN_INPUT, 1)->data;
 	int do_count;
 
 	// use out pin as cycle count state
-	if (node->out_pins[0]->data == NULL)
+	if (get_link_on_pin(node, PIN_OUTPUT, 0)->data == NULL)
 	{
 		do_count = 0;
 	}
 	else
 	{
-		do_count = *(int *)node->out_pins[0]->data;
+		do_count = *(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data;
 	}
 
 	// printf("count = %d, do_count = %d\n", count, do_count);
 	if (count > do_count)
 	{
-		direct_call_node(node->out_pins[0]->receiver);
-		*(int *)node->out_pins[0]->data = do_count + 1;
+		direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
+		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data = do_count + 1;
 		delayed_call_node(node, time_step);
 	}
 }
@@ -93,15 +113,20 @@ void do_times_inderect(struct node *node)
 // (double) -> (trigger)
 void loop_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0;
-	node->out_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0;
+	// node->out_pins_mask = 1 << 0;
+
+	init_pins(node, 1, 1);
+	reg_pin(node, PIN_INPUT, 0, "delay", "double");
+
+	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
 }
 
 void loop(struct node *node)
 {
-	double time_step = *(double *)node->in_pins[0]->data;
+	double time_step = *(double *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 
-	direct_call_node(node->out_pins[0]->receiver);
+	direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
 	delayed_call_node(node, time_step);
 }
 

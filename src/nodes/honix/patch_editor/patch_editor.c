@@ -29,13 +29,6 @@ struct node *selected_node;
 struct node *dragged_node;
 struct vector2i dragged_node_offset;
 
-enum pin_type
-{
-	PIN_NONE,
-	PIN_INPUT,
-	PIN_OUTPUT
-};
-
 struct pin_hold
 {
 	struct node *node;
@@ -238,7 +231,7 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 {
 	struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, pin);
-	struct link *out_link = node->out_pins[pin];
+	struct link *out_link = get_link_on_pin(node, PIN_OUTPUT, pin);
 	if (out_link == NULL)
 		return;
 
@@ -313,7 +306,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	}
 
 	// Draw in pins
-	for (int i = 0; i < NODE_PINS_COUNT; i++)
+	for (int i = 0; i < node->in_pins.array_size; i++)
 	{
 		if (!in_pin_is_active(node, i))
 			continue;
@@ -326,7 +319,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
-		struct link *in_link = node->in_pins[i];
+		struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
 		if (in_link == NULL)
 			continue;
 
@@ -339,7 +332,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	}
 
 	// Draw out pins and out links
-	for (int i = 0; i < NODE_PINS_COUNT; i++)
+	for (int i = 0; i < node->out_pins.array_size; i++)
 	{
 		if (!out_pin_is_active(node, i))
 			continue;
@@ -410,7 +403,9 @@ void deinit()
 
 void patch_editor_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0;
+	init_pins(node, 1, 0);
+	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
 
 	init();
 }

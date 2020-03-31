@@ -13,10 +13,20 @@
 
 void number_io_init(struct node *node)
 {
-	node->in_pins_mask = 1 << 0;
-	node->out_pins_mask = 1 << 0;
+	// node->in_pins_mask = 1 << 0;
+	// node->out_pins_mask = 1 << 0;
 
-	connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
+	// init_pins(node,
+		// (struct pin_array){.array_size = 2, .pins = (struct pin *){1,2}});
+
+	// define in and out pins count
+	init_pins(node, 1, 1);
+	// reg pin
+	reg_pin(node, PIN_INPUT, 0, "number", "int");
+	reg_pin(node, PIN_OUTPUT, 0, "number", "int");
+
+	// this will do automatically
+	// connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
 }
 
 void number_io(struct node *node)
@@ -28,7 +38,7 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 	int x = node->rect.pos.x;
 	int y = node->rect.pos.y;
 
-	int number = *(int *)node->in_pins[0]->data;
+	int number = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 
 	// Draw node name
 	nvgBeginPath(vg);
@@ -57,21 +67,24 @@ void number_io_input_key_func(
 	{
 	case GLFW_KEY_UP:
 	case GLFW_KEY_KP_8:
-		*(int *)node->in_pins[0]->data += 1;
-		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data += 1;
+		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
+			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 		try_direct_call_next(node);
 		break;
 
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_KP_2:
-		*(int *)node->in_pins[0]->data -= 1;
-		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data -= 1;
+		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
+			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 		try_direct_call_next(node);
 		break;
 
 	case GLFW_KEY_R:
-		*(int *)node->in_pins[0]->data = 0;
-		*(int *)node->out_pins[0]->data = *(int *)node->in_pins[0]->data;
+		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data = 0;
+		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
+			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 		try_direct_call_next(node);
 		break;
 

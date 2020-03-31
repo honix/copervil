@@ -14,11 +14,60 @@ void init_nodes_subsystem()
 	nodes_pointer = 0;
 }
 
-void init_node(struct node *node)
+void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
+{
+	node->in_pins = (struct pin_array){
+		.array_size = in_pins,
+		.pins = calloc(in_pins, sizeof(struct pin))};
+	node->out_pins = (struct pin_array){
+		.array_size = out_pins,
+		.pins = calloc(out_pins, sizeof(struct pin))};
+}
+
+void reg_pin(
+	struct node *node, 
+	enum pin_type pin_type, uint8_t pin, 
+	char *name, char *type)
+{
+	struct pin *p = get_pin(node, pin_type, pin);
+	p->name = name;
+	// TODO: match type with table and give uniq for type
+	p->type_id = 0;
+	// TODO: alloc link for this type from type->byte table
+	p->connected_link = make_link(calloc(1, 128));
+}
+
+static void init_node(struct node *node)
 {
 	if (node->function_note.init_func == NULL)
 		return;
 	node->function_note.init_func(node);
+}
+
+struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin)
+{
+	switch (pin_type)
+	{
+	case PIN_INPUT:
+		return node->in_pins.pins + pin;
+		break;
+
+	case PIN_OUTPUT:
+		return node->out_pins.pins + pin;
+		break;
+
+	default:
+		printf("bad pin_type\n");
+		break;
+	}
+
+	return NULL;
+}
+
+struct link *get_link_on_pin(
+	struct node *node, enum pin_type pin_type, uint8_t pin)
+{
+	return (*get_pin(node, pin_type, pin)).connected_link;
 }
 
 void direct_call_node(struct node *node)
@@ -36,9 +85,9 @@ void direct_call_node(struct node *node)
 
 void try_direct_call_next(struct node *node)
 {
-	if (node->out_pins[0] == NULL)
+	if (node->out_pins.array_size == 0)
 		return;
-	struct node *next_node = node->out_pins[0]->receiver;
+	struct node *next_node = get_link_on_pin(node, PIN_OUTPUT, 0)->receiver;
 	if (next_node == NULL)
 		return;
 	direct_call_node(next_node);
@@ -64,16 +113,16 @@ struct node *make_node(
 	node->rect.size.y = NODE_HEIGHT;
 	node->function_note = *function_note;
 
-	for (int i = 0; i < NODE_PINS_COUNT; i++)
-	{
-		node->in_pins[i] = NULL;
-		node->out_pins[i] = NULL;
-	}
+	// for (int i = 0; i < NODE_PINS_COUNT; i++)
+	// {
+	// 	node->in_pins[i] = NULL;
+	// 	node->out_pins[i] = NULL;
+	// }
 
-	node->in_pins_mask = 0b0000000000000000;
-	node->out_pins_mask = 0b0000000000000000;
+	// node->in_pins_mask = 0b0000000000000000;
+	// node->out_pins_mask = 0b0000000000000000;
 
-	node->flags = 0b00000000;
+	// node->flags = 0b00000000;
 	//node->flags = 0 | CALL_NEXT;
 
 	nodes[nodes_pointer] = node;
@@ -98,18 +147,21 @@ void connect_nodes(
 	link->sender_pin = sender_pin;
 	link->receiver = receiver;
 	link->receiver_pin = reciever_pin;
+	// TODO: check types of pins
 	if (sender != NULL)
-		sender->out_pins[sender_pin] = link;
+		(*get_pin(sender, PIN_OUTPUT, sender_pin)).connected_link = link;
 	if (receiver != NULL)
-		receiver->in_pins[reciever_pin] = link;
+		(*get_pin(receiver, PIN_INPUT, reciever_pin)).connected_link = link;
 }
 
 bool in_pin_is_active(struct node *node, uint8_t pin)
 {
-	return node->in_pins_mask & 1 << pin;
+	// return node->in_pins_mask & 1 << pin;
+	return true;
 }
 
 bool out_pin_is_active(struct node *node, uint8_t pin)
 {
-	return node->out_pins_mask & 1 << pin;
+	// return node->out_pins_mask & 1 << pin;
+	return true;
 }

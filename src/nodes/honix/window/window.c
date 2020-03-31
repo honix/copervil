@@ -17,8 +17,8 @@ void make_window_init(struct node *node)
 {
 	windows_count += 1;
 
-	node->in_pins_mask = 1 << 0; // trigger
-	node->out_pins_mask = 0b0000000000000001;
+	// node->in_pins_mask = 1 << 0; // trigger
+	// node->out_pins_mask = 0b0000000000000001;
 
 	// TODO: ugh I want better node storage than unused in pins pointers
 	node->in_pins[14] = make_link(malloc(sizeof(GLFWwindow *)));

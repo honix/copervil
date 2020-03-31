@@ -19,9 +19,31 @@ struct function_note;
 #define NODE_WIDTH (PIN_PADDING + (PIN_SIZE + PIN_PADDING) * NODE_PINS_COUNT)
 #define NODE_HEIGHT 30
 
-enum node_flags
+// enum node_flags
+// {
+// 	CALL_NEXT = 0b00000001
+// };
+
+enum pin_type
 {
-	CALL_NEXT = 0b00000001
+	PIN_NONE,
+	PIN_INPUT,
+	PIN_OUTPUT
+};
+
+struct pin
+{
+	char *name;
+	unsigned int type_id;
+	// bool hidden;
+
+	struct link *connected_link;
+};
+
+struct pin_array
+{
+	uint8_t array_size;
+	struct pin *pins;
 };
 
 struct node
@@ -30,19 +52,27 @@ struct node
 
 	struct function_note function_note;
 
-	struct link *in_pins[NODE_PINS_COUNT];
-	uint16_t in_pins_mask;
+	struct pin_array in_pins;
+	struct pin_array out_pins;
 
-	struct link *out_pins[NODE_PINS_COUNT];
-	uint16_t out_pins_mask;
-
-	uint8_t flags;
+	// uint8_t flags;
 };
 
 struct node **nodes; // TODO: dynamic
 unsigned int nodes_pointer;
 
 void init_nodes_subsystem();
+
+void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
+void reg_pin(
+	struct node *node, 
+	enum pin_type pin_type, uint8_t pin, 
+	char *name, char *type);
+
+struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin);
+struct link *get_link_on_pin(
+	struct node *node, enum pin_type pin_type, uint8_t pin);
+
 struct node *make_node(
 	int x, int y,
 	struct function_note *function_note);
