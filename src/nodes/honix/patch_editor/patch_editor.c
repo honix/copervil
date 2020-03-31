@@ -105,7 +105,11 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 	if (pin_type == PIN_NONE)
 		return none;
 
-	for (int i = 0; i < NODE_PINS_COUNT; i++)
+	uint8_t pin_count = pin_type == PIN_INPUT
+							? node->in_pins.array_size
+							: node->out_pins.array_size;
+
+	for (int i = 0; i < pin_count; i++)
 	{
 		struct rect expanded_rect =
 			expand_rect(calc_pin_rect(node, pin_type, i),
@@ -286,9 +290,9 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	nvgFill(vg);
 	nvgLineJoin(vg, NVG_BUTT);
 	nvgStrokeWidth(vg, 2);
-	nvgStrokeColor(
-		vg,
-		node == selected_node ? nvgHSLA(0.5f, 0.75f, 0.75f, 200) : nvgHSLA(0, 0, 0, 100));
+	nvgStrokeColor(vg, node == selected_node
+						   ? nvgHSLA(0.5f, 0.75f, 0.75f, 200)
+						   : nvgHSLA(0, 0, 0, 100));
 	nvgStroke(vg);
 
 	if (node->function_note.draw_func != NULL)

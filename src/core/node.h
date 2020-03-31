@@ -6,7 +6,7 @@
 #include "geometry.h"
 #include "dl_loader.h"
 
-#define NODE_PINS_COUNT 8
+// #define NODE_PINS_COUNT 8
 
 struct link;
 struct function_note;
@@ -16,7 +16,7 @@ struct function_note;
 #define PIN_HALF_SIZE (PIN_SIZE / 2)
 #define PIN_PADDING 10
 
-#define NODE_WIDTH (PIN_PADDING + (PIN_SIZE + PIN_PADDING) * NODE_PINS_COUNT)
+#define NODE_WIDTH (PIN_PADDING + (PIN_SIZE + PIN_PADDING) * 8)
 #define NODE_HEIGHT 30
 
 // enum node_flags
