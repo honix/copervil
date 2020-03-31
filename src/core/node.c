@@ -136,6 +136,19 @@ struct node *make_node(
 	return node;
 }
 
+void free_node(struct node *node)
+{
+	for (int i = 0; i < node->in_pins.array_size; i++)
+		free_link(get_pin(node, PIN_INPUT, i)->connected_link);
+	for (int i = 0; i < node->out_pins.array_size; i++)
+		free_link(get_pin(node, PIN_OUTPUT, i)->connected_link);
+	free(node->in_pins.pins);
+	free(node->out_pins.pins);
+	free(node);
+
+	// TODO: remove from nodes collection
+}
+
 void connect_nodes(
 	struct link *link,
 	struct node *sender,
@@ -143,11 +156,13 @@ void connect_nodes(
 	struct node *receiver,
 	uint8_t reciever_pin)
 {
+	// TODO: free old links
 	link->sender = sender;
 	link->sender_pin = sender_pin;
 	link->receiver = receiver;
 	link->receiver_pin = reciever_pin;
 	// TODO: check types of pins
+	// TODO: auto make link using sizeof type
 	if (sender != NULL)
 		(*get_pin(sender, PIN_OUTPUT, sender_pin)).connected_link = link;
 	if (receiver != NULL)

@@ -76,6 +76,7 @@ struct link *get_link_on_pin(
 struct node *make_node(
 	int x, int y,
 	struct function_note *function_note);
+void free_node(struct node *node);
 void direct_call_node(struct node *node);
 void try_direct_call_next(struct node *node);
 void connect_nodes(

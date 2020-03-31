@@ -136,9 +136,14 @@ void key_callback(
 	//     key, scancode, action, mods);
 	switch (key)
 	{
+	case GLFW_KEY_DELETE:
+		if (selected_node != NULL)
+			free_node(selected_node);
+		break;
 	case GLFW_KEY_Q:
 	case GLFW_KEY_ESCAPE:
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		break;
 	}
 
 	if (selected_node != NULL &&

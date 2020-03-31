@@ -143,12 +143,19 @@ void test_sum_node()
 	make_node(10, 200, get_function_note("number_io"));
 }
 
+void init_subsystems()
+{
+	init_nodes_subsystem();
+	init_links_subsystem();
+	init_dl_loader_subsystem();
+}
+
 int main(int acount, char **args)
 {
 	printf("=== start ===\n");
 
-	init_nodes_subsystem();
-	init_dl_loader_subsystem();
+	init_subsystems();
+
 	//test_arrays();
 	//test_nodes();
 	test_do_times();

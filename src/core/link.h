@@ -11,5 +11,10 @@ struct link
 	unsigned char receiver_pin;
 };
 
+struct link **links; // TODO: dynamic
+unsigned int links_pointer;
+
+void init_links_subsystem();
+
 struct link *make_link(void *data);
-// void set_data (link *this, const struct sized_array *data);
+void free_link(struct link *link);
