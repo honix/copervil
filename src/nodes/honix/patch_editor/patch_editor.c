@@ -269,8 +269,8 @@ void draw_pin_hold(struct NVGcontext *vg)
 	nvgBeginPath(vg);
 	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
 	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
-	nvgLineTo(vg, cursor_pos.x + PIN_HALF_SIZE, cursor_pos.y - PIN_SIZE);
-	nvgLineTo(vg, cursor_pos.x + PIN_HALF_SIZE, cursor_pos.y);
+	nvgLineTo(vg, cursor_pos.x, cursor_pos.y - PIN_SIZE);
+	nvgLineTo(vg, cursor_pos.x, cursor_pos.y);
 
 	nvgLineJoin(vg, NVG_ROUND);
 	nvgStrokeWidth(vg, 3);
