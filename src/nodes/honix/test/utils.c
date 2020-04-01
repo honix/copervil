@@ -126,7 +126,9 @@ void loop(struct node *node)
 {
 	double time_step = *(double *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 
-	direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
+	// direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
+	try_direct_call_next(node);
+
 	delayed_call_node(node, time_step);
 }
 

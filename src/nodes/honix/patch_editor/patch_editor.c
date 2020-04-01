@@ -427,7 +427,7 @@ void patch_editor(struct node *node)
 	glfwMakeContextCurrent(window);
 
 	/* Render here */
-	// glViewport(0, 0, window_width, window_height);
+	glViewport(0, 0, window_width, window_height);
 	glClearColor(0.25f, 0.25f, 0.25f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 

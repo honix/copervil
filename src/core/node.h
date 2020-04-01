@@ -55,6 +55,7 @@ struct node
 	struct pin_array in_pins;
 	struct pin_array out_pins;
 
+	void *inner_state;
 	// uint8_t flags;
 };
 

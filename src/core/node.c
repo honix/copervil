@@ -66,18 +66,23 @@ struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin)
 	switch (pin_type)
 	{
 	case PIN_INPUT:
-		return node->in_pins.pins + pin;
-		break;
+		if (node->in_pins.array_size > pin)
+			return node->in_pins.pins + pin;
+		else
+			goto error;
 
 	case PIN_OUTPUT:
-		return node->out_pins.pins + pin;
-		break;
+		if (node->out_pins.array_size > pin)
+			return node->out_pins.pins + pin;
+		else
+			goto error;
 
 	default:
-		printf("bad pin_type\n");
-		break;
+		goto error;
 	}
 
+error:
+	printf("error: bad pin\n");
 	return NULL;
 }
 
@@ -115,7 +120,6 @@ void deinit_node(struct node *node)
 	if (node->function_note.deinit_func == NULL)
 		return;
 	node->function_note.deinit_func(node);
-	// TODO: free memory
 }
 
 struct node *make_node(
@@ -155,6 +159,8 @@ struct node *make_node(
 
 void free_node(struct node *node)
 {
+	deinit_node(node);
+
 	for (int i = 0; i < node->in_pins.array_size; i++)
 		free_link(get_pin(node, PIN_INPUT, i)->connected_link, PIN_INPUT);
 	for (int i = 0; i < node->out_pins.array_size; i++)

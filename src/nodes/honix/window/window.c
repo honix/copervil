@@ -13,17 +13,27 @@
 
 uint8_t windows_count = 0;
 
+struct make_window_state
+{
+	GLFWwindow *window;
+	int random_number;
+};
+
+static struct make_window_state *get_state(struct node *node)
+{
+	return (struct make_window_state *)node->inner_state;
+}
+
 void make_window_init(struct node *node)
 {
+	init_pins(node, 1, 1);
+	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
+	reg_pin(node, PIN_OUTPUT, 0, "window", "GLFWWindow *");
+
+	node->inner_state = malloc(sizeof(struct make_window_state));
+	get_state(node)->random_number = rand() % 360;
+
 	windows_count += 1;
-
-	// node->in_pins_mask = 1 << 0; // trigger
-	// node->out_pins_mask = 0b0000000000000001;
-
-	// TODO: ugh I want better node storage than unused in pins pointers
-	node->in_pins[14] = make_link(malloc(sizeof(GLFWwindow *)));
-	node->in_pins[15] = make_link(malloc(sizeof(int))); // cozy API :(
-	*(int *)node->in_pins[15]->data = rand() % 360;
 
 	if (!glfwInit())
 		return;
@@ -36,10 +46,10 @@ void make_window_init(struct node *node)
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	node->in_pins[14]->data = glfwCreateWindow(256, 256, "Window", NULL, NULL);
+	get_state(node)->window = glfwCreateWindow(256, 256, "Window", NULL, NULL);
 	glfwSetWindowPos(
-		node->in_pins[14]->data, 100 + (windows_count - 1) * 280, 200);
-	if (!(GLFWwindow *)node->in_pins[14]->data)
+		get_state(node)->window, 100 + (windows_count - 1) * 280, 200);
+	if (!get_state(node)->window)
 	{
 		glfwTerminate();
 		return;
@@ -57,9 +67,9 @@ void make_window_init(struct node *node)
 
 void make_window(struct node *node)
 {
-	*(int *)node->in_pins[15]->data += 1;
+	get_state(node)->random_number += 1;
 
-	glfwMakeContextCurrent((GLFWwindow *)node->in_pins[14]->data);
+	glfwMakeContextCurrent(get_state(node)->window);
 
 	// Fill window with black
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -74,7 +84,7 @@ void make_window(struct node *node)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glScalef(0.5, 0.5, 0.5);
-	glRotatef(*(int *)node->in_pins[15]->data * 2, 0, 0, 1);
+	glRotatef(get_state(node)->random_number * 2, 0, 0, 1);
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
@@ -87,9 +97,16 @@ void make_window(struct node *node)
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
-	glfwSwapBuffers((GLFWwindow *)node->in_pins[14]->data);
+	glfwSwapBuffers(get_state(node)->window);
 
-	node->out_pins[0]->data = (GLFWwindow *)node->in_pins[14]->data;
+	*(GLFWwindow **)get_link_on_pin(node, PIN_OUTPUT, 0)->data = get_state(node)->window;
+}
+
+void make_window_deinit(struct node *node)
+{
+	printf("make_window_deinit\n");
+	glfwDestroyWindow(get_state(node)->window);
+	free(node->inner_state);
 }
 
 void register_library(reg_function_t reg)
@@ -97,5 +114,6 @@ void register_library(reg_function_t reg)
 	reg((struct function_note){
 		"make_window",
 		make_window_init,
-		make_window});
+		make_window,
+		make_window_deinit});
 }
