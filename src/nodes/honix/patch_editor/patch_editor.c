@@ -44,7 +44,6 @@ struct vector2i calc_pin_pos(struct node *node, enum pin_type pin_type, uint8_t 
 	switch (pin_type)
 	{
 	case PIN_INPUT:
-		/* code */
 		vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
 		vec.y = node->rect.pos.y;
 		break;
@@ -134,11 +133,15 @@ void key_callback(
 	// printf("key_callback: %s %d %d %d %d\n",
 	//     glfwGetKeyName(key, scancode),
 	//     key, scancode, action, mods);
+
 	switch (key)
 	{
 	case GLFW_KEY_DELETE:
-		if (selected_node != NULL)
+		if (action == GLFW_PRESS && selected_node != NULL)
+		{
 			free_node(selected_node);
+			selected_node = NULL;
+		}
 		break;
 	case GLFW_KEY_Q:
 	case GLFW_KEY_ESCAPE:
@@ -328,16 +331,16 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
-		struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
-		if (in_link == NULL)
-			continue;
+		// struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
+		// if (in_link == NULL)
+		// 	continue;
 
-		nvgBeginPath(vg);
-		nvgRect(vg,
-				pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
-				PIN_SIZE, PIN_HALF_SIZE);
-		nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
-		nvgFill(vg);
+		// nvgBeginPath(vg);
+		// nvgRect(vg,
+		// 		pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
+		// 		PIN_SIZE, PIN_HALF_SIZE);
+		// nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
+		// nvgFill(vg);
 	}
 
 	// Draw out pins and out links

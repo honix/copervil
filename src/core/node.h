@@ -58,7 +58,7 @@ struct node
 	// uint8_t flags;
 };
 
-struct node **nodes; // TODO: dynamic
+struct node **nodes; // TODO: consider using dynamic collection
 unsigned int nodes_pointer;
 
 void init_nodes_subsystem();
@@ -68,6 +68,10 @@ void reg_pin(
 	struct node *node, 
 	enum pin_type pin_type, uint8_t pin, 
 	char *name, char *type);
+
+void drop_link(
+	struct node *node,
+	enum pin_type pin_type, uint8_t pin);
 
 struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin);
 struct link *get_link_on_pin(

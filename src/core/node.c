@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "link.h"
 #include "dl_loader.h" // funtion_note
@@ -24,17 +25,33 @@ void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
 		.pins = calloc(out_pins, sizeof(struct pin))};
 }
 
+void init_pin_link(struct pin *pin)
+{
+	// TODO: consider default pin values
+	// TODO: alloc link for this type from type->byte table
+	pin->connected_link = make_link(calloc(1, 128));
+}
+
 void reg_pin(
-	struct node *node, 
-	enum pin_type pin_type, uint8_t pin, 
+	struct node *node,
+	enum pin_type pin_type, uint8_t pin,
 	char *name, char *type)
 {
 	struct pin *p = get_pin(node, pin_type, pin);
 	p->name = name;
-	// TODO: match type with table and give uniq for type
+	// TODO: match type table and give unique type number
 	p->type_id = 0;
-	// TODO: alloc link for this type from type->byte table
-	p->connected_link = make_link(calloc(1, 128));
+
+	init_pin_link(p);
+}
+
+void drop_link(
+	struct node *node,
+	enum pin_type pin_type, uint8_t pin)
+{
+	struct pin *p = get_pin(node, pin_type, pin);
+	p->connected_link = NULL;
+	init_pin_link(p);
 }
 
 static void init_node(struct node *node)
@@ -129,7 +146,7 @@ struct node *make_node(
 	nodes_pointer++;
 
 	if (nodes_pointer >= NODES_MAX_COUNT)
-		printf("Oops! NODES_MAX_COUNT exceeded!");
+		printf("Oops! NODES_MAX_COUNT exceeded!\n");
 
 	init_node(node);
 
@@ -139,14 +156,29 @@ struct node *make_node(
 void free_node(struct node *node)
 {
 	for (int i = 0; i < node->in_pins.array_size; i++)
-		free_link(get_pin(node, PIN_INPUT, i)->connected_link);
+		free_link(get_pin(node, PIN_INPUT, i)->connected_link, PIN_INPUT);
 	for (int i = 0; i < node->out_pins.array_size; i++)
-		free_link(get_pin(node, PIN_OUTPUT, i)->connected_link);
+		free_link(get_pin(node, PIN_OUTPUT, i)->connected_link, PIN_OUTPUT);
 	free(node->in_pins.pins);
 	free(node->out_pins.pins);
-	free(node);
 
-	// TODO: remove from nodes collection
+	unsigned int shift = 0;
+	for (int i = 0; i < nodes_pointer; i++)
+	{
+		if (nodes[i] == node)
+		{
+			shift = i;
+			break;
+		}
+	}
+	memmove(
+		nodes + shift,
+		nodes + shift + 1,
+		(nodes_pointer - shift - 1) * sizeof(struct node *));
+
+	nodes_pointer--;
+
+	free(node);
 }
 
 void connect_nodes(

@@ -1,6 +1,9 @@
 #include "link.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+
+#include "node.h"
 
 #define LINKS_MAX_COUNT 128 // TODO: this is bad temp code. rewrite
 
@@ -21,13 +24,18 @@ struct link *make_link(void *data)
 	links_pointer++;
 
 	if (links_pointer >= LINKS_MAX_COUNT)
-		printf("Oops! LINKS_MAX_COUNT exceeded!");
+		printf("Oops! LINKS_MAX_COUNT exceeded!\n");
 
 	return link;
 }
 
-void free_link(struct link *link)
+void free_link(struct link *link, enum pin_type owner)
 {
+	if (owner == PIN_INPUT && link->sender != NULL)
+		drop_link(link->sender, PIN_OUTPUT, link->sender_pin);
+	if (owner == PIN_OUTPUT && link->receiver != NULL)
+		drop_link(link->receiver, PIN_INPUT, link->receiver_pin);
+
 	free(link->data);
 	free(link);
 
