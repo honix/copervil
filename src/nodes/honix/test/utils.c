@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #include "core/link.h"
 #include "core/node.h"
@@ -77,7 +78,7 @@ void do_times_inderect_init(struct node *node)
 
 	// TODO: oh we cant initialize pins before link comes in
 	// *(int *)node->out_pins[0]->data = 0;
-	
+
 	init_pins(node, 2, 1);
 	reg_pin(node, PIN_INPUT, 0, "times", "int");
 	reg_pin(node, PIN_INPUT, 1, "delay", "double");
@@ -118,8 +119,10 @@ void loop_init(struct node *node)
 
 	init_pins(node, 1, 1);
 	reg_pin(node, PIN_INPUT, 0, "delay", "double");
-
+	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0/60;
 	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
+
+	delayed_call_node(node, 0);
 }
 
 void loop(struct node *node)
@@ -130,6 +133,29 @@ void loop(struct node *node)
 	try_direct_call_next(node);
 
 	delayed_call_node(node, time_step);
+}
+
+void lfo_init(struct node *node)
+{
+	init_pins(node, 2, 2);
+	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
+	reg_pin(node, PIN_INPUT, 1, "freq", "int"); // TODO: double
+	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
+	reg_pin(node, PIN_OUTPUT, 1, "value", "double");
+
+	// delayed_call_node(node, 0);
+}
+
+void lfo(struct node *node)
+{
+	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data +=
+		*(int *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0/60; // ignore relatime for now
+
+	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
+		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
+
+	try_direct_call_next(node);
+	// delayed_call_node(node, 1/60);
 }
 
 void register_library(reg_function_t reg)
@@ -144,6 +170,8 @@ void register_library(reg_function_t reg)
 		"do_times_inderect", do_times_inderect_init, do_times_inderect});
 	reg((struct function_note){
 		"loop", loop_init, loop});
+	reg((struct function_note){
+		"lfo", lfo_init, lfo});
 }
 /*
 

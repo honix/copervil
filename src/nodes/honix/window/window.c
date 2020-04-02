@@ -16,7 +16,7 @@ uint8_t windows_count = 0;
 struct make_window_state
 {
 	GLFWwindow *window;
-	int random_number;
+	// int random_number;
 };
 
 static struct make_window_state *get_state(struct node *node)
@@ -26,12 +26,13 @@ static struct make_window_state *get_state(struct node *node)
 
 void make_window_init(struct node *node)
 {
-	init_pins(node, 1, 1);
+	init_pins(node, 2, 1);
 	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
+	reg_pin(node, PIN_INPUT, 1, "rotate", "double");
 	reg_pin(node, PIN_OUTPUT, 0, "window", "GLFWWindow *");
 
 	node->inner_state = malloc(sizeof(struct make_window_state));
-	get_state(node)->random_number = rand() % 360;
+	// get_state(node)->random_number = rand() % 360;
 
 	windows_count += 1;
 
@@ -63,11 +64,13 @@ void make_window_init(struct node *node)
 	// glfwSetCursorPosCallback(window, cursor_pos_callback);
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+
+	direct_call_node(node); // draw one frame
 }
 
 void make_window(struct node *node)
 {
-	get_state(node)->random_number += 1;
+	// get_state(node)->random_number += 1;
 
 	glfwMakeContextCurrent(get_state(node)->window);
 
@@ -84,7 +87,7 @@ void make_window(struct node *node)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glScalef(0.5, 0.5, 0.5);
-	glRotatef(get_state(node)->random_number * 2, 0, 0, 1);
+	glRotatef(*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 360, 0, 0, 1);
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 

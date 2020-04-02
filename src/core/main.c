@@ -90,24 +90,27 @@ void test_patch_editor()
 	struct node *node2 = make_node(200, 200, get_function_note("patch_editor"));
 	connect_nodes(make_link(NULL), node1, 0, node2, 0);
 
-	direct_call_node(node1);
+	// direct_call_node(node1);
 }
 
 void test_user_window()
 {
 	load_library("./src/nodes/honix/window/window.so");
 
-	struct node *node1 = make_node(400, 100, get_function_note("make_window"));
+	struct node *node1 = make_node(400, 125, get_function_note("make_window"));
 	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 
-	double *h1 = malloc(sizeof(double));
-	*h1 = 1.0 / 60;
+	// double *h1 = malloc(sizeof(double));
+	// *h1 = 1.0 / 60;
 
-	struct node *node2 = make_node(400, 10, get_function_note("loop"));
-	connect_nodes(make_link(NULL), node2, 0, node1, 0);
-	connect_nodes(make_link(h1), NULL, 0, node2, 0);
+	// struct node *node2 = make_node(400, 10, get_function_note("loop"));
+	// connect_nodes(make_link(NULL), node2, 0, node1, 0);
+	// connect_nodes(make_link(h1), NULL, 0, node2, 0);
 
-	direct_call_node(node2);
+	make_node(400, 10, get_function_note("loop"));
+	make_node(400, 75, get_function_note("lfo"));	
+
+	// direct_call_node(node2);
 }
 
 void test_number_io()
