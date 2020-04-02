@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "node.h"
+#include "link.h"
 #include "list.h"
 #include "utils.h"
 
@@ -41,12 +42,22 @@ int ord(struct list_cell *a, struct list_cell *b)
 	return delayed_node_a->call_time < delayed_node_b->call_time ? 1 : 0;
 }
 
-void delayed_call_node(struct node *node, double secs)
+void delayed_call_node_self(struct node *node, double secs)
 {
 	struct list_cell *cell = make_list_cell(
 		make_delayed_node(node, current_time_secs() + secs));
 
 	insert_list_cell_ordered(&delayed_node_list, cell, ord);
+}
+
+void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
+{
+	struct node *target = get_link_on_pin(node, PIN_OUTPUT, pin)->receiver;
+
+	if (target == NULL || target->only_self_trigger)
+		return;
+
+	delayed_call_node_self(target, secs);
 }
 
 struct timespec time_req;
@@ -83,7 +94,7 @@ void loop_step()
 	{
 		struct delayed_node *delayed_node =
 			delayed_node_list.first_cell->data;
-		direct_call_node(delayed_node->node);
+		direct_call_node_self(delayed_node->node);
 		// TODO: drop and free first cell
 		// drop first cell
 		delayed_node_list.first_cell =

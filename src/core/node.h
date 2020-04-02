@@ -56,6 +56,8 @@ struct node
 	struct pin_array out_pins;
 
 	void *inner_state;
+
+	bool only_self_trigger;
 	// uint8_t flags;
 };
 
@@ -82,8 +84,8 @@ struct node *make_node(
 	int x, int y,
 	struct function_note *function_note);
 void free_node(struct node *node);
-void direct_call_node(struct node *node);
-void try_direct_call_next(struct node *node);
+void direct_call_node_self(struct node *node);
+void direct_call_node_on_pin(struct node *node, uint8_t pin);
 void connect_nodes(
 	struct link *link,
 	struct node *sender,

@@ -92,7 +92,7 @@ struct link *get_link_on_pin(
 	return (*get_pin(node, pin_type, pin)).connected_link;
 }
 
-void direct_call_node(struct node *node)
+void direct_call_node_self(struct node *node)
 {
 	// printf("// direct_call_node %s\n", node->name);
 
@@ -101,18 +101,18 @@ void direct_call_node(struct node *node)
 	// Do we need this CALL_NEXT feature?
 	// if (node->flags & CALL_NEXT)
 	// {
-	// 	try_call_next(node);
+	// 	call_next(node);
 	// }
 }
 
-void try_direct_call_next(struct node *node)
+void direct_call_node_on_pin(struct node *node, uint8_t pin)
 {
-	if (node->out_pins.array_size == 0)
+	struct node *next_node = get_link_on_pin(node, PIN_OUTPUT, pin)->receiver;
+
+	if (next_node == NULL || next_node->only_self_trigger)
 		return;
-	struct node *next_node = get_link_on_pin(node, PIN_OUTPUT, 0)->receiver;
-	if (next_node == NULL)
-		return;
-	direct_call_node(next_node);
+
+	direct_call_node_self(next_node);
 }
 
 void deinit_node(struct node *node)
@@ -133,6 +133,7 @@ struct node *make_node(
 	node->rect.size.x = NODE_WIDTH;
 	node->rect.size.y = NODE_HEIGHT;
 	node->function_note = *function_note;
+	node->only_self_trigger = false;
 
 	// for (int i = 0; i < NODE_PINS_COUNT; i++)
 	// {

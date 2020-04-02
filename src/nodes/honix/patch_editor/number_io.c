@@ -70,7 +70,7 @@ void number_io_input_key_func(
 		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data += 1;
 		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
 			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		try_direct_call_next(node);
+		direct_call_node_on_pin(node, 0);
 		break;
 
 	case GLFW_KEY_DOWN:
@@ -78,14 +78,14 @@ void number_io_input_key_func(
 		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data -= 1;
 		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
 			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		try_direct_call_next(node);
+		direct_call_node_on_pin(node, 0);
 		break;
 
 	case GLFW_KEY_R:
 		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data = 0;
 		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
 			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		try_direct_call_next(node);
+		direct_call_node_on_pin(node, 0);
 		break;
 
 	default:

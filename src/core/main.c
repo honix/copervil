@@ -73,7 +73,7 @@ void test_do_times()
 	struct node *node2 = make_node(400, 400, get_function_note("print_int"));
 	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
 
-	direct_call_node(node1);
+	direct_call_node_self(node1);
 }
 
 void test_patch_editor()
@@ -131,7 +131,7 @@ void test_number_io()
 	struct node *node2 = make_node(10, 450, get_function_note("number_io"));
 	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
 
-	direct_call_node(node1);
+	direct_call_node_self(node1);
 }
 
 void test_sum_node()

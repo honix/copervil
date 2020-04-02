@@ -65,7 +65,7 @@ void do_times(struct node *node)
 	for (int i = 0; i < count; i++)
 	{
 		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data = i;
-		direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
+		direct_call_node_on_pin(node, 0);
 		// inderect_call_node(node->out_pins[0]->receiver, 0);
 	}
 }
@@ -105,9 +105,9 @@ void do_times_inderect(struct node *node)
 	// printf("count = %d, do_count = %d\n", count, do_count);
 	if (count > do_count)
 	{
-		direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
+		direct_call_node_on_pin(node, 0);
 		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data = do_count + 1;
-		delayed_call_node(node, time_step);
+		delayed_call_node_self(node, time_step);
 	}
 }
 
@@ -122,7 +122,9 @@ void loop_init(struct node *node)
 	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0/60;
 	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
 
-	delayed_call_node(node, 0);
+	node->only_self_trigger = true;
+
+	delayed_call_node_self(node, 0);
 }
 
 void loop(struct node *node)
@@ -130,9 +132,9 @@ void loop(struct node *node)
 	double time_step = *(double *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 
 	// direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
-	try_direct_call_next(node);
+	direct_call_node_on_pin(node, 0);
 
-	delayed_call_node(node, time_step);
+	delayed_call_node_self(node, time_step);
 }
 
 void lfo_init(struct node *node)
@@ -143,7 +145,7 @@ void lfo_init(struct node *node)
 	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
 	reg_pin(node, PIN_OUTPUT, 1, "value", "double");
 
-	// delayed_call_node(node, 0);
+	// delayed_call_node_on_pin(node, 0);
 }
 
 void lfo(struct node *node)
@@ -154,8 +156,8 @@ void lfo(struct node *node)
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
 
-	try_direct_call_next(node);
-	// delayed_call_node(node, 1/60);
+	direct_call_node_on_pin(node, 0);
+	// delayed_call_node_on_pin(node, 1/60);
 }
 
 void register_library(reg_function_t reg)

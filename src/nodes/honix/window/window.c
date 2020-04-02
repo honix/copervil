@@ -65,7 +65,7 @@ void make_window_init(struct node *node)
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
-	direct_call_node(node); // draw one frame
+	direct_call_node_self(node); // draw one frame
 }
 
 void make_window(struct node *node)
