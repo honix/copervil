@@ -38,6 +38,8 @@ struct pin_hold
 
 struct pin_hold pin_hold;
 
+char new_node_name[128];
+
 struct vector2i calc_pin_pos(struct node *node, enum pin_type pin_type, uint8_t pin)
 {
 	struct vector2i vec;
@@ -126,6 +128,15 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 	return none;
 }
 
+void character_callback(GLFWwindow *window, unsigned int codepoint)
+{
+	uint8_t p = -1;
+	while (new_node_name[++p] != '\0')
+		;
+	new_node_name[p] = (char)codepoint;
+	new_node_name[p + 1] = '\0';
+}
+
 void key_callback(
 	GLFWwindow *window, int key,
 	int scancode, int action, int mods)
@@ -134,19 +145,37 @@ void key_callback(
 	//     glfwGetKeyName(key, scancode),
 	//     key, scancode, action, mods);
 
-	switch (key)
+	struct function_note *note;
+	uint8_t p;
+
+	if (action & (GLFW_PRESS | GLFW_REPEAT))
 	{
-	case GLFW_KEY_DELETE:
-		if (action == GLFW_PRESS && selected_node != NULL)
+		switch (key)
 		{
-			free_node(selected_node);
-			selected_node = NULL;
+		case GLFW_KEY_DELETE:
+			if (action == GLFW_PRESS && selected_node != NULL)
+			{
+				free_node(selected_node);
+				selected_node = NULL;
+			}
+			break;
+		case GLFW_KEY_Q:
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			break;
+		case GLFW_KEY_ENTER:
+			note = get_function_note(new_node_name);
+			if (note != NULL)
+				make_node(0, 0, note);
+			new_node_name[0] = '\0';
+		case GLFW_KEY_BACKSPACE:
+			p = -1;
+			while (new_node_name[++p] != '\0')
+				;
+			if (p > 0)
+				new_node_name[p - 1] = '\0';
+			break;
 		}
-		break;
-	case GLFW_KEY_Q:
-	case GLFW_KEY_ESCAPE:
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-		break;
 	}
 
 	if (selected_node != NULL &&
@@ -388,6 +417,7 @@ void init()
 	glfwMakeContextCurrent(window);
 
 	glfwSetWindowSizeCallback(window, window_size_callback);
+	glfwSetCharCallback(window, character_callback);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, cursor_pos_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -442,6 +472,12 @@ void patch_editor(struct node *node)
 	{
 		draw_pin_hold(vg);
 	}
+
+	nvgFontSize(vg, 15.0f);
+	nvgFontFace(vg, "sans");
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
+	nvgFillColor(vg, nvgRGBA(255, 120, 0, 255));
+	nvgText(vg, 10, window_height - 10, new_node_name, NULL);
 
 	nvgEndFrame(vg);
 

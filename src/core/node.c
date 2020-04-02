@@ -7,7 +7,7 @@
 #include "link.h"
 #include "dl_loader.h" // funtion_note
 
-#define NODES_MAX_COUNT 16 // TODO: this is bad temp code. rewrite
+#define NODES_MAX_COUNT 128 // TODO: this is bad temp code. rewrite
 
 void init_nodes_subsystem()
 {

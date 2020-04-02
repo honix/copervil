@@ -45,6 +45,6 @@ struct function_note *get_function_note(char *name)
 			return note;
 	}
 
-	printf("Error: No such function note %s\n", name);
+	printf("Error: No such function note: %s\n", name);
 	return NULL;
 }
