@@ -19,6 +19,7 @@ make
 ```
 
 ### todo (topmost is priority)
+- node reqursive call problem (for example changing loop step in real-time will cause more loops calls)
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - better pins interface (NULL link handling)
 - rethink node creation API from C
