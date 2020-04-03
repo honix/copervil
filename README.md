@@ -27,3 +27,7 @@ make
 - patch_editor *.so objects is too big, they staticly linked with nanovg
 - patch_editor eats cpu - redraw on event, not every 1/60 seconds
 - thirdparty libraries auto-wrap? (use header files to generate node functions)
+
+### strange ideas
+- lua (or janet) interpreter as node, can be used as command line; such interpreter can be used as patch file definition using interpreter syntax
+- pin nodes to the screen space, and use them as part of ui
