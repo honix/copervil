@@ -19,13 +19,12 @@ make
 ```
 
 ### todo (topmost is priority)
-- node reqursive call problem (for example changing loop step in real-time will cause more loops calls)
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
-- better pins interface (NULL link handling)
+- patch_editor eats cpu - redraw on event, not every 1/60 seconds
 - rethink node creation API from C
 - better, systematic error logging
+- try to plugin big drawing/sound engines like ogre, try run both in same time
 - patch_editor *.so objects is too big, they staticly linked with nanovg
-- patch_editor eats cpu - redraw on event, not every 1/60 seconds
 - thirdparty libraries auto-wrap? (use header files to generate node functions)
 
 ### strange ideas
