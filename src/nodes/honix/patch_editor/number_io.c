@@ -11,22 +11,23 @@
 #include "core/loop.h"
 #include "core/dl_loader.h"
 
+enum number_io_inputs
+{
+	in_number
+};
+
+enum number_io_outputs
+{
+	out_number
+};
+
 void number_io_init(struct node *node)
 {
-	// node->in_pins_mask = 1 << 0;
-	// node->out_pins_mask = 1 << 0;
-
-	// init_pins(node,
-		// (struct pin_array){.array_size = 2, .pins = (struct pin *){1,2}});
-
 	// define in and out pins count
 	init_pins(node, 1, 1);
 	// reg pin
-	reg_pin(node, PIN_INPUT, 0, "number", "int");
-	reg_pin(node, PIN_OUTPUT, 0, "number", "int");
-
-	// this will do automatically
-	// connect_nodes(make_link(calloc(1, sizeof(int))), NULL, 0, node, 0);
+	REG_PIN(node, PIN_INPUT, in_number, "number", int);
+	REG_PIN(node, PIN_OUTPUT, out_number, "number", int);
 }
 
 void number_io(struct node *node)
@@ -37,14 +38,15 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 {
 	int x = node->rect.pos.x;
 	int y = node->rect.pos.y;
+	int width = node->rect.size.x;
+	int height = node->rect.size.y;
 
-	int number = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
+	int number = GET_PIN(node, PIN_INPUT, in_number, int);
 
 	// Draw node name
 	nvgBeginPath(vg);
 	nvgFillColor(vg, nvgRGBA(0, 0, 250, 75));
-	nvgRect(vg, x, y,
-			node->rect.size.x * ((float)number / 100), node->rect.size.y);
+	nvgRect(vg, x, y, width * ((float)number / 100), height);
 	nvgFill(vg);
 
 	nvgFontSize(vg, 15.0f);
@@ -63,29 +65,27 @@ void number_io_input_key_func(
 	if (action != GLFW_PRESS && action != GLFW_REPEAT)
 		return;
 
+#define change_number(op, value)                  \
+	GET_PIN(node, PIN_INPUT, in_number, int)      \
+	op value;                                     \
+	GET_PIN(node, PIN_OUTPUT, out_number, int) =  \
+		GET_PIN(node, PIN_INPUT, in_number, int); \
+	direct_call_node_on_pin(node, 0);
+
 	switch (key)
 	{
 	case GLFW_KEY_UP:
 	case GLFW_KEY_KP_8:
-		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data += 1;
-		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
-			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		direct_call_node_on_pin(node, 0);
+		change_number(+=, 1);
 		break;
 
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_KP_2:
-		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data -= 1;
-		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
-			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		direct_call_node_on_pin(node, 0);
+		change_number(-=, 1);
 		break;
 
 	case GLFW_KEY_R:
-		*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data = 0;
-		*(int *)get_link_on_pin(node, PIN_OUTPUT, 0)->data =
-			*(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
-		direct_call_node_on_pin(node, 0);
+		change_number(=, 0);
 		break;
 
 	default:
@@ -93,9 +93,12 @@ void number_io_input_key_func(
 	}
 }
 
-void register_library(reg_function_t reg)
+void register_library()
 {
-	reg((struct function_note){
+	//REG_TYPE(int);
+	// -> req_type("int", sizeof(int));
+
+	register_function((struct function_note){
 		.name = "number_io",
 		.init_func = number_io_init,
 		.main_func = number_io,

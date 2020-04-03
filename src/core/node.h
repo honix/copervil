@@ -67,6 +67,13 @@ unsigned int nodes_pointer;
 void init_nodes_subsystem();
 
 void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
+
+#define REG_PIN(node, pin_type, pin, name, type) \
+	(reg_pin(node, pin_type, pin, name, #type))
+
+#define GET_PIN(node, pin_type, pin, type) \
+	(*(type *)get_link_on_pin(node, pin_type, pin)->data)
+
 void reg_pin(
 	struct node *node, 
 	enum pin_type pin_type, uint8_t pin, 

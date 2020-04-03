@@ -23,9 +23,9 @@ struct function_note
 		int button, int action, int mods);
 };
 
-typedef void (*reg_function_t)(
-	struct function_note function_note
-);
+// typedef void (*reg_function_t)(
+// 	struct function_note function_note
+// );
 
 void init_dl_loader_subsystem();
 void register_function(struct function_note function_note);

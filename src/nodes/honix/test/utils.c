@@ -160,19 +160,19 @@ void lfo(struct node *node)
 	// delayed_call_node_on_pin(node, 1/60);
 }
 
-void register_library(reg_function_t reg)
+void register_library()
 {
-	reg((struct function_note){
+	register_function((struct function_note){
 		"sum", sum_init, sum});
-	reg((struct function_note){
+	register_function((struct function_note){
 		"print_int", print_int_init, print_int});
-	reg((struct function_note){
+	register_function((struct function_note){
 		"do_times", do_times_init, do_times});
-	reg((struct function_note){
+	register_function((struct function_note){
 		"do_times_inderect", do_times_inderect_init, do_times_inderect});
-	reg((struct function_note){
+	register_function((struct function_note){
 		"loop", loop_init, loop});
-	reg((struct function_note){
+	register_function((struct function_note){
 		"lfo", lfo_init, lfo});
 }
 /*

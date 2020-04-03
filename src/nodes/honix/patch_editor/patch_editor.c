@@ -494,9 +494,9 @@ void patch_editor(struct node *node)
 	}
 }
 
-void register_library(reg_function_t reg)
+void register_library()
 {
-	reg((struct function_note){
+	register_function((struct function_note){
 		.name = "patch_editor",
 		.init_func = patch_editor_init,
 		.main_func = patch_editor});

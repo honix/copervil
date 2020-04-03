@@ -24,16 +24,15 @@ void register_function(struct function_note function_note)
 
 void load_library(char *path)
 {
-	void *handle;
-	handle = dlopen(path, RTLD_LAZY);
-	void (*register_library)(reg_function_t);
+	void *handle = dlopen(path, RTLD_LAZY);
+	void (*register_library)();
 	register_library = dlsym(handle, "register_library");
 	if (register_library == NULL)
 	{
 		printf("Error: No register function in %s\n", path);
 		return;
 	}
-	register_library(register_function);
+	register_library();
 }
 
 struct function_note *get_function_note(char *name)

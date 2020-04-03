@@ -102,7 +102,8 @@ void make_window(struct node *node)
 
 	glfwSwapBuffers(get_state(node)->window);
 
-	*(GLFWwindow **)get_link_on_pin(node, PIN_OUTPUT, 0)->data = get_state(node)->window;
+	// *(GLFWwindow **)get_link_on_pin(node, PIN_OUTPUT, 0)->data = get_state(node)->window;
+	GET_PIN(node, PIN_OUTPUT, 0, GLFWwindow *) = get_state(node)->window;
 }
 
 void make_window_deinit(struct node *node)
@@ -112,9 +113,9 @@ void make_window_deinit(struct node *node)
 	free(node->inner_state);
 }
 
-void register_library(reg_function_t reg)
+void register_library()
 {
-	reg((struct function_note){
+	register_function((struct function_note){
 		"make_window",
 		make_window_init,
 		make_window,
