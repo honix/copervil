@@ -59,19 +59,13 @@ void test_do_times()
 
 	load_library("./src/nodes/honix/test/utils.so");
 
-	int *h1 = malloc(sizeof(int));
-	*h1 = 3;
-
-	double *h2 = malloc(sizeof(double));
-	*h2 = 1.0;
-
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node(300, 300, get_function_note("do_times_inderect"));
-	connect_nodes(make_link(h1), NULL, 0, node1, 0);
-	connect_nodes(make_link(h2), NULL, 0, node1, 1);
+	GET_PIN(node1, PIN_INPUT, 0, int) = 3;
+	GET_PIN(node1, PIN_INPUT, 1, double) = 1.0;
 
 	struct node *node2 = make_node(400, 400, get_function_note("print_int"));
-	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
+	connect_nodes(node1, 0, node2, 0);
 
 	direct_call_node_self(node1);
 }
@@ -80,15 +74,12 @@ void test_patch_editor()
 {
 	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
 
-	double *h1 = malloc(sizeof(double));
-	*h1 = 1.0 / 60;
-
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node(200, 100, get_function_note("loop"));
-	connect_nodes(make_link(h1), NULL, 0, node1, 0);
+	GET_PIN(node1, PIN_INPUT, 0, double) = 1.0 / 60;
 
 	struct node *node2 = make_node(200, 200, get_function_note("patch_editor"));
-	connect_nodes(make_link(NULL), node1, 0, node2, 0);
+	connect_nodes(node1, 0, node2, 0);
 
 	// direct_call_node(node1);
 }
@@ -97,8 +88,8 @@ void test_user_window()
 {
 	load_library("./src/nodes/honix/window/window.so");
 
-	struct node *node1 = make_node(400, 125, get_function_note("make_window"));
-	connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
+	make_node(400, 125, get_function_note("make_window"));
+	// connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 
 	// double *h1 = malloc(sizeof(double));
 	// *h1 = 1.0 / 60;
@@ -125,11 +116,11 @@ void test_number_io()
 
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node(10, 300, get_function_note("do_times_inderect"));
-	connect_nodes(make_link(h1), NULL, 0, node1, 0);
-	connect_nodes(make_link(h2), NULL, 0, node1, 1);
+	GET_PIN(node1, PIN_INPUT, 0, int) = 100;
+	GET_PIN(node1, PIN_INPUT, 1, double) = 0.1;
 
 	struct node *node2 = make_node(10, 450, get_function_note("number_io"));
-	connect_nodes(make_link(calloc(1, sizeof(int))), node1, 0, node2, 0);
+	connect_nodes(node1, 0, node2, 0);
 
 	direct_call_node_self(node1);
 }

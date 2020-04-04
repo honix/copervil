@@ -11,6 +11,7 @@
 #include "core/loop.h"
 #include "core/dl_loader.h"
 #include "core/geometry.h"
+#include "core/type_bank.h"
 
 #define HIT_RECT_EXPAND_AMOUNT 10
 
@@ -237,7 +238,6 @@ void mouse_button_callback(
 				// TODO: this code is broken!
 				// Top down connection
 				connect_nodes(
-					make_link(calloc(1, 128)),
 					pin_hold.node, pin_hold.pin,
 					new_pin_hold.node, new_pin_hold.pin);
 				clear_pin_hold();
@@ -447,7 +447,7 @@ void patch_editor_init(struct node *node)
 {
 	// node->in_pins_mask = 1 << 0;
 	init_pins(node, 1, 0);
-	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
+	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
 
 	init();
 }

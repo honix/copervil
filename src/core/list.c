@@ -86,7 +86,7 @@ struct list_cell *list_find(
 	do
 		if (pred(cell, pred_args))
 			return cell;
-	while (cell = cell->next != NULL);
+	while ((cell = cell->next) != NULL);
 
 	return NULL;
 }

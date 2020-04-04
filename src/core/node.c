@@ -6,6 +6,7 @@
 
 #include "link.h"
 #include "dl_loader.h" // funtion_note
+#include "type_bank.h"
 
 #define NODES_MAX_COUNT 128 // TODO: this is bad temp code. rewrite
 
@@ -25,22 +26,24 @@ void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
 		.pins = calloc(out_pins, sizeof(struct pin))};
 }
 
-void init_pin_link(struct pin *pin)
+static void init_pin_link(struct pin *pin)
 {
 	// TODO: consider default pin values
 	// TODO: alloc link for this type from type->byte table
-	pin->connected_link = make_link(calloc(1, 128));
+	pin->connected_link = make_link(
+		calloc(1, get_type_note_by_id(pin->type_id)->size));
 }
 
 void reg_pin(
 	struct node *node,
 	enum pin_type pin_type, uint8_t pin,
-	char *name, char *type)
+	char *name, char *type_name, size_t type_size)
 {
 	struct pin *p = get_pin(node, pin_type, pin);
 	p->name = name;
-	// TODO: match type table and give unique type number
-	p->type_id = 0;
+
+	struct type_note *type_note = reg_type(type_name, type_size);
+	p->type_id = type_note->id;
 
 	init_pin_link(p);
 }
@@ -189,23 +192,45 @@ void free_node(struct node *node)
 }
 
 void connect_nodes(
-	struct link *link,
 	struct node *sender,
-	uint8_t sender_pin,
+	uint8_t sender_pin_number,
 	struct node *receiver,
-	uint8_t reciever_pin)
+	uint8_t reciever_pin_number)
 {
-	// TODO: free old links, and maybe save datas they hold
-	link->sender = sender;
-	link->sender_pin = sender_pin;
-	link->receiver = receiver;
-	link->receiver_pin = reciever_pin;
-	// TODO: check types of pins
-	// TODO: auto make link using sizeof type
+	struct pin *sender_pin;
+	struct pin *receiver_pin;
+	size_t size = -1;
+
 	if (sender != NULL)
-		(*get_pin(sender, PIN_OUTPUT, sender_pin)).connected_link = link;
+	{
+		sender_pin = get_pin(sender, PIN_OUTPUT, sender_pin_number);
+		size = get_type_note_by_id(sender_pin->type_id)->size;
+	}
 	if (receiver != NULL)
-		(*get_pin(receiver, PIN_INPUT, reciever_pin)).connected_link = link;
+	{
+		receiver_pin = get_pin(receiver, PIN_INPUT, reciever_pin_number);
+		if (size == -1)
+			size = get_type_note_by_id(receiver_pin->type_id)->size;
+	}
+
+	if (sender_pin != NULL && receiver_pin != NULL &&
+		sender_pin->type_id != receiver_pin->type_id)
+	{
+		printf("Error: types are not same\n");
+		return;
+	}
+
+	// TODO: free old links, and maybe save datas they hold
+	struct link *link = make_link(calloc(1, size));
+	link->sender = sender;
+	link->sender_pin = sender_pin_number;
+	link->receiver = receiver;
+	link->receiver_pin = reciever_pin_number;
+
+	if (sender_pin != NULL)
+		sender_pin->connected_link = link;
+	if (receiver_pin != NULL)
+		receiver_pin->connected_link = link;
 }
 
 bool in_pin_is_active(struct node *node, uint8_t pin)

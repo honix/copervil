@@ -6,6 +6,7 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg/src/nanovg_gl.h"
 
+// oh so many core includes!
 #include "core/node.h"
 #include "core/link.h"
 #include "core/loop.h"
@@ -95,9 +96,6 @@ void number_io_input_key_func(
 
 void register_library()
 {
-	//REG_TYPE(int);
-	// -> req_type("int", sizeof(int));
-
 	register_function((struct function_note){
 		.name = "number_io",
 		.init_func = number_io_init,

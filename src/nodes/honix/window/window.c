@@ -27,9 +27,9 @@ static struct make_window_state *get_state(struct node *node)
 void make_window_init(struct node *node)
 {
 	init_pins(node, 2, 1);
-	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
-	reg_pin(node, PIN_INPUT, 1, "rotate", "double");
-	reg_pin(node, PIN_OUTPUT, 0, "window", "GLFWWindow *");
+	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_INPUT, 1, "rotate", double);
+	REG_PIN(node, PIN_OUTPUT, 0, "window", GLFWwindow *);
 
 	node->inner_state = malloc(sizeof(struct make_window_state));
 	// get_state(node)->random_number = rand() % 360;

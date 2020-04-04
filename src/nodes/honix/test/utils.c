@@ -20,10 +20,10 @@ void sum_init(struct node *node)
 
 	init_pins(node, 2, 1);
 
-	reg_pin(node, PIN_INPUT, 0, "number a", "int");
-	reg_pin(node, PIN_INPUT, 1, "number b", "int");
+	REG_PIN(node, PIN_INPUT, 0, "number a", int);
+	REG_PIN(node, PIN_INPUT, 1, "number b", int);
 
-	reg_pin(node, PIN_OUTPUT, 0, "result", "int");
+	REG_PIN(node, PIN_OUTPUT, 0, "result", int);
 }
 
 void sum(struct node *node)
@@ -38,7 +38,7 @@ void print_int_init(struct node *node)
 {
 	// node->in_pins_mask = 1 << 0;
 	init_pins(node, 1, 0);
-	reg_pin(node, PIN_INPUT, 0, "number", "int");
+	REG_PIN(node, PIN_INPUT, 0, "number", int);
 }
 
 void print_int(struct node *node)
@@ -53,10 +53,10 @@ void do_times_init(struct node *node)
 	// node->in_pins_mask = 1 << 0;
 	// node->out_pins_mask = 1 << 0 | 1 << 1;
 	init_pins(node, 1, 2);
-	reg_pin(node, PIN_INPUT, 0, "times", "int");
+	REG_PIN(node, PIN_INPUT, 0, "times", int);
 
-	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
-	reg_pin(node, PIN_OUTPUT, 1, "times", "int");
+	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_OUTPUT, 1, "times", int);
 }
 
 void do_times(struct node *node)
@@ -80,10 +80,10 @@ void do_times_inderect_init(struct node *node)
 	// *(int *)node->out_pins[0]->data = 0;
 
 	init_pins(node, 2, 1);
-	reg_pin(node, PIN_INPUT, 0, "times", "int");
-	reg_pin(node, PIN_INPUT, 1, "delay", "double");
+	REG_PIN(node, PIN_INPUT, 0, "times", int);
+	REG_PIN(node, PIN_INPUT, 1, "delay", double);
 
-	reg_pin(node, PIN_OUTPUT, 0, "int/trigger", "int");
+	REG_PIN(node, PIN_OUTPUT, 0, "int/trigger", int);
 }
 
 void do_times_inderect(struct node *node)
@@ -118,9 +118,9 @@ void loop_init(struct node *node)
 	// node->out_pins_mask = 1 << 0;
 
 	init_pins(node, 1, 1);
-	reg_pin(node, PIN_INPUT, 0, "delay", "double");
+	REG_PIN(node, PIN_INPUT, 0, "delay", double);
 	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0/60;
-	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
+	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 
 	node->only_self_trigger = true;
 
@@ -140,10 +140,10 @@ void loop(struct node *node)
 void lfo_init(struct node *node)
 {
 	init_pins(node, 2, 2);
-	reg_pin(node, PIN_INPUT, 0, "trigger", "trigger");
-	reg_pin(node, PIN_INPUT, 1, "freq", "int"); // TODO: double
-	reg_pin(node, PIN_OUTPUT, 0, "trigger", "trigger");
-	reg_pin(node, PIN_OUTPUT, 1, "value", "double");
+	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_INPUT, 1, "freq", int); // TODO: double
+	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_OUTPUT, 1, "value", double);
 
 	// delayed_call_node_on_pin(node, 0);
 }

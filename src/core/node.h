@@ -1,10 +1,13 @@
 #pragma once
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include "geometry.h"
 #include "dl_loader.h"
+
+typedef uint8_t trigger;
 
 // #define NODE_PINS_COUNT 8
 
@@ -69,7 +72,7 @@ void init_nodes_subsystem();
 void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
 
 #define REG_PIN(node, pin_type, pin, name, type) \
-	(reg_pin(node, pin_type, pin, name, #type))
+	(reg_pin(node, pin_type, pin, name, #type, sizeof(type)))
 
 #define GET_PIN(node, pin_type, pin, type) \
 	(*(type *)get_link_on_pin(node, pin_type, pin)->data)
@@ -77,7 +80,7 @@ void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
 void reg_pin(
 	struct node *node, 
 	enum pin_type pin_type, uint8_t pin, 
-	char *name, char *type);
+	char *name, char *type, size_t type_size);
 
 void drop_link(
 	struct node *node,
@@ -94,11 +97,10 @@ void free_node(struct node *node);
 void direct_call_node_self(struct node *node);
 void direct_call_node_on_pin(struct node *node, uint8_t pin);
 void connect_nodes(
-	struct link *link,
 	struct node *sender,
-	uint8_t sender_pin,
+	uint8_t sender_pin_number,
 	struct node *receiver,
-	uint8_t reciever_pin);
+	uint8_t reciever_pin_number);
 
 bool in_pin_is_active(struct node *node, uint8_t pin);
 bool out_pin_is_active(struct node *node, uint8_t pin);
