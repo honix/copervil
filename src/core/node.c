@@ -195,7 +195,7 @@ void connect_nodes(
 	struct node *receiver,
 	uint8_t reciever_pin)
 {
-	// TODO: free old links
+	// TODO: free old links, and maybe save datas they hold
 	link->sender = sender;
 	link->sender_pin = sender_pin;
 	link->receiver = receiver;

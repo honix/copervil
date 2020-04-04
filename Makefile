@@ -4,7 +4,8 @@ HEADERS_CORE = src/core/link.h \
 	src/core/node.h \
 	src/core/sized_array.h \
 	src/core/dl_loader.h \
-	src/core/geometry.h
+	src/core/geometry.h \
+	src/core/type_bank.h
 
 HEADERS_ALL = $(HEADERS_CORE)
 

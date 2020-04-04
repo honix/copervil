@@ -12,16 +12,36 @@ struct list_cell *make_list_cell(void *data)
 	return list_cell;
 }
 
-void link_list_cell(struct list_cell *cell, struct list_cell *next)
+static void link_list_cell(struct list_cell *cell, struct list_cell *next)
 {
 	cell->next = next;
 }
 
-void insert_list_cell(struct list_cell *cell, struct list_cell *next)
+static void link_list_cell_saving_tail(
+	struct list_cell *cell,
+	struct list_cell *next)
 {
 	struct list_cell *temp = cell->next;
 	link_list_cell(cell, next);
 	link_list_cell(next, temp);
+}
+
+void insert_list_cell_at_top(
+	struct list *list,
+	struct list_cell *insert_cell)
+{
+	struct list_cell *cell = list->first_cell;
+	if (cell == NULL)
+	{
+		list->first_cell = insert_cell;
+		return;
+	}
+	else
+	{
+		link_list_cell(insert_cell, cell);
+		list->first_cell = insert_cell;
+		return;
+	}
 }
 
 void insert_list_cell_ordered(
@@ -38,7 +58,7 @@ void insert_list_cell_ordered(
 	}
 	if (ord(cell, insert_cell) <= 0)
 	{
-		insert_list_cell(insert_cell, cell);
+		link_list_cell(insert_cell, cell);
 		list->first_cell = insert_cell;
 		return;
 	}
@@ -48,11 +68,35 @@ void insert_list_cell_ordered(
 		cell = cell->next;
 		if (cell == NULL || ord(cell, insert_cell) <= 0)
 		{
-			insert_list_cell(prev, insert_cell);
+			link_list_cell_saving_tail(prev, insert_cell);
 			return;
 		}
 		prev = cell;
 	}
+}
+
+struct list_cell *list_find(
+	struct list *list,
+	bool(pred)(struct list_cell *, void *),
+	void *pred_args)
+{
+	struct list_cell *cell = list->first_cell;
+	if (cell == NULL)
+		return NULL;
+	do
+		if (pred(cell, pred_args))
+			return cell;
+	while (cell = cell->next != NULL);
+
+	return NULL;
+}
+
+bool is_list_any(
+	struct list *list,
+	bool(pred)(struct list_cell *, void *),
+	void *pred_args)
+{
+	return list_find(list, pred, pred_args) == NULL ? false : true;
 }
 
 void remove_next_list_cell(struct list_cell *cell)
