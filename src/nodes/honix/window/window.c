@@ -4,9 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
 
-#include "core/node.h"
-#include "core/link.h"
-#include "core/dl_loader.h"
+#include "core/node_api.h"
 
 // WARN // WARN // WARN // WARN
 // THIS CODE IS SUPER EXPERIMTAL!

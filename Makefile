@@ -1,4 +1,5 @@
-HEADERS_CORE = src/core/link.h \
+HEADERS_CORE = \
+	src/core/link.h \
 	src/core/list.h \
 	src/core/loop.h \
 	src/core/node.h \
@@ -6,6 +7,8 @@ HEADERS_CORE = src/core/link.h \
 	src/core/dl_loader.h \
 	src/core/geometry.h \
 	src/core/type_bank.h
+
+NODE_API = src/core/node_api.h
 
 HEADERS_ALL = $(HEADERS_CORE)
 
@@ -25,14 +28,18 @@ bin/core: src/core/main.c $(OBJECTS) bin
 	gcc -Wall -g -rdynamic $< $(OBJECTS) -o $@ -lm -ldl
 
 
-nodes:
+nodes: $(NODE_API)
 	cd src/nodes && for m in `find | grep Makefile`; do make -C `dirname $$m`; done
+
+
+$(NODE_API): $(HEADERS_CORE)
+	touch $@
 
 
 obj:
 	mkdir obj
 
-obj/%.o: src/core/%.c $(HEADERS_CORE) obj 
+obj/%.o: src/core/%.c $(HEADERS_CORE) obj
 	gcc -Wall -g -c $< -o $@
 
 obj/%.o: src/editor/%.c $(HEADERS_CORE) $(HEADERS_EDITOR) obj

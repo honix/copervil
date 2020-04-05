@@ -6,11 +6,7 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg/src/nanovg_gl.h"
 
-// oh so many core includes!
-#include "core/node.h"
-#include "core/link.h"
-#include "core/loop.h"
-#include "core/dl_loader.h"
+#include "core/node_api.h"
 
 enum number_io_inputs
 {

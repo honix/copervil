@@ -6,12 +6,7 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg/src/nanovg_gl.h"
 
-#include "core/node.h"
-#include "core/link.h"
-#include "core/loop.h"
-#include "core/dl_loader.h"
-#include "core/geometry.h"
-#include "core/type_bank.h"
+#include "core/node_api.h"
 
 #define HIT_RECT_EXPAND_AMOUNT 10
 

@@ -3,11 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "core/link.h"
-#include "core/node.h"
-#include "core/loop.h"
-#include "core/utils.h"
-#include "core/dl_loader.h"
+#include "core/node_api.h"
 
 // (int, int) -> (int)
 void sum_init(struct node *node)
