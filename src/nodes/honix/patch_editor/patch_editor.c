@@ -33,8 +33,9 @@ struct vector2i dragged_node_offset;
 struct pin_hold
 {
 	struct node *node;
-	enum pin_type type;
+	enum pin_type pin_type;
 	uint8_t pin;
+	unsigned long type_id;
 };
 
 struct pin_hold pin_hold;
@@ -121,8 +122,9 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 		{
 			return (struct pin_hold){
 				.node = node,
-				.type = pin_type,
-				.pin = i};
+				.pin_type = pin_type,
+				.pin = i,
+				.type_id = get_pin(node, pin_type, i)->type_id};
 		}
 	}
 
@@ -233,7 +235,7 @@ void mouse_button_callback(
 
 			struct pin_hold new_pin_hold = pin_under_cursor(selected_node, cursor_pos);
 			if (new_pin_hold.node != NULL && pin_hold.node != NULL &&
-				new_pin_hold.type != pin_hold.type)
+				new_pin_hold.pin_type != pin_hold.pin_type)
 			{
 				// TODO: this code is broken!
 				// Top down connection
@@ -298,7 +300,7 @@ void draw_pin_hold(struct NVGcontext *vg)
 {
 	struct vector2i cursor_pos = get_cursor_pos();
 	struct vector2i pin_pos =
-		calc_pin_pos(pin_hold.node, pin_hold.type, pin_hold.pin);
+		calc_pin_pos(pin_hold.node, pin_hold.pin_type, pin_hold.pin);
 
 	nvgBeginPath(vg);
 	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
@@ -349,15 +351,16 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	// Draw in pins
 	for (int i = 0; i < node->in_pins.array_size; i++)
 	{
-		if (!in_pin_is_active(node, i))
-			continue;
-
 		struct vector2i pin_pos = calc_pin_pos(node, PIN_INPUT, i);
 		nvgBeginPath(vg);
 		nvgRect(vg,
 				pin_pos.x, pin_pos.y,
 				PIN_SIZE, PIN_HALF_SIZE);
-		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
+		if (pin_hold.node != NULL &&
+			pin_hold.type_id == get_pin(node, PIN_INPUT, i)->type_id)
+			nvgFillColor(vg, nvgHSLA(0.35f, 1, 0.75f, 128));
+		else
+			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
 		// struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
@@ -375,9 +378,6 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	// Draw out pins and out links
 	for (int i = 0; i < node->out_pins.array_size; i++)
 	{
-		if (!out_pin_is_active(node, i))
-			continue;
-
 		// Draw out pin
 		struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, i);
 		nvgBeginPath(vg);

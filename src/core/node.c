@@ -233,14 +233,14 @@ void connect_nodes(
 		receiver_pin->connected_link = link;
 }
 
-bool in_pin_is_active(struct node *node, uint8_t pin)
-{
-	// return node->in_pins_mask & 1 << pin;
-	return true;
-}
+// bool in_pin_is_active(struct node *node, uint8_t pin)
+// {
+// 	// return node->in_pins_mask & 1 << pin;
+// 	return true;
+// }
 
-bool out_pin_is_active(struct node *node, uint8_t pin)
-{
-	// return node->out_pins_mask & 1 << pin;
-	return true;
-}
+// bool out_pin_is_active(struct node *node, uint8_t pin)
+// {
+// 	// return node->out_pins_mask & 1 << pin;
+// 	return true;
+// }

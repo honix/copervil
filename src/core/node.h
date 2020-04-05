@@ -102,5 +102,5 @@ void connect_nodes(
 	struct node *receiver,
 	uint8_t reciever_pin_number);
 
-bool in_pin_is_active(struct node *node, uint8_t pin);
-bool out_pin_is_active(struct node *node, uint8_t pin);
+// bool in_pin_is_active(struct node *node, uint8_t pin);
+// bool out_pin_is_active(struct node *node, uint8_t pin);
