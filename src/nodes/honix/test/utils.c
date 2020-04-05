@@ -157,7 +157,7 @@ void lfo(struct node *node)
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
 
-	direct_call_node_on_pin(node, 0);
+	// direct_call_node_on_pin(node, 0);
 	// delayed_call_node_on_pin(node, 1/60);
 }
 

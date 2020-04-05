@@ -66,8 +66,29 @@ void make_window_init(struct node *node)
 	direct_call_node_self(node); // draw one frame
 }
 
+#include <time.h>
+
+double current_time_secs()
+{
+	// TODO: this seems to work only on linux family
+	// need test this function on windows
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, &time);
+	return time.tv_sec + (double)time.tv_nsec / 1000000000;
+}
+
+double prev_time = 0;
+int t = 0;
+
 void make_window(struct node *node)
 {
+	if (t++ == 55)
+	{
+		t = 0;
+		printf("delta: %f\n", current_time_secs() - prev_time);
+	}
+	prev_time = current_time_secs();
+
 	// get_state(node)->random_number += 1;
 
 	glfwMakeContextCurrent(get_state(node)->window);
