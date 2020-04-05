@@ -53,6 +53,8 @@ void do_times_init(struct node *node)
 
 	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 	REG_PIN(node, PIN_OUTPUT, 1, "times", int);
+
+	node->auto_call_next = false;
 }
 
 void do_times(struct node *node)
@@ -80,6 +82,8 @@ void do_times_inderect_init(struct node *node)
 	REG_PIN(node, PIN_INPUT, 1, "delay", double);
 
 	REG_PIN(node, PIN_OUTPUT, 0, "int/trigger", int);
+
+	node->auto_call_next = false;
 }
 
 void do_times_inderect(struct node *node)
@@ -115,10 +119,11 @@ void loop_init(struct node *node)
 
 	init_pins(node, 1, 1);
 	REG_PIN(node, PIN_INPUT, 0, "delay", double);
-	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0/60;
+	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0 / 60;
 	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 
 	node->only_self_trigger = true;
+	node->auto_call_next = false;
 
 	delayed_call_node_self(node, 0);
 }
@@ -147,7 +152,7 @@ void lfo_init(struct node *node)
 void lfo(struct node *node)
 {
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data +=
-		*(int *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0/60; // ignore relatime for now
+		*(int *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0 / 60; // ignore relatime for now
 
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);

@@ -61,6 +61,7 @@ struct node
 	void *inner_state;
 
 	bool only_self_trigger;
+	bool auto_call_next;
 	// uint8_t flags;
 };
 

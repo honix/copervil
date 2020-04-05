@@ -135,6 +135,13 @@ void character_callback(GLFWwindow *window, unsigned int codepoint)
 	new_node_name[p + 1] = '\0';
 }
 
+struct vector2i get_cursor_pos()
+{
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
+	return (struct vector2i){.x = x, .y = y};
+}
+
 void key_callback(
 	GLFWwindow *window, int key,
 	int scancode, int action, int mods)
@@ -145,9 +152,11 @@ void key_callback(
 
 	struct function_note *note;
 	uint8_t p;
+	struct vector2i pos;
 
 	if (action & (GLFW_PRESS | GLFW_REPEAT))
 	{
+
 		switch (key)
 		{
 		case GLFW_KEY_DELETE:
@@ -164,7 +173,10 @@ void key_callback(
 		case GLFW_KEY_ENTER:
 			note = get_function_note(new_node_name);
 			if (note != NULL)
-				make_node(0, 0, note);
+			{
+				pos = get_cursor_pos();
+				make_node(pos.x, pos.y, note);
+			}
 			new_node_name[0] = '\0';
 		case GLFW_KEY_BACKSPACE:
 			p = -1;
@@ -195,13 +207,6 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
 		struct vector2i cursor_pos = {.x = x, .y = y};
 		dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
 	}
-}
-
-struct vector2i get_cursor_pos()
-{
-	double x, y;
-	glfwGetCursorPos(window, &x, &y);
-	return (struct vector2i){.x = x, .y = y};
 }
 
 void clear_pin_hold()

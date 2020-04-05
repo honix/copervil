@@ -19,7 +19,6 @@ make
 ```
 
 ### todo (topmost is priority)
-- make nodes_api.h generated file target to minimize nodes includes and makefiles
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - patch_editor eats cpu - redraw on event, not every 1/60 seconds
 - rethink node creation API from C

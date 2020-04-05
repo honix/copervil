@@ -61,7 +61,7 @@ void test_do_times()
 
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node(300, 300, get_function_note("do_times_inderect"));
-	GET_PIN(node1, PIN_INPUT, 0, int) = 3;
+	GET_PIN(node1, PIN_INPUT, 0, int) = 10;
 	GET_PIN(node1, PIN_INPUT, 1, double) = 1.0;
 
 	struct node *node2 = make_node(400, 400, get_function_note("print_int"));

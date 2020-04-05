@@ -85,7 +85,7 @@ struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin)
 	}
 
 error:
-	printf("error: bad pin\n");
+	// printf("error: bad pin\n");
 	return NULL;
 }
 
@@ -101,17 +101,17 @@ void direct_call_node_self(struct node *node)
 
 	node->function_note.main_func(node);
 
-	// Do we need this CALL_NEXT feature?
-	// if (node->flags & CALL_NEXT)
-	// {
-	// 	call_next(node);
-	// }
+	if (node->auto_call_next)
+		direct_call_node_on_pin(node, 0);
 }
 
-void direct_call_node_on_pin(struct node *node, uint8_t pin)
+void direct_call_node_on_pin(struct node *node, uint8_t pin_index)
 {
-	struct node *next_node = get_link_on_pin(node, PIN_OUTPUT, pin)->receiver;
+	struct pin *pin = get_pin(node, PIN_OUTPUT, pin_index);
+	if (pin == NULL)
+		return;
 
+	struct node *next_node = pin->connected_link->receiver;
 	if (next_node == NULL || next_node->only_self_trigger)
 		return;
 
@@ -137,6 +137,7 @@ struct node *make_node(
 	node->rect.size.y = NODE_HEIGHT;
 	node->function_note = *function_note;
 	node->only_self_trigger = false;
+	node->auto_call_next = true;
 
 	// for (int i = 0; i < NODE_PINS_COUNT; i++)
 	// {
