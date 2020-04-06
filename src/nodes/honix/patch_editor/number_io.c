@@ -23,8 +23,8 @@ void number_io_init(struct node *node)
 	// define in and out pins count
 	init_pins(node, 1, 1);
 	// reg pin
-	REG_PIN(node, PIN_INPUT, in_number, "number", int);
-	REG_PIN(node, PIN_OUTPUT, out_number, "number", int);
+	REG_PIN(node, PIN_INPUT, in_number, "number", double);
+	REG_PIN(node, PIN_OUTPUT, out_number, "number", double);
 }
 
 void number_io(struct node *node)
@@ -38,12 +38,12 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 	int width = node->rect.size.x;
 	int height = node->rect.size.y;
 
-	int number = GET_PIN(node, PIN_INPUT, in_number, int);
+	double number = GET_PIN(node, PIN_INPUT, in_number, double);
 
 	// Draw node name
 	nvgBeginPath(vg);
 	nvgFillColor(vg, nvgRGBA(0, 0, 250, 75));
-	nvgRect(vg, x, y, width * ((float)number / 100), height);
+	nvgRect(vg, x, y, width * (number / 100), height);
 	nvgFill(vg);
 
 	nvgFontSize(vg, 15.0f);
@@ -51,7 +51,7 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 	nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
 	char s[32];
-	sprintf(s, "%d", number);
+	sprintf(s, "%f", number);
 	nvgText(vg, x + 15, y + 30 / 2, s, NULL);
 }
 
@@ -62,23 +62,30 @@ void number_io_input_key_func(
 	if (action != GLFW_PRESS && action != GLFW_REPEAT)
 		return;
 
-#define change_number(op, value)                  \
-	GET_PIN(node, PIN_INPUT, in_number, int)      \
-	op value;                                     \
-	GET_PIN(node, PIN_OUTPUT, out_number, int) =  \
-		GET_PIN(node, PIN_INPUT, in_number, int); \
+#define change_number(op, value)                     \
+	GET_PIN(node, PIN_INPUT, in_number, double)      \
+	op value;                                        \
+	GET_PIN(node, PIN_OUTPUT, out_number, double) =  \
+		GET_PIN(node, PIN_INPUT, in_number, double); \
 	direct_call_node_on_pin(node, 0);
+
+	double step = 1;
+
+	if (mods & GLFW_MOD_SHIFT)
+		step *= 0.1;
+	if (mods & GLFW_MOD_ALT)
+		step *= 0.01;
 
 	switch (key)
 	{
 	case GLFW_KEY_UP:
 	case GLFW_KEY_KP_8:
-		change_number(+=, 1);
+		change_number(+=, step);
 		break;
 
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_KP_2:
-		change_number(-=, 1);
+		change_number(-=, step);
 		break;
 
 	case GLFW_KEY_R:

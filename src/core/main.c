@@ -88,7 +88,7 @@ void test_user_window()
 {
 	load_library("./src/nodes/honix/window/window.so");
 
-	make_node(400, 125, get_function_note("make_window"));
+	struct node *node_window = make_node(400, 125, get_function_note("make_window"));
 	// connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 
 	// double *h1 = malloc(sizeof(double));
@@ -98,8 +98,13 @@ void test_user_window()
 	// connect_nodes(make_link(NULL), node2, 0, node1, 0);
 	// connect_nodes(make_link(h1), NULL, 0, node2, 0);
 
-	make_node(400, 10, get_function_note("loop"));
-	make_node(400, 75, get_function_note("lfo"));	
+	struct node *node_loop = make_node(400, 10, get_function_note("loop"));
+	struct node *node_lfo = make_node(400, 75, get_function_note("lfo"));
+	GET_PIN(node_lfo, PIN_INPUT, 1, double) = 0.25;
+
+	connect_nodes(node_loop, 0, node_lfo, 0);
+	connect_nodes(node_lfo, 0, node_window, 0);
+	connect_nodes(node_lfo, 1, node_window, 1);
 
 	// direct_call_node(node2);
 }

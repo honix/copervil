@@ -142,7 +142,7 @@ void lfo_init(struct node *node)
 {
 	init_pins(node, 2, 2);
 	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
-	REG_PIN(node, PIN_INPUT, 1, "freq", int); // TODO: double
+	REG_PIN(node, PIN_INPUT, 1, "freq", double);
 	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 	REG_PIN(node, PIN_OUTPUT, 1, "value", double);
 
@@ -152,13 +152,37 @@ void lfo_init(struct node *node)
 void lfo(struct node *node)
 {
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data +=
-		*(int *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0 / 60; // ignore relatime for now
+		*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0 / 60; // ignore relatime for now
 
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
 
 	// direct_call_node_on_pin(node, 0);
 	// delayed_call_node_on_pin(node, 1/60);
+}
+
+void double_to_int_init(struct node *node)
+{
+	init_pins(node, 1, 1);
+	REG_PIN(node, PIN_INPUT, 0, "number", double);
+	REG_PIN(node, PIN_OUTPUT, 0, "int", int);
+}
+
+void double_to_int(struct node *node)
+{
+	GET_PIN(node, PIN_OUTPUT, 0, int) = GET_PIN(node, PIN_INPUT, 0, double);
+}
+
+void int_to_double_init(struct node *node)
+{
+	init_pins(node, 1, 1);
+	REG_PIN(node, PIN_INPUT, 0, "int", int);
+	REG_PIN(node, PIN_OUTPUT, 0, "number", double);
+}
+
+void int_to_double(struct node *node)
+{
+	GET_PIN(node, PIN_OUTPUT, 0, double) = GET_PIN(node, PIN_INPUT, 0, int);
 }
 
 void register_library()
@@ -175,6 +199,10 @@ void register_library()
 		"loop", loop_init, loop});
 	register_function((struct function_note){
 		"lfo", lfo_init, lfo});
+	register_function((struct function_note){
+		"double_to_int", double_to_int_init, double_to_int});
+	register_function((struct function_note){
+		"int_to_double", int_to_double_init, int_to_double});
 }
 /*
 

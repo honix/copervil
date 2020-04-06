@@ -77,17 +77,22 @@ double current_time_secs()
 	return time.tv_sec + (double)time.tv_nsec / 1000000000;
 }
 
+unsigned int samples = 60;
 double prev_time = 0;
+double acc = 0;
 int t = 0;
 
 void make_window(struct node *node)
 {
-	if (t++ == 55)
+	if (++t == samples)
 	{
+		printf("delta: %f\n", acc / samples);
 		t = 0;
-		printf("delta: %f\n", current_time_secs() - prev_time);
+		acc = 0;
 	}
-	prev_time = current_time_secs();
+	double curr_time = current_time_secs();
+	acc += curr_time - prev_time;
+	prev_time = curr_time;
 
 	// get_state(node)->random_number += 1;
 
