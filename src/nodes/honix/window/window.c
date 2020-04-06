@@ -30,6 +30,7 @@ void make_window_init(struct node *node)
 	REG_PIN(node, PIN_OUTPUT, 0, "window", GLFWwindow *);
 
 	node->inner_state = malloc(sizeof(struct make_window_state));
+	node->auto_call_next = false;
 	// get_state(node)->random_number = rand() % 360;
 
 	windows_count += 1;
@@ -137,6 +138,22 @@ void make_window_deinit(struct node *node)
 	free(node->inner_state);
 }
 
+void set_window_pos_init(struct node *node)
+{
+	init_pins(node, 3, 0);
+	REG_PIN(node, PIN_INPUT, 0, "window", GLFWwindow *);
+	REG_PIN(node, PIN_INPUT, 1, "x", double);
+	REG_PIN(node, PIN_INPUT, 2, "y", double);
+}
+
+void set_window_pos(struct node *node)
+{
+	glfwSetWindowPos(
+		GET_PIN(node, PIN_INPUT, 0, GLFWwindow *),
+		(int)GET_PIN(node, PIN_INPUT, 1, double),
+		(int)GET_PIN(node, PIN_INPUT, 2, double));
+}
+
 void register_library()
 {
 	register_function((struct function_note){
@@ -144,4 +161,9 @@ void register_library()
 		make_window_init,
 		make_window,
 		make_window_deinit});
+
+	register_function((struct function_note){
+		"set_window_pos",
+		set_window_pos_init,
+		set_window_pos});
 }
