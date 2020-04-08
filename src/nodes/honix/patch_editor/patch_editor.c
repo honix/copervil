@@ -13,6 +13,8 @@
 extern struct node **nodes;
 extern unsigned int nodes_pointer;
 
+struct type_note *trigger_type_note;
+
 // TODO: move this data to local node starage
 int window_width = 700;
 int window_height = 512;
@@ -292,7 +294,11 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 
 	nvgLineJoin(vg, NVG_ROUND);
 	nvgStrokeWidth(vg, 3);
-	nvgStrokeColor(vg, nvgHSLA(0, 0, 128, 170));
+	unsigned long type_id = get_pin(node, PIN_OUTPUT, pin)->type_id;
+	if (type_id == trigger_type_note->id)
+		nvgStrokeColor(vg, nvgHSLA(0.6f, 1.0f, 0.5f, 220));
+	else
+		nvgStrokeColor(vg, nvgHSLA(0, 0, 1.0f, 170));
 	nvgStroke(vg);
 }
 
@@ -356,12 +362,26 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 		nvgRect(vg,
 				pin_pos.x, pin_pos.y,
 				PIN_SIZE, PIN_HALF_SIZE);
-		if (pin_hold.node != NULL &&
-			pin_hold.type_id == get_pin(node, PIN_INPUT, i)->type_id)
-			nvgFillColor(vg, nvgHSLA(0.35f, 1, 0.75f, 128));
+		unsigned long type_id = get_pin(node, PIN_INPUT, i)->type_id;
+		if (type_id == trigger_type_note->id)
+			nvgFillColor(vg, nvgHSLA(0.6f, 1, 0.5f, 128));
+		else if (pin_hold.node != NULL && pin_hold.type_id == type_id)
+			nvgFillColor(vg, nvgHSLA(0.35f, 1, 0.5f, 128));
 		else
 			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
+
+		if (node == selected_node)
+		{
+			nvgFontSize(vg, 15.0f);
+			nvgFontFace(vg, "sans");
+			nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+			nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y - 10);
+			nvgRotate(vg, -45);
+			nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
+			nvgText(vg, 0, 0, get_pin(node, PIN_INPUT, i)->name, NULL);
+			nvgReset(vg);
+		}
 
 		// struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
 		// if (in_link == NULL)
@@ -384,16 +404,34 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 		nvgRect(vg,
 				pin_pos.x, pin_pos.y,
 				PIN_SIZE, PIN_HALF_SIZE);
-		nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
+		unsigned long type_id = get_pin(node, PIN_OUTPUT, i)->type_id;
+		if (type_id == trigger_type_note->id)
+			nvgFillColor(vg, nvgHSLA(0.6f, 1, 0.5f, 128));
+		else
+			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
 		// Draw link from this out pin
 		draw_node_link(vg, node, i);
+
+		if (node == selected_node)
+		{
+			nvgFontSize(vg, 15.0f);
+			nvgFontFace(vg, "sans");
+			nvgTextAlign(vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
+			nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + 10 + PIN_HALF_SIZE);
+			nvgRotate(vg, -45);
+			nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
+			nvgText(vg, 0, 0, get_pin(node, PIN_OUTPUT, i)->name, NULL);
+			nvgReset(vg);
+		}
 	}
 }
 
 void init()
 {
+	trigger_type_note = reg_type("trigger", sizeof(trigger));
+
 	if (!glfwInit())
 		return;
 

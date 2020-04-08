@@ -7,9 +7,7 @@
 #include "geometry.h"
 #include "dl_loader.h"
 
-typedef uint8_t trigger;
-
-// #define NODE_PINS_COUNT 8
+typedef struct {} trigger;
 
 struct link;
 struct function_note;
@@ -21,11 +19,6 @@ struct function_note;
 
 #define NODE_WIDTH (PIN_PADDING + (PIN_SIZE + PIN_PADDING) * 8)
 #define NODE_HEIGHT 30
-
-// enum node_flags
-// {
-// 	CALL_NEXT = 0b00000001
-// };
 
 enum pin_type
 {
@@ -102,6 +95,3 @@ void connect_nodes(
 	uint8_t sender_pin_number,
 	struct node *receiver,
 	uint8_t reciever_pin_number);
-
-// bool in_pin_is_active(struct node *node, uint8_t pin);
-// bool out_pin_is_active(struct node *node, uint8_t pin);

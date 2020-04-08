@@ -4,15 +4,24 @@
 
 #include "list.h"
 
-struct list type_note_list;
+static struct list type_note_list;
 
-struct type_note *make_type_note(unsigned int id, char *name, size_t size)
+static struct type_note *make_type_note(unsigned int id, char *name, size_t size)
 {
     struct type_note *type_note = malloc(sizeof(struct type_note));
     type_note->id = id;
     type_note->name = name;
     type_note->size = size;
     return type_note;
+}
+
+static unsigned long hash(char *cp)
+{
+    // D. J. Bernstein hash function
+    unsigned long hash = 5381;
+    while (*cp)
+        hash = 33 * hash ^ (unsigned char)*cp++;
+    return hash;
 }
 
 struct get_type_note_by_id_pred_args
@@ -40,20 +49,6 @@ struct type_note *get_type_note_by_id(unsigned long id)
         return NULL;
 
     return (struct type_note *)cell->data;
-}
-
-// static bool is_type_id_registred(unsigned long id)
-// {
-//     return get_type_note_by_id(id) == NULL ? false : true;
-// }
-
-static unsigned long hash(char *cp)
-{
-    // D. J. Bernstein hash function
-    unsigned long hash = 5381;
-    while (*cp)
-        hash = 33 * hash ^ (unsigned char)*cp++;
-    return hash;
 }
 
 struct type_note *reg_type(char *name, size_t size)

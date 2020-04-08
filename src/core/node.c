@@ -29,7 +29,6 @@ void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
 static void init_pin_link(struct pin *pin)
 {
 	// TODO: consider default pin values
-	// TODO: alloc link for this type from type->byte table
 	pin->connected_link = make_link(
 		calloc(1, get_type_note_by_id(pin->type_id)->size));
 }
@@ -139,18 +138,6 @@ struct node *make_node(
 	node->only_self_trigger = false;
 	node->auto_call_next = true;
 
-	// for (int i = 0; i < NODE_PINS_COUNT; i++)
-	// {
-	// 	node->in_pins[i] = NULL;
-	// 	node->out_pins[i] = NULL;
-	// }
-
-	// node->in_pins_mask = 0b0000000000000000;
-	// node->out_pins_mask = 0b0000000000000000;
-
-	// node->flags = 0b00000000;
-	//node->flags = 0 | CALL_NEXT;
-
 	nodes[nodes_pointer] = node;
 	nodes_pointer++;
 
@@ -217,7 +204,8 @@ void connect_nodes(
 	if (sender_pin != NULL && receiver_pin != NULL &&
 		sender_pin->type_id != receiver_pin->type_id)
 	{
-		printf("Error: types are not same\n");
+		printf("Error: connecting %s and %s nodes: types are not same\n",
+			   sender->function_note.name, receiver->function_note.name);
 		return;
 	}
 
@@ -233,15 +221,3 @@ void connect_nodes(
 	if (receiver_pin != NULL)
 		receiver_pin->connected_link = link;
 }
-
-// bool in_pin_is_active(struct node *node, uint8_t pin)
-// {
-// 	// return node->in_pins_mask & 1 << pin;
-// 	return true;
-// }
-
-// bool out_pin_is_active(struct node *node, uint8_t pin)
-// {
-// 	// return node->out_pins_mask & 1 << pin;
-// 	return true;
-// }

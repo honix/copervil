@@ -51,7 +51,10 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 	nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
 	char s[32];
-	sprintf(s, "%f", number);
+	if (fmod(number, 1) != 0)
+		sprintf(s, "%f", number);
+	else
+		sprintf(s, "%d", (int) number);
 	nvgText(vg, x + 15, y + 30 / 2, s, NULL);
 }
 
