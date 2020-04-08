@@ -235,15 +235,19 @@ void mouse_button_callback(
 				dragged_node->rect.pos,
 				cursor_pos);
 
-			struct pin_hold new_pin_hold = pin_under_cursor(selected_node, cursor_pos);
+			struct pin_hold new_pin_hold =
+				pin_under_cursor(selected_node, cursor_pos);
 			if (new_pin_hold.node != NULL && pin_hold.node != NULL &&
 				new_pin_hold.pin_type != pin_hold.pin_type)
 			{
-				// TODO: this code is broken!
-				// Top down connection
-				connect_nodes(
-					pin_hold.node, pin_hold.pin,
-					new_pin_hold.node, new_pin_hold.pin);
+				if (pin_hold.pin_type == PIN_OUTPUT)
+					connect_nodes(
+						pin_hold.node, pin_hold.pin,
+						new_pin_hold.node, new_pin_hold.pin);
+				else
+					connect_nodes(
+						new_pin_hold.node, new_pin_hold.pin,
+						pin_hold.node, pin_hold.pin);
 				clear_pin_hold();
 			}
 			else
@@ -309,10 +313,20 @@ void draw_pin_hold(struct NVGcontext *vg)
 		calc_pin_pos(pin_hold.node, pin_hold.pin_type, pin_hold.pin);
 
 	nvgBeginPath(vg);
-	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
-	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
-	nvgLineTo(vg, cursor_pos.x, cursor_pos.y - PIN_SIZE);
-	nvgLineTo(vg, cursor_pos.x, cursor_pos.y);
+	if (pin_hold.pin_type == PIN_OUTPUT)
+	{
+		nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
+		nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
+		nvgLineTo(vg, cursor_pos.x, cursor_pos.y - PIN_SIZE);
+		nvgLineTo(vg, cursor_pos.x, cursor_pos.y);
+	}
+	else
+	{
+		nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y);
+		nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y - PIN_SIZE);
+		nvgLineTo(vg, cursor_pos.x, cursor_pos.y + PIN_SIZE);
+		nvgLineTo(vg, cursor_pos.x, cursor_pos.y);
+	}
 
 	nvgLineJoin(vg, NVG_ROUND);
 	nvgStrokeWidth(vg, 3);

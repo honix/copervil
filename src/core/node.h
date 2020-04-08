@@ -91,7 +91,7 @@ void free_node(struct node *node);
 void direct_call_node_self(struct node *node);
 void direct_call_node_on_pin(struct node *node, uint8_t pin);
 void connect_nodes(
-	struct node *sender1,
+	struct node *sender,
 	uint8_t sender_pin_number,
 	struct node *receiver,
 	uint8_t reciever_pin_number);
