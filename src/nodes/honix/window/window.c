@@ -11,25 +11,25 @@
 
 uint8_t windows_count = 0;
 
-struct make_window_state
+struct window_state
 {
 	GLFWwindow *window;
 	// int random_number;
 };
 
-static struct make_window_state *get_state(struct node *node)
+static struct window_state *get_state(struct node *node)
 {
-	return (struct make_window_state *)node->inner_state;
+	return (struct window_state *)node->inner_state;
 }
 
-void make_window_init(struct node *node)
+void window_init(struct node *node)
 {
-	init_pins(node, 2, 1);
+	init_pins(node, 1, 2);
 	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
-	REG_PIN(node, PIN_INPUT, 1, "rotate", double);
-	REG_PIN(node, PIN_OUTPUT, 0, "window", GLFWwindow *);
+	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_OUTPUT, 1, "window", GLFWwindow *);
 
-	node->inner_state = malloc(sizeof(struct make_window_state));
+	node->inner_state = malloc(sizeof(struct window_state));
 	node->auto_call_next = false;
 	// get_state(node)->random_number = rand() % 360;
 
@@ -83,7 +83,7 @@ double prev_time = 0;
 double acc = 0;
 int t = 0;
 
-void make_window(struct node *node)
+void window(struct node *node)
 {
 	if (++t == samples)
 	{
@@ -109,21 +109,9 @@ void make_window(struct node *node)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(-1, 1, -1, 1, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glScalef(0.5, 0.5, 0.5);
-	glRotatef(*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 360, 0, 0, 1);
 
-	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
-
-	glBegin(GL_TRIANGLES); // glBegin/End depricated in gl >= 3.0
-	glColor3f(1, 1, 1);
-	glVertex3f(0, 1, 0);
-	glVertex3f(1, -1, 0);
-	glVertex3f(-1, -1, 0);
-	glEnd();
-
-	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+	// DRAW STUFF
+	direct_call_node_on_pin(node, 0);
 
 	glfwSwapBuffers(get_state(node)->window);
 
@@ -131,11 +119,38 @@ void make_window(struct node *node)
 	GET_PIN(node, PIN_OUTPUT, 0, GLFWwindow *) = get_state(node)->window;
 }
 
-void make_window_deinit(struct node *node)
+void window_deinit(struct node *node)
 {
-	printf("make_window_deinit\n");
+	printf("window_deinit\n");
 	glfwDestroyWindow(get_state(node)->window);
 	free(node->inner_state);
+}
+
+void draw_triangle_init(struct node *node)
+{
+	init_pins(node, 2, 0);
+	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	REG_PIN(node, PIN_INPUT, 1, "rotate", double);
+}
+
+void draw_triangle(struct node *node)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glScalef(0.5, 0.5, 0.5);
+	glRotatef(*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 360, 0, 0, 1);
+	// glRotatef(360, 0, 0, 1);
+
+	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
+
+	glBegin(GL_LINE_LOOP); // glBegin/End depricated in gl >= 3.0
+	glColor3f(1, 1, 1);
+	glVertex3f(0, 1, 0);
+	glVertex3f(1, -1, 0);
+	glVertex3f(-1, -1, 0);
+	glEnd();
+
+	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 }
 
 void set_window_pos_init(struct node *node)
@@ -157,13 +172,18 @@ void set_window_pos(struct node *node)
 void register_library()
 {
 	register_function((struct function_note){
-		"make_window",
-		make_window_init,
-		make_window,
-		make_window_deinit});
+		"window",
+		window_init,
+		window,
+		window_deinit});
 
 	register_function((struct function_note){
 		"set_window_pos",
 		set_window_pos_init,
 		set_window_pos});
+
+	register_function((struct function_note){
+		"draw_triangle",
+		draw_triangle_init,
+		draw_triangle});
 }
