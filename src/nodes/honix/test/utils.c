@@ -5,19 +5,22 @@
 
 #include "core/node_api.h"
 
-#define DEFINE_MATH_OP(name, op)                         \
-	void name##_op_init(struct node *node)               \
-	{                                                    \
-		init_pins(node, 2, 1);                           \
-		REG_PIN(node, PIN_INPUT, 0, "number a", double); \
-		REG_PIN(node, PIN_INPUT, 1, "number b", double); \
-		REG_PIN(node, PIN_OUTPUT, 0, "result", double);  \
-	}                                                    \
-	void name##_op(struct node *node)                    \
-	{                                                    \
-		GET_PIN(node, PIN_OUTPUT, 0, double) =           \
-			GET_PIN(node, PIN_INPUT, 0, double) op       \
-				GET_PIN(node, PIN_INPUT, 1, double);     \
+#define DEFINE_MATH_OP(name, op)                          \
+	void name##_op_init(struct node *node)                \
+	{                                                     \
+		init_pins(node, 3, 2);                            \
+		REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);  \
+		REG_PIN(node, PIN_INPUT, 1, "number a", double);  \
+		REG_PIN(node, PIN_INPUT, 2, "number b", double);  \
+		REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger); \
+		REG_PIN(node, PIN_OUTPUT, 1, "result", double);   \
+	}                                                     \
+	void name##_op(struct node *node)                     \
+	{                                                     \
+		GET_PIN(node, PIN_OUTPUT, 1, double) =            \
+			GET_PIN(node, PIN_INPUT, 1, double) op        \
+				GET_PIN(node, PIN_INPUT, 2, double);      \
+		direct_call_node_on_pin(node, 0);                 \
 	}
 
 DEFINE_MATH_OP(add, +);
@@ -56,11 +59,11 @@ void do_times_init(struct node *node)
 
 void do_times(struct node *node)
 {
-	int count = (int) GET_PIN(node, PIN_INPUT, 1, double);
+	int count = (int)GET_PIN(node, PIN_INPUT, 1, double);
 	for (int i = 0; i < count; i++)
 	{
 		GET_PIN(node, PIN_OUTPUT, 1, double) = i;
-		GET_PIN(node, PIN_OUTPUT, 2, double) = (double) i / count;
+		GET_PIN(node, PIN_OUTPUT, 2, double) = (double)i / count;
 		direct_call_node_on_pin(node, 0);
 	}
 }

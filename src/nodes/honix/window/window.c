@@ -128,9 +128,10 @@ void window_deinit(struct node *node)
 
 void draw_triangle_init(struct node *node)
 {
-	init_pins(node, 2, 0);
+	init_pins(node, 2, 1);
 	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
 	REG_PIN(node, PIN_INPUT, 1, "rotate", double);
+	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 }
 
 void draw_triangle(struct node *node)
@@ -150,6 +151,7 @@ void draw_triangle(struct node *node)
 	glVertex3f(-1, -1, 0);
 	glEnd();
 
+	direct_call_node_on_pin(node, 0);
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 }
 
