@@ -1,15 +1,28 @@
 #pragma once
 
+#include <stdint.h>
+
+#define MAX_RECEIVERS_COUNT 8 // TODO: bad code
+
 struct node;
 enum pin_type;
+
+struct link_address
+{
+	struct node *node;
+	uint8_t pin_number;
+};
 
 struct link
 {
 	void *data;
-	struct node *sender;
-	unsigned char sender_pin;
-	struct node *receiver;
-	unsigned char receiver_pin;
+	// struct node *sender;
+	// unsigned char sender_pin;
+	struct link_address sender_address;
+	// struct node *receiver;
+	// unsigned char receiver_pin;
+	uint8_t receivers_count;
+	struct link_address *receivers_addresses;
 };
 
 struct link **links; // TODO: consider using dynamic collection

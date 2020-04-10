@@ -7,7 +7,9 @@
 #include "geometry.h"
 #include "dl_loader.h"
 
-typedef struct {} trigger;
+typedef struct
+{
+} trigger;
 
 struct link;
 struct function_note;
@@ -72,24 +74,32 @@ void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
 	(*(type *)get_link_on_pin(node, pin_type, pin)->data)
 
 void reg_pin(
-	struct node *node, 
-	enum pin_type pin_type, uint8_t pin, 
-	char *name, char *type, size_t type_size);
+	struct node *node,
+	enum pin_type pin_type,
+	uint8_t pin_number,
+	char *name,
+	char *type,
+	size_t type_size);
 
 void drop_link(
 	struct node *node,
-	enum pin_type pin_type, uint8_t pin);
+	enum pin_type pin_type, uint8_t pin_number);
 
-struct pin *get_pin(struct node *node, enum pin_type pin_type, uint8_t pin);
+struct pin *get_pin(
+	struct node *node,
+	enum pin_type pin_type,
+	uint8_t pin_number);
 struct link *get_link_on_pin(
-	struct node *node, enum pin_type pin_type, uint8_t pin);
+	struct node *node,
+	enum pin_type pin_type,
+	uint8_t pin_number);
 
 struct node *make_node(
 	int x, int y,
 	struct function_note *function_note);
 void free_node(struct node *node);
 void direct_call_node_self(struct node *node);
-void direct_call_node_on_pin(struct node *node, uint8_t pin);
+void direct_call_node_on_pin(struct node *node, uint8_t pin_number);
 void connect_nodes(
 	struct node *sender,
 	uint8_t sender_pin_number,

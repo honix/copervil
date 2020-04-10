@@ -52,12 +52,16 @@ void delayed_call_node_self(struct node *node, double secs)
 
 void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
 {
-	struct node *target = get_link_on_pin(node, PIN_OUTPUT, pin)->receiver;
+	struct link *link = get_link_on_pin(node, PIN_OUTPUT, pin);
+	for (uint8_t i = 0; i < link->receivers_count; i++)
+	{
+		struct node *target = link->receivers_addresses[i].node;
 
-	if (target == NULL || target->only_self_trigger)
-		return;
+		if (target == NULL || target->only_self_trigger)
+			return;
 
-	delayed_call_node_self(target, secs);
+		delayed_call_node_self(target, secs);
+	}
 }
 
 struct timespec time_req;

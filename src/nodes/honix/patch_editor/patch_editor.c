@@ -284,26 +284,31 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 	if (out_link == NULL)
 		return;
 
-	if (out_link->receiver == NULL)
-		return;
+	struct link *link = get_link_on_pin(node, PIN_OUTPUT, pin);
+	for (uint8_t i = 0; i < link->receivers_count; i++)
+	{
+		if (out_link->receivers_addresses[i].node == NULL)
+			return;
 
-	struct vector2i other_pin_pos = calc_pin_pos(
-		out_link->receiver, PIN_INPUT,
-		out_link->receiver_pin);
-	nvgBeginPath(vg);
-	nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
-	nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
-	nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
-	nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
+		struct vector2i other_pin_pos = calc_pin_pos(
+			out_link->receivers_addresses[i].node, 
+			PIN_INPUT,
+			out_link->receivers_addresses[i].pin_number);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE);
+		nvgLineTo(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + PIN_HALF_SIZE + PIN_SIZE);
+		nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y - PIN_SIZE);
+		nvgLineTo(vg, other_pin_pos.x + PIN_HALF_SIZE, other_pin_pos.y);
 
-	nvgLineJoin(vg, NVG_ROUND);
-	nvgStrokeWidth(vg, 3);
-	unsigned long type_id = get_pin(node, PIN_OUTPUT, pin)->type_id;
-	if (type_id == trigger_type_note->id)
-		nvgStrokeColor(vg, nvgHSLA(0.6f, 1.0f, 0.5f, 220));
-	else
-		nvgStrokeColor(vg, nvgHSLA(0, 0, 1.0f, 170));
-	nvgStroke(vg);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgStrokeWidth(vg, 3);
+		unsigned long type_id = get_pin(node, PIN_OUTPUT, pin)->type_id;
+		if (type_id == trigger_type_note->id)
+			nvgStrokeColor(vg, nvgHSLA(0.6f, 1.0f, 0.5f, 220));
+		else
+			nvgStrokeColor(vg, nvgHSLA(0, 0, 1.0f, 170));
+		nvgStroke(vg);
+	}
 }
 
 void draw_pin_hold(struct NVGcontext *vg)

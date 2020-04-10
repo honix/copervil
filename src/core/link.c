@@ -17,8 +17,11 @@ struct link *make_link(void *data)
 {
 	struct link *link = malloc(sizeof(struct link));
 	link->data = data;
-	link->sender = NULL;
-	link->receiver = NULL;
+	// link->sender = NULL;
+	// link->receiver = NULL;
+	link->receivers_addresses =
+		calloc(MAX_RECEIVERS_COUNT, sizeof(struct link_address));
+	link->receivers_count = 0;
 
 	links[links_pointer] = link;
 	links_pointer++;
@@ -31,12 +34,23 @@ struct link *make_link(void *data)
 
 void free_link(struct link *link, enum pin_type owner)
 {
-	if (owner == PIN_INPUT && link->sender != NULL)
-		drop_link(link->sender, PIN_OUTPUT, link->sender_pin);
-	if (owner == PIN_OUTPUT && link->receiver != NULL)
-		drop_link(link->receiver, PIN_INPUT, link->receiver_pin);
-
+	if (owner == PIN_INPUT && link->sender_address.node != NULL)
+		drop_link(link->sender_address.node,
+				  PIN_OUTPUT,
+				  link->sender_address.pin_number);
+	if (owner == PIN_OUTPUT)
+	{
+		for (uint8_t i = 0; i < link->receivers_count; i++)
+		{
+			if (link->receivers_addresses[i].node != NULL)
+				drop_link(link->receivers_addresses[i].node,
+						  PIN_INPUT,
+						  link->receivers_addresses[i].pin_number);
+		}
+	}
+	
 	free(link->data);
+	free(link->receivers_addresses);
 	free(link);
 
 	// TODO: remove from links collection
