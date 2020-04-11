@@ -139,7 +139,7 @@ void draw_triangle(struct node *node)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glScalef(0.5, 0.5, 0.5);
-	glRotatef(*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 360, 0, 0, 1);
+	glRotatef(GET_PIN(node, PIN_INPUT, 1, double) * 360, 0, 0, 1);
 	// glRotatef(360, 0, 0, 1);
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());

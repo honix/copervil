@@ -35,11 +35,20 @@ static void init_pin_link(
 	// TODO: consider default pin values
 	pin->connected_link = make_link(
 		calloc(1, get_type_note_by_id(pin->type_id)->size));
+
+	// switch (pin_type)
+	// {
+	// case PIN_OUTPUT:
+	// 	set_sender(pin->connected_link, node, pin_number);
+	// 	break;
+
+	// case PIN_INPUT:
+	// 	add_receiver(pin->connected_link, node, pin_number);
+	// 	break;
+	// }
+
 	if (pin_type == PIN_OUTPUT)
-	{
-		pin->connected_link->sender_address.node = node;
-		pin->connected_link->sender_address.pin_number = pin_number;
-	}
+		set_sender(pin->connected_link, node, pin_number);
 }
 
 void reg_pin(
@@ -65,7 +74,7 @@ void drop_link(
 	uint8_t pin_number)
 {
 	struct pin *pin = get_pin(node, pin_type, pin_number);
-	pin->connected_link = NULL;
+	// pin->connected_link = NULL;
 	init_pin_link(node, pin_type, pin, pin_number);
 }
 
@@ -179,9 +188,11 @@ void free_node(struct node *node)
 	deinit_node(node);
 
 	for (int i = 0; i < node->in_pins.array_size; i++)
-		free_link(get_pin(node, PIN_INPUT, i)->connected_link, PIN_INPUT);
+		free_link(
+			get_pin(node, PIN_INPUT, i)->connected_link, PIN_INPUT, node);
 	for (int i = 0; i < node->out_pins.array_size; i++)
-		free_link(get_pin(node, PIN_OUTPUT, i)->connected_link, PIN_OUTPUT);
+		free_link(
+			get_pin(node, PIN_OUTPUT, i)->connected_link, PIN_OUTPUT, node);
 	free(node->in_pins.pins);
 	free(node->out_pins.pins);
 
@@ -236,28 +247,20 @@ void connect_nodes(
 
 	// TODO: free old links, and maybe save datas they hold
 	// do not allow multiple in's ? (btw this can be usefull whith triggers)
-	
-	// struct link *receiver_link = get_link_on_pin(
-	// 	receiver, PIN_INPUT, reciever_pin_number);
-	// if (receiver_link != NULL)
-	// 	free_link(receiver_link, PIN_INPUT);
+
+	struct link *receiver_link = receiver_pin->connected_link;
+	if (receiver_link != NULL)
+		free_link(receiver_link, PIN_INPUT, receiver);
 
 	// struct link *link = make_link(calloc(1, size));
-	struct link *link = sender_pin->connected_link;
+	struct link *sender_link = sender_pin->connected_link;
 
 	// link->sender_address.node = sender;
 	// link->sender_address.pin = sender_pin_number;
-	link->receivers_addresses[link->receivers_count].node = receiver;
-	link->receivers_addresses[link->receivers_count].pin_number = reciever_pin_number;
-	link->receivers_count++;
-
-	printf("link->receivers_count = %d\n", link->receivers_count); // TODO: bad code
-
-	if (link->receivers_count > MAX_RECEIVERS_COUNT)
-		printf("Error: MAX_RECEIVERS_COUNT exceeded\n"); // TODO: bad code
+	add_receiver(sender_link, receiver, reciever_pin_number);
 
 	// if (sender_pin != NULL)
 	// sender_pin->connected_link = link;
 	// if (receiver_pin != NULL)
-	receiver_pin->connected_link = link;
+	receiver_pin->connected_link = sender_link;
 }

@@ -31,4 +31,14 @@ unsigned int links_pointer;
 void init_links_subsystem();
 
 struct link *make_link(void *data);
-void free_link(struct link *link, enum pin_type owner);
+void free_link(struct link *link, enum pin_type owner, struct node *owner_node);
+
+void set_sender(
+	struct link *link,
+	struct node *sender,
+	uint8_t sender_pin_number);
+
+void add_receiver(
+	struct link *link,
+	struct node *receiver,
+	uint8_t reciever_pin_number);
