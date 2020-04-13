@@ -6,7 +6,7 @@ NANOVG_OBJ = $(THIRDPARTY)/nanovg/build/obj/Debug/nanovg/nanovg.o
 
 all: patch_editor.so number_io.so
 
-%.so: %.c $(HEADERS_CORE)
+%.so: %.c $(HEADERS_CORE) $(NANOVG_OBJ)
 	gcc -Wall -shared -fPIC -g -I../../.. -I$(THIRDPARTY) $< $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw
 
 NANOVG_MAKE = $(THIRDPARTY)/nanovg/build/nanovg.make
