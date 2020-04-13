@@ -7,7 +7,8 @@ work in progress, early prototype
 developed and tested to work on linux, but will be easy to port on windows and other platforms
 
 ### dependencies to run from sources
-- core deps: ```make, gcc```
+- common deps: ```make, gcc```
+- patch editor deps: ```libglfw3-dev```
 
 thirdparty libs:
 - nanovg deps: ```premake4, make, gcc```
