@@ -11,7 +11,7 @@ developed and tested to work on linux, but will be easy to port on windows and o
 - patch editor deps: ```libglfw3-dev```
 
 thirdparty libs:
-- nanovg deps: ```premake4, make, gcc```
+- nanovg deps: ```premake4```
 
 ### build and run
 run this commands in project root folder:
