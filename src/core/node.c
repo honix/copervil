@@ -172,6 +172,9 @@ struct node *make_node(
 	node->only_self_trigger = false;
 	node->auto_call_next = true;
 
+	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
+	node->out_pins = (struct pin_array){.array_size = 0, .pins = NULL};
+
 	nodes[nodes_pointer] = node;
 	nodes_pointer++;
 
@@ -193,6 +196,7 @@ void free_node(struct node *node)
 	for (int i = 0; i < node->out_pins.array_size; i++)
 		free_link(
 			get_pin(node, PIN_OUTPUT, i)->connected_link, PIN_OUTPUT, node);
+
 	free(node->in_pins.pins);
 	free(node->out_pins.pins);
 
@@ -205,6 +209,7 @@ void free_node(struct node *node)
 			break;
 		}
 	}
+
 	memmove(
 		nodes + shift,
 		nodes + shift + 1,

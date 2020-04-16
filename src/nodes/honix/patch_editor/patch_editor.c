@@ -503,7 +503,7 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 	redraw_patch_editor();
 }
 
-void init()
+void init_window()
 {
 	trigger_type_note = reg_type("trigger", sizeof(trigger));
 
@@ -568,12 +568,13 @@ void deinit()
 void patch_editor_init(struct node *node)
 {
 	// node->in_pins_mask = 1 << 0;
-	init_pins(node, 1, 0);
-	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	// init_pins(node, 0, 0);
+	// REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	node->only_self_trigger = true;
 
-	init();
+	init_window();
 
-	redraw_patch_editor();
+	direct_call_node_self(node);
 }
 
 void patch_editor(struct node *node)
@@ -591,6 +592,8 @@ void patch_editor(struct node *node)
 		glfwTerminate(); // TEMP
 		exit(0);
 	}
+
+	delayed_call_node_self(node, 1.0/60);
 }
 
 void register_library()
