@@ -26,6 +26,7 @@ make
 
 ### todo (topmost is priority)
 - question - will _all_ nodes have trigger in trigger out pins? (see do_times add sequence, when we want add to not send trigger to draw_triangle)
+- may be patch_editor will draw in another thread (glfwMakeContextCurrent is not cheap)
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - rethink node creation API from C
 - better, systematic error logging

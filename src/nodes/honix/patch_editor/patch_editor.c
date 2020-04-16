@@ -142,7 +142,6 @@ struct vector2i get_cursor_pos()
 	return (struct vector2i){.x = x, .y = y};
 }
 
-
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 {
 	struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, pin);
@@ -205,7 +204,7 @@ void draw_pin_hold(struct NVGcontext *vg)
 	nvgStroke(vg);
 }
 
-void draw_node(struct NVGcontext *vg, struct node *node)
+void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 {
 
 	int x = node->rect.pos.x;
@@ -256,28 +255,21 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
-		if (node == selected_node)
+		if (!only_body)
 		{
-			nvgFontSize(vg, 15.0f);
-			nvgFontFace(vg, "sans");
-			nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-			nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y - 10);
-			nvgRotate(vg, -45);
-			nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
-			nvgText(vg, 0, 0, get_pin(node, PIN_INPUT, i)->name, NULL);
-			nvgReset(vg);
+			if (node == selected_node)
+			{
+				// Draw node name
+				nvgFontSize(vg, 15.0f);
+				nvgFontFace(vg, "sans");
+				nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+				nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y - 10);
+				nvgRotate(vg, -45);
+				nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
+				nvgText(vg, 0, 0, get_pin(node, PIN_INPUT, i)->name, NULL);
+				nvgReset(vg);
+			}
 		}
-
-		// struct link *in_link = get_link_on_pin(node, PIN_INPUT, i);
-		// if (in_link == NULL)
-		// 	continue;
-
-		// nvgBeginPath(vg);
-		// nvgRect(vg,
-		// 		pin_pos.x, pin_pos.y - PIN_HALF_SIZE,
-		// 		PIN_SIZE, PIN_HALF_SIZE);
-		// nvgFillColor(vg, nvgHSLA(0, 0, 128, 128));
-		// nvgFill(vg);
 	}
 
 	// Draw out pins and out links
@@ -296,19 +288,23 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
 		nvgFill(vg);
 
-		// Draw link from this out pin
-		draw_node_link(vg, node, i);
-
-		if (node == selected_node)
+		if (!only_body)
 		{
-			nvgFontSize(vg, 15.0f);
-			nvgFontFace(vg, "sans");
-			nvgTextAlign(vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-			nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + 10 + PIN_HALF_SIZE);
-			nvgRotate(vg, -45);
-			nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
-			nvgText(vg, 0, 0, get_pin(node, PIN_OUTPUT, i)->name, NULL);
-			nvgReset(vg);
+			// Draw link from this out pin
+			draw_node_link(vg, node, i);
+
+			if (node == selected_node)
+			{
+				// Draw node name
+				nvgFontSize(vg, 15.0f);
+				nvgFontFace(vg, "sans");
+				nvgTextAlign(vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
+				nvgTranslate(vg, pin_pos.x + PIN_HALF_SIZE, pin_pos.y + 10 + PIN_HALF_SIZE);
+				nvgRotate(vg, -45);
+				nvgFillColor(vg, nvgHSLA(0, 0, 1, 255));
+				nvgText(vg, 0, 0, get_pin(node, PIN_OUTPUT, i)->name, NULL);
+				nvgReset(vg);
+			}
 		}
 	}
 }
@@ -317,7 +313,6 @@ void draw_patch_editor()
 {
 	glfwMakeContextCurrent(window);
 
-	/* Render here */
 	glViewport(0, 0, window_width, window_height);
 	glClearColor(0.25f, 0.25f, 0.25f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -326,7 +321,7 @@ void draw_patch_editor()
 
 	for (int i = 0; i < nodes_pointer; i++)
 	{
-		draw_node(vg, nodes[i]);
+		draw_node(vg, nodes[i], false);
 	}
 
 	if (pin_hold.node != NULL)
@@ -342,7 +337,25 @@ void draw_patch_editor()
 
 	nvgEndFrame(vg);
 
-	/* Swap front and back buffers */
+	glfwSwapBuffers(window);
+}
+
+void draw_patch_editor_custom_nodes()
+{
+	glfwMakeContextCurrent(window);
+
+	glViewport(0, 0, window_width, window_height);
+
+	nvgBeginFrame(vg, window_width, window_height, 1);
+
+	for (int i = 0; i < nodes_pointer; i++)
+	{
+		if (nodes[i]->function_note.draw_func != NULL)
+			draw_node(vg, nodes[i], true);
+	}
+
+	nvgEndFrame(vg);
+
 	glfwSwapBuffers(window);
 }
 
@@ -577,12 +590,20 @@ void patch_editor_init(struct node *node)
 	direct_call_node_self(node);
 }
 
+int frame = 0;
+
 void patch_editor(struct node *node)
 {
+	frame++;
+
 	if (need_to_redraw)
 	{
 		need_to_redraw = false;
 		draw_patch_editor();
+	}
+	else if (frame % 60 == 0)
+	{
+		draw_patch_editor_custom_nodes();
 	}
 
 	glfwPollEvents();
@@ -593,7 +614,7 @@ void patch_editor(struct node *node)
 		exit(0);
 	}
 
-	delayed_call_node_self(node, 1.0/60);
+	delayed_call_node_self(node, 1.0 / 60);
 }
 
 void register_library()
