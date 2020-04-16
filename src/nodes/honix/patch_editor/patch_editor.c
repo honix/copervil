@@ -291,7 +291,7 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 			return;
 
 		struct vector2i other_pin_pos = calc_pin_pos(
-			out_link->receivers_addresses[i].node, 
+			out_link->receivers_addresses[i].node,
 			PIN_INPUT,
 			out_link->receivers_addresses[i].pin_number);
 		nvgBeginPath(vg);
@@ -464,6 +464,13 @@ void init()
 
 	window = glfwCreateWindow(
 		window_width, window_height, "World", NULL, NULL);
+
+	int xpos, ypos, width, height;
+	glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(),
+						   &xpos, &ypos, &width, &height);
+	glfwSetWindowPos(window,
+					 width / 2 - window_width / 2,
+					 height / 2 - window_height / 2);
 
 	if (!window)
 	{
