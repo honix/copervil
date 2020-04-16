@@ -15,9 +15,13 @@ extern unsigned int nodes_pointer;
 
 struct type_note *trigger_type_note;
 
+// struct node *patch_editor_node; // needed to call it from glfw callbacks
+
 // TODO: move this data to local node starage
 int window_width = 700;
 int window_height = 512;
+
+bool need_to_redraw = false;
 
 GLFWwindow *window;
 struct NVGcontext *vg;
@@ -52,6 +56,9 @@ struct vector2i calc_pin_pos(struct node *node, enum pin_type pin_type, uint8_t 
 	case PIN_OUTPUT:
 		vec.x = node->rect.pos.x + PIN_PADDING + (PIN_SIZE + PIN_PADDING) * pin;
 		vec.y = node->rect.pos.y + NODE_HEIGHT - PIN_HALF_SIZE;
+		break;
+
+	default:
 		break;
 	}
 	return vec;
@@ -128,15 +135,6 @@ struct pin_hold pin_under_cursor(struct node *node, struct vector2i cursor_pos)
 	return none;
 }
 
-void character_callback(GLFWwindow *window, unsigned int codepoint)
-{
-	uint8_t p = -1;
-	while (new_node_name[++p] != '\0')
-		;
-	new_node_name[p] = (char)codepoint;
-	new_node_name[p + 1] = '\0';
-}
-
 struct vector2i get_cursor_pos()
 {
 	double x, y;
@@ -144,138 +142,6 @@ struct vector2i get_cursor_pos()
 	return (struct vector2i){.x = x, .y = y};
 }
 
-void key_callback(
-	GLFWwindow *window, int key,
-	int scancode, int action, int mods)
-{
-	// printf("key_callback: %s %d %d %d %d\n",
-	//     glfwGetKeyName(key, scancode),
-	//     key, scancode, action, mods);
-
-	struct function_note *note;
-	uint8_t p;
-	struct vector2i pos;
-
-	if (action & (GLFW_PRESS | GLFW_REPEAT))
-	{
-
-		switch (key)
-		{
-		case GLFW_KEY_DELETE:
-			if (action == GLFW_PRESS && selected_node != NULL)
-			{
-				free_node(selected_node);
-				selected_node = NULL;
-			}
-			break;
-		case GLFW_KEY_Q:
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
-			break;
-		case GLFW_KEY_ENTER:
-			note = get_function_note(new_node_name);
-			if (note != NULL)
-			{
-				pos = get_cursor_pos();
-				make_node(pos.x, pos.y, note);
-			}
-			new_node_name[0] = '\0';
-		case GLFW_KEY_BACKSPACE:
-			p = -1;
-			while (new_node_name[++p] != '\0')
-				;
-			if (p > 0)
-				new_node_name[p - 1] = '\0';
-			break;
-		}
-	}
-
-	if (selected_node != NULL &&
-		selected_node->function_note.input_key_func != NULL)
-	{
-		selected_node->function_note.input_key_func(
-			selected_node, key, scancode, action, mods);
-	}
-}
-
-void cursor_pos_callback(GLFWwindow *window, double x, double y)
-{
-	// printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
-	// nodes[1]->x = x; // TEST
-	// nodes[1]->y = y;
-
-	if (dragged_node != NULL)
-	{
-		struct vector2i cursor_pos = {.x = x, .y = y};
-		dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
-	}
-}
-
-void clear_pin_hold()
-{
-	pin_hold = (struct pin_hold){.node = NULL};
-}
-
-void mouse_button_callback(
-	GLFWwindow *window,
-	int button, int action, int mods)
-{
-	struct vector2i cursor_pos = get_cursor_pos();
-
-	// printf("mouse_button_callback: %d %d %d %d\n",
-	// 	   button, action, cursor_pos.x, cursor_pos.y);
-
-	switch (action)
-	{
-	case GLFW_PRESS:
-		dragged_node = selected_node = node_under_cursor(cursor_pos);
-		if (dragged_node != NULL)
-		{
-			dragged_node_offset = vector_sub(
-				dragged_node->rect.pos,
-				cursor_pos);
-
-			struct pin_hold new_pin_hold =
-				pin_under_cursor(selected_node, cursor_pos);
-			if (new_pin_hold.node != NULL && pin_hold.node != NULL &&
-				new_pin_hold.pin_type != pin_hold.pin_type)
-			{
-				if (pin_hold.pin_type == PIN_OUTPUT)
-					connect_nodes(
-						pin_hold.node, pin_hold.pin,
-						new_pin_hold.node, new_pin_hold.pin);
-				else
-					connect_nodes(
-						new_pin_hold.node, new_pin_hold.pin,
-						pin_hold.node, pin_hold.pin);
-				clear_pin_hold();
-			}
-			else
-			{
-				pin_hold = new_pin_hold;
-			}
-		}
-		else
-		{
-			clear_pin_hold();
-		}
-		break;
-	case GLFW_RELEASE:
-		dragged_node = NULL;
-		break;
-	}
-}
-
-void window_size_callback(GLFWwindow *window, int width, int height)
-{
-	window_width = width;
-	window_height = height;
-
-	printf("window_size_callback: %d %d\n", width, height);
-
-	glfwMakeContextCurrent(window);
-	glViewport(0, 0, width, height);
-}
 
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 {
@@ -344,7 +210,7 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 
 	int x = node->rect.pos.x;
 	int y = node->rect.pos.y;
-	int width = node->rect.size.x;
+	// int width = node->rect.size.x;
 	int height = node->rect.size.y;
 
 	// Draw body
@@ -447,6 +313,196 @@ void draw_node(struct NVGcontext *vg, struct node *node)
 	}
 }
 
+void draw_patch_editor()
+{
+	glfwMakeContextCurrent(window);
+
+	/* Render here */
+	glViewport(0, 0, window_width, window_height);
+	glClearColor(0.25f, 0.25f, 0.25f, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	nvgBeginFrame(vg, window_width, window_height, 1);
+
+	for (int i = 0; i < nodes_pointer; i++)
+	{
+		draw_node(vg, nodes[i]);
+	}
+
+	if (pin_hold.node != NULL)
+	{
+		draw_pin_hold(vg);
+	}
+
+	nvgFontSize(vg, 15.0f);
+	nvgFontFace(vg, "sans");
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
+	nvgFillColor(vg, nvgRGBA(255, 120, 0, 255));
+	nvgText(vg, 10, window_height - 10, new_node_name, NULL);
+
+	nvgEndFrame(vg);
+
+	/* Swap front and back buffers */
+	glfwSwapBuffers(window);
+}
+
+void redraw_patch_editor()
+{
+	need_to_redraw = true;
+}
+
+void character_callback(GLFWwindow *window, unsigned int codepoint)
+{
+	uint8_t p = -1;
+	while (new_node_name[++p] != '\0')
+		;
+	new_node_name[p] = (char)codepoint;
+	new_node_name[p + 1] = '\0';
+}
+
+void key_callback(
+	GLFWwindow *window, int key,
+	int scancode, int action, int mods)
+{
+	// printf("key_callback: %s %d %d %d %d\n",
+	//     glfwGetKeyName(key, scancode),
+	//     key, scancode, action, mods);
+
+	struct function_note *note;
+	uint8_t p;
+	struct vector2i pos;
+
+	if (action & (GLFW_PRESS | GLFW_REPEAT))
+	{
+
+		switch (key)
+		{
+		case GLFW_KEY_DELETE:
+			if (action == GLFW_PRESS && selected_node != NULL)
+			{
+				free_node(selected_node);
+				selected_node = NULL;
+			}
+			break;
+		case GLFW_KEY_Q:
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			break;
+		case GLFW_KEY_ENTER:
+			note = get_function_note(new_node_name);
+			if (note != NULL)
+			{
+				pos = get_cursor_pos();
+				make_node(pos.x, pos.y, note);
+			}
+			new_node_name[0] = '\0';
+		case GLFW_KEY_BACKSPACE:
+			p = -1;
+			while (new_node_name[++p] != '\0')
+				;
+			if (p > 0)
+				new_node_name[p - 1] = '\0';
+			break;
+		}
+	}
+
+	if (selected_node != NULL &&
+		selected_node->function_note.input_key_func != NULL)
+	{
+		selected_node->function_note.input_key_func(
+			selected_node, key, scancode, action, mods);
+	}
+
+	redraw_patch_editor();
+}
+
+void cursor_pos_callback(GLFWwindow *window, double x, double y)
+{
+	// printf("cursor_pos_callback: %d %d\n", (int)x, (int)y);
+	// nodes[1]->x = x; // TEST
+	// nodes[1]->y = y;
+
+	if (dragged_node != NULL)
+	{
+		struct vector2i cursor_pos = {.x = x, .y = y};
+		dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
+
+		redraw_patch_editor();
+	}
+
+	if (pin_hold.node != NULL)
+		redraw_patch_editor();
+}
+
+void clear_pin_hold()
+{
+	pin_hold = (struct pin_hold){.node = NULL};
+}
+
+void mouse_button_callback(
+	GLFWwindow *window,
+	int button, int action, int mods)
+{
+	struct vector2i cursor_pos = get_cursor_pos();
+
+	// printf("mouse_button_callback: %d %d %d %d\n",
+	// 	   button, action, cursor_pos.x, cursor_pos.y);
+
+	switch (action)
+	{
+	case GLFW_PRESS:
+		dragged_node = selected_node = node_under_cursor(cursor_pos);
+		if (dragged_node != NULL)
+		{
+			dragged_node_offset = vector_sub(
+				dragged_node->rect.pos,
+				cursor_pos);
+
+			struct pin_hold new_pin_hold =
+				pin_under_cursor(selected_node, cursor_pos);
+			if (new_pin_hold.node != NULL && pin_hold.node != NULL &&
+				new_pin_hold.pin_type != pin_hold.pin_type)
+			{
+				if (pin_hold.pin_type == PIN_OUTPUT)
+					connect_nodes(
+						pin_hold.node, pin_hold.pin,
+						new_pin_hold.node, new_pin_hold.pin);
+				else
+					connect_nodes(
+						new_pin_hold.node, new_pin_hold.pin,
+						pin_hold.node, pin_hold.pin);
+				clear_pin_hold();
+			}
+			else
+			{
+				pin_hold = new_pin_hold;
+			}
+		}
+		else
+		{
+			clear_pin_hold();
+		}
+		redraw_patch_editor();
+		break;
+	case GLFW_RELEASE:
+		dragged_node = NULL;
+		break;
+	}
+}
+
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+	window_width = width;
+	window_height = height;
+
+	printf("window_size_callback: %d %d\n", width, height);
+
+	glfwMakeContextCurrent(window);
+	glViewport(0, 0, width, height);
+
+	redraw_patch_editor();
+}
+
 void init()
 {
 	trigger_type_note = reg_type("trigger", sizeof(trigger));
@@ -500,6 +556,8 @@ void init()
 	// glEnable(GL_CULL_FACE);
 	// glDisable(GL_DEPTH_TEST);
 	// end initialization
+
+	redraw_patch_editor();
 }
 
 void deinit()
@@ -514,41 +572,18 @@ void patch_editor_init(struct node *node)
 	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
 
 	init();
+
+	redraw_patch_editor();
 }
 
 void patch_editor(struct node *node)
 {
-	glfwMakeContextCurrent(window);
-
-	/* Render here */
-	glViewport(0, 0, window_width, window_height);
-	glClearColor(0.25f, 0.25f, 0.25f, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	nvgBeginFrame(vg, window_width, window_height, 1);
-
-	for (int i = 0; i < nodes_pointer; i++)
+	if (need_to_redraw)
 	{
-		draw_node(vg, nodes[i]);
+		need_to_redraw = false;
+		draw_patch_editor();
 	}
 
-	if (pin_hold.node != NULL)
-	{
-		draw_pin_hold(vg);
-	}
-
-	nvgFontSize(vg, 15.0f);
-	nvgFontFace(vg, "sans");
-	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
-	nvgFillColor(vg, nvgRGBA(255, 120, 0, 255));
-	nvgText(vg, 10, window_height - 10, new_node_name, NULL);
-
-	nvgEndFrame(vg);
-
-	/* Swap front and back buffers */
-	glfwSwapBuffers(window);
-
-	/* Poll for and process events */
 	glfwPollEvents();
 
 	if (glfwWindowShouldClose(window))

@@ -29,6 +29,7 @@ void number_io_init(struct node *node)
 
 void number_io(struct node *node)
 {
+	
 }
 
 void number_io_draw(struct NVGcontext *vg, struct node *node)
