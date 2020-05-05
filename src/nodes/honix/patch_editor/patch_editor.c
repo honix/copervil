@@ -6,12 +6,12 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg/src/nanovg_gl.h"
 
+#include "sx/allocator.h"
+#include "sx/array.h"
+
 #include "core/node_api.h"
 
 #define HIT_RECT_EXPAND_AMOUNT 10
-
-extern struct node **nodes;
-extern unsigned int nodes_pointer;
 
 struct type_note *trigger_type_note;
 
@@ -74,7 +74,7 @@ struct rect calc_pin_rect(struct node *node, enum pin_type pin_type, uint8_t pin
 struct node *node_under_cursor(struct vector2i cursor_pos)
 {
 	struct node *node = NULL;
-	for (int i = 0; i < nodes_pointer; i++)
+	for (int i = 0; i < sx_array_count(nodes); i++)
 	{
 		struct rect expanded_rect =
 			expand_rect(nodes[i]->rect, HIT_RECT_EXPAND_AMOUNT);
@@ -319,7 +319,7 @@ void draw_patch_editor()
 
 	nvgBeginFrame(vg, window_width, window_height, 1);
 
-	for (int i = 0; i < nodes_pointer; i++)
+	for (int i = 0; i < sx_array_count(nodes); i++)
 	{
 		draw_node(vg, nodes[i], false);
 	}
@@ -348,7 +348,7 @@ void draw_patch_editor_custom_nodes()
 
 	nvgBeginFrame(vg, window_width, window_height, 1);
 
-	for (int i = 0; i < nodes_pointer; i++)
+	for (int i = 0; i < sx_array_count(nodes); i++)
 	{
 		if (nodes[i]->function_note.draw_func != NULL)
 			draw_node(vg, nodes[i], true);

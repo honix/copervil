@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "node.h"
+#include "sx/allocator.h"
+#include "sx/array.h"
 
-#define LINKS_MAX_COUNT 128 // TODO: this is bad temp code. rewrite
+#include "node.h"
 
 void init_links_subsystem()
 {
-	links = malloc(sizeof(struct link *) * LINKS_MAX_COUNT);
-	links_pointer = 0;
+	links = NULL;
 }
 
 struct link *make_link(void *data)
@@ -25,11 +25,7 @@ struct link *make_link(void *data)
 		calloc(MAX_RECEIVERS_COUNT, sizeof(struct link_address));
 	link->receivers_count = 0;
 
-	links[links_pointer] = link;
-	links_pointer++;
-
-	if (links_pointer >= LINKS_MAX_COUNT)
-		printf("Oops! LINKS_MAX_COUNT exceeded!\n");
+	sx_array_push(sx_alloc_malloc_leak_detect(), links, link);
 
 	return link;
 }
@@ -52,9 +48,21 @@ void free_link(struct link *link, enum pin_type owner, struct node *owner_node)
 
 	free(link->data);
 	free(link->receivers_addresses);
-	free(link);
 
-	// TODO: remove from links collection
+	unsigned int shift = 0;
+	for (int i = 0; i < sx_array_count(links); i++)
+	{
+		if (links[i] == link)
+		{
+			shift = i;
+			break;
+		}
+	}
+
+	links[shift] = sx_array_last(links);
+	sx_array_pop_last(links);
+
+	free(link);
 }
 
 void set_sender(

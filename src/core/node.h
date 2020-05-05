@@ -60,8 +60,7 @@ struct node
 	// uint8_t flags;
 };
 
-struct node **nodes; // TODO: consider using dynamic collection
-unsigned int nodes_pointer;
+struct node **nodes;
 
 void init_nodes_subsystem();
 

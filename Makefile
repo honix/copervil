@@ -24,11 +24,11 @@ run: bin/core nodes
 bin:
 	mkdir bin
 
-bin/core: src/core/main.c $(OBJECTS) bin
-	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl
+bin/core: src/core/main.c $(OBJECTS) bin thirdparty/sx/libsx.a
+	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl -pthread
 
 
-nodes: $(NODE_API)
+nodes: $(NODE_API) thirdparty/sx/libsx.a
 	cd src/nodes && for m in `find | grep Makefile`; do make -C `dirname $$m`; done
 
 
@@ -40,22 +40,15 @@ obj:
 	mkdir obj
 
 obj/%.o: src/core/%.c $(HEADERS_CORE) obj
-	gcc -Wall -g -c $< -o $@
-
-obj/%.o: src/editor/%.c $(HEADERS_CORE) $(HEADERS_EDITOR) obj
-	gcc -Wall -g -c $< -o $@
-
-obj/loop.o: src/core/loop.c $(HEADERS_CORE) obj
 	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
 
-obj/type_bank.o: src/core/type_bank.c $(HEADERS_CORE) obj
-	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
 
 thirdparty/sx/libsx.a: thirdparty/sx/Makefile
 	cd thirdparty/sx && make
 
 thirdparty/sx/Makefile: thirdparty/sx/CMakeLists.txt
 	cd thirdparty/sx && cmake CMakeLists.txt && make
+
 
 clean:
 	rm -rf bin

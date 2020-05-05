@@ -4,16 +4,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "link.h"
-#include "dl_loader.h" // funtion_note
-#include "type_bank.h"
+#include "sx/allocator.h"
+#include "sx/array.h"
 
-#define NODES_MAX_COUNT 128 // TODO: this is bad temp code. rewrite
+#include "link.h"
+#include "dl_loader.h" // function_note
+#include "type_bank.h"
 
 void init_nodes_subsystem()
 {
-	nodes = malloc(sizeof(struct node *) * NODES_MAX_COUNT);
-	nodes_pointer = 0;
+	nodes = NULL;
 }
 
 void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
@@ -175,11 +175,7 @@ struct node *make_node(
 	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 	node->out_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 
-	nodes[nodes_pointer] = node;
-	nodes_pointer++;
-
-	if (nodes_pointer >= NODES_MAX_COUNT)
-		printf("Oops! NODES_MAX_COUNT exceeded!\n");
+	sx_array_push(sx_alloc_malloc_leak_detect(), nodes, node);
 
 	init_node(node);
 
@@ -201,7 +197,7 @@ void free_node(struct node *node)
 	free(node->out_pins.pins);
 
 	unsigned int shift = 0;
-	for (int i = 0; i < nodes_pointer; i++)
+	for (int i = 0; i < sx_array_count(nodes); i++)
 	{
 		if (nodes[i] == node)
 		{
@@ -210,12 +206,8 @@ void free_node(struct node *node)
 		}
 	}
 
-	memmove(
-		nodes + shift,
-		nodes + shift + 1,
-		(nodes_pointer - shift - 1) * sizeof(struct node *));
-
-	nodes_pointer--;
+	nodes[shift] = sx_array_last(nodes);
+	sx_array_pop_last(nodes);
 
 	free(node);
 }

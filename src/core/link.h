@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#define MAX_RECEIVERS_COUNT 8 // TODO: bad code
+#define MAX_RECEIVERS_COUNT 8 // TODO: refactor?
 
 struct node;
 enum pin_type;
@@ -25,8 +25,7 @@ struct link
 	struct link_address *receivers_addresses;
 };
 
-struct link **links; // TODO: consider using dynamic collection
-unsigned int links_pointer;
+struct link **links;
 
 void init_links_subsystem();
 

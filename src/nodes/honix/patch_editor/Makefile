@@ -1,13 +1,17 @@
-HEADERS_CORE = \
-	../../../../src/core/node_api.h
+
+SRC = ../../..
+HEADERS_CORE = $(SRC)/core/node_api.h
 
 THIRDPARTY = ../../../../thirdparty
 NANOVG_OBJ = $(THIRDPARTY)/nanovg/build/obj/Debug/nanovg/nanovg.o
 
+LIBSX_INCLUDE = $(THIRDPARTY)/sx/include
+LIBSX_OBJ = $(THIRDPARTY)/sx/libsx.a
+
 all: patch_editor.so number_io.so
 
-%.so: %.c $(HEADERS_CORE) $(NANOVG_OBJ)
-	gcc -Wall -shared -fPIC -g -I../../.. -I$(THIRDPARTY) $< $(NANOVG_OBJ) -o $@ -lm -lGL -lglfw
+%.so: %.c $(HEADERS_CORE) $(NANOVG_OBJ) $(LIBSX_OBJ)
+	gcc -Wall -shared -fPIC -g -I$(SRC) -I$(THIRDPARTY) -I$(LIBSX_INCLUDE) $< $(NANOVG_OBJ) $(LIBSX_OBJ) -o $@ -lm -lGL -lglfw
 
 NANOVG_MAKE = $(THIRDPARTY)/nanovg/build/nanovg.make
 
