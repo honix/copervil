@@ -6,7 +6,7 @@
 
 struct type_note
 {
-    unsigned long id; // hash of name
+    uint32_t id; // hash of name
 
     char *name;
     size_t size;

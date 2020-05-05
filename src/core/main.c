@@ -143,6 +143,7 @@ void test_sum_node()
 
 void init_subsystems()
 {
+	init_loop_subsystem();
 	init_nodes_subsystem();
 	init_links_subsystem();
 	init_dl_loader_subsystem();

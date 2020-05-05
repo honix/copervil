@@ -67,17 +67,6 @@ void window_init(struct node *node)
 	direct_call_node_self(node); // draw one frame
 }
 
-#include <time.h>
-
-double current_time_secs()
-{
-	// TODO: this seems to work only on linux family
-	// need test this function on windows
-	struct timespec time;
-	clock_gettime(CLOCK_REALTIME, &time);
-	return time.tv_sec + (double)time.tv_nsec / 1000000000;
-}
-
 unsigned int samples = 60;
 double prev_time = 0;
 double acc = 0;

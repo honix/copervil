@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "sx/timer.h"
+
 #include "node.h"
 #include "link.h"
 #include "list.h"
@@ -11,6 +13,8 @@
 
 // this list will be always sorted by > call_time
 struct list delayed_node_list;
+
+uint64_t start_time;
 
 struct delayed_node
 {
@@ -28,11 +32,7 @@ struct delayed_node *make_delayed_node(struct node *node, double call_time)
 
 double current_time_secs()
 {
-	// TODO: this seems to work only on linux family
-	// need test this function on windows
-	struct timespec time;
-	clock_gettime(CLOCK_REALTIME, &time);
-	return time.tv_sec + (double)time.tv_nsec / 1000000000;
+	return sx_tm_sec(sx_tm_since(start_time));
 }
 
 int ord(struct list_cell *a, struct list_cell *b)
@@ -106,16 +106,17 @@ void loop_step()
 	}
 }
 
-void init_timers()
+void init_loop_subsystem()
 {
+	sx_tm_init();
+	start_time = sx_tm_now();
+
 	time_req.tv_sec = 0;
 	time_req.tv_nsec = 0;
 }
 
 void loop_run()
 {
-	init_timers();
-
 	while (1)
 	{
 		loop_step();

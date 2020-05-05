@@ -25,7 +25,7 @@ bin:
 	mkdir bin
 
 bin/core: src/core/main.c $(OBJECTS) bin
-	gcc -Wall -g -rdynamic $< $(OBJECTS) -o $@ -lm -ldl
+	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl
 
 
 nodes: $(NODE_API)
@@ -44,6 +44,18 @@ obj/%.o: src/core/%.c $(HEADERS_CORE) obj
 
 obj/%.o: src/editor/%.c $(HEADERS_CORE) $(HEADERS_EDITOR) obj
 	gcc -Wall -g -c $< -o $@
+
+obj/loop.o: src/core/loop.c $(HEADERS_CORE) obj
+	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
+
+obj/type_bank.o: src/core/type_bank.c $(HEADERS_CORE) obj
+	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
+
+thirdparty/sx/libsx.a: thirdparty/sx/Makefile
+	cd thirdparty/sx && make
+
+thirdparty/sx/Makefile: thirdparty/sx/CMakeLists.txt
+	cd thirdparty/sx && cmake CMakeLists.txt && make
 
 clean:
 	rm -rf bin

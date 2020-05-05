@@ -2,11 +2,13 @@
 
 #include <string.h>
 
+#include "sx/hash.h"
+
 #include "list.h"
 
 static struct list type_note_list;
 
-static struct type_note *make_type_note(unsigned int id, char *name, size_t size)
+static struct type_note *make_type_note(uint32_t id, char *name, size_t size)
 {
     struct type_note *type_note = malloc(sizeof(struct type_note));
     type_note->id = id;
@@ -15,13 +17,9 @@ static struct type_note *make_type_note(unsigned int id, char *name, size_t size
     return type_note;
 }
 
-static unsigned long hash(char *cp)
+static uint32_t hash(char *cp)
 {
-    // D. J. Bernstein hash function
-    unsigned long hash = 5381;
-    while (*cp)
-        hash = 33 * hash ^ (unsigned char)*cp++;
-    return hash;
+    return sx_hash_fnv32_str(cp);
 }
 
 struct get_type_note_by_id_pred_args
@@ -53,7 +51,7 @@ struct type_note *get_type_note_by_id(unsigned long id)
 
 struct type_note *reg_type(char *name, size_t size)
 {
-    unsigned long id = hash(name);
+    uint32_t id = hash(name);
 
     struct type_note *type_note = get_type_note_by_id(id);
     if (type_note != NULL)

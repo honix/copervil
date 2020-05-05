@@ -24,6 +24,7 @@ void register_function(struct function_note function_note)
 
 void load_library(char *path)
 {
+	// TODO: try to refactor it using thirdparty/sx/include/os.h
 	void *handle = dlopen(path, RTLD_LAZY);
 	void (*register_library)();
 	register_library = dlsym(handle, "register_library");
