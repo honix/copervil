@@ -408,7 +408,8 @@ void key_callback(
 				pos = get_cursor_pos();
 				make_node(pos.x, pos.y, note);
 			}
-			new_node_name[0] = '\0';
+			// new_node_name[0] = '\0';
+			break;
 		case GLFW_KEY_BACKSPACE:
 			p = -1;
 			while (new_node_name[++p] != '\0')
