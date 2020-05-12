@@ -27,7 +27,10 @@ run: bin/core nodes
 	./$<
 
 
-bin/core: src/core/main.c $(OBJECTS) thirdparty/sx/libsx.a
+bin:
+	mkdir bin
+
+bin/core: src/core/main.c $(OBJECTS) thirdparty/sx/libsx.a | bin
 	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl -pthread
 
 
@@ -39,7 +42,10 @@ $(NODE_API): $(HEADERS_CORE)
 	touch $@
 
 
-obj/%.o: src/core/%.c $(HEADERS_CORE)
+obj:
+	mkdir obj
+
+obj/%.o: src/core/%.c $(HEADERS_CORE) | obj
 	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
 
 
