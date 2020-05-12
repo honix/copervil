@@ -13,6 +13,7 @@ all: patch_editor.so number_io.so
 %.so: %.c $(HEADERS_CORE) $(NANOVG_OBJ) $(LIBSX_OBJ)
 	gcc -Wall -shared -fPIC -g -I$(SRC) -I$(THIRDPARTY) -I$(LIBSX_INCLUDE) $< $(NANOVG_OBJ) $(LIBSX_OBJ) -o $@ -lm -lGL -lglfw
 
+
 NANOVG_MAKE = $(THIRDPARTY)/nanovg/build/nanovg.make
 
 $(NANOVG_OBJ): $(NANOVG_MAKE)
