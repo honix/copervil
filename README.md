@@ -22,6 +22,7 @@ git clone --recurse-submodules git@github.com:honix/c.git
 run this commands in project root folder:
 ```
 make
+make run
 ```
 
 ### todo (topmost is priority)

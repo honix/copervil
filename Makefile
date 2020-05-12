@@ -17,14 +17,17 @@ objects_all_file = $(headers_all_file:.h=.o)
 OBJECTS = $(addprefix obj/,$(objects_all_file))
 
 
+build: bin/core nodes
+
+
+install:
+
+
 run: bin/core nodes
 	./$<
 
 
-bin:
-	mkdir bin
-
-bin/core: src/core/main.c $(OBJECTS) bin thirdparty/sx/libsx.a
+bin/core: src/core/main.c $(OBJECTS) thirdparty/sx/libsx.a
 	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl -pthread
 
 
@@ -36,10 +39,7 @@ $(NODE_API): $(HEADERS_CORE)
 	touch $@
 
 
-obj:
-	mkdir obj
-
-obj/%.o: src/core/%.c $(HEADERS_CORE) obj
+obj/%.o: src/core/%.c $(HEADERS_CORE)
 	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
 
 
