@@ -9,7 +9,7 @@ developed and tested to work on linux, but will be easy to port on windows and o
 ### dependencies to run from sources
 
 - common deps: ```make, gcc```
-- patch editor deps: ```libglfw3-dev```
+- patch editor deps: ```libglfw3-dev``` (> 3.3.0)
 
 thirdparty libs:
 - nanovg deps: ```premake4```
@@ -26,6 +26,7 @@ make run
 ```
 
 ### todo (topmost is priority)
+- try run each group of nodes in separate thread, messaging using signals, maybe timer (scheduler) will be dropped after..
 - question - will _all_ nodes have trigger in trigger out pins? (see do_times add sequence, when we want add to not send trigger to draw_triangle)
 - may be patch_editor will draw in another thread (glfwMakeContextCurrent is not cheap)
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
