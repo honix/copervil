@@ -29,7 +29,9 @@ void number_io_init(struct node *node)
 
 void number_io(struct node *node)
 {
-	
+	GET_PIN(node, PIN_OUTPUT, out_number, double) =
+		GET_PIN(node, PIN_INPUT, in_number, double);
+	// direct_call_node_on_pin(node, 0);
 }
 
 void number_io_draw(struct NVGcontext *vg, struct node *node)
@@ -55,7 +57,7 @@ void number_io_draw(struct NVGcontext *vg, struct node *node)
 	if (fmod(number, 1) != 0)
 		sprintf(s, "%f", number);
 	else
-		sprintf(s, "%d", (int) number);
+		sprintf(s, "%d", (int)number);
 	nvgText(vg, x + 15, y + 30 / 2, s, NULL);
 }
 

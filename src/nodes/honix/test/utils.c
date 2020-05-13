@@ -6,19 +6,16 @@
 #define DEFINE_MATH_OP(name, op)                          \
 	void name##_op_init(struct node *node)                \
 	{                                                     \
-		init_pins(node, 3, 2);                            \
-		REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);  \
-		REG_PIN(node, PIN_INPUT, 1, "number a", double);  \
-		REG_PIN(node, PIN_INPUT, 2, "number b", double);  \
-		REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger); \
-		REG_PIN(node, PIN_OUTPUT, 1, "result", double);   \
+		init_pins(node, 2, 1);                            \
+		REG_PIN(node, PIN_INPUT, 0, "number a", double);  \
+		REG_PIN(node, PIN_INPUT, 1, "number b", double);  \
+		REG_PIN(node, PIN_OUTPUT, 0, "result", double);   \
 	}                                                     \
 	void name##_op(struct node *node)                     \
 	{                                                     \
-		GET_PIN(node, PIN_OUTPUT, 1, double) =            \
-			GET_PIN(node, PIN_INPUT, 1, double) op        \
-				GET_PIN(node, PIN_INPUT, 2, double);      \
-		direct_call_node_on_pin(node, 0);                 \
+		GET_PIN(node, PIN_OUTPUT, 0, double) =            \
+			GET_PIN(node, PIN_INPUT, 0, double) op        \
+				GET_PIN(node, PIN_INPUT, 0, double);      \
 	}
 
 DEFINE_MATH_OP(add, +);
@@ -38,6 +35,19 @@ void print_int(struct node *node)
 {
 	int number = *(int *)get_link_on_pin(node, PIN_INPUT, 0)->data;
 	printf("%d\n", number);
+}
+
+void print_number_init(struct node *node)
+{
+	// node->in_pins_mask = 1 << 0;
+	init_pins(node, 1, 0);
+	REG_PIN(node, PIN_INPUT, 0, "number", double);
+}
+
+void print_number(struct node *node)
+{
+	double number = GET_PIN(node, PIN_INPUT, 0, double);
+	printf("%f\n", number);
 }
 
 // (int) -> (trigger, int)
@@ -196,6 +206,8 @@ void register_library()
 
 	register_function((struct function_note){
 		"print_int", print_int_init, print_int});
+	register_function((struct function_note){
+		"print_number", print_number_init, print_number});
 	register_function((struct function_note){
 		"do_times", do_times_init, do_times});
 	register_function((struct function_note){
