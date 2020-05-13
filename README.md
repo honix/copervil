@@ -9,7 +9,7 @@ developed and tested to work on linux, but will be easy to port on windows and o
 ### dependencies to run from sources
 
 - common deps: ```make, gcc```
-- patch editor deps: ```libglfw3-dev```
+- patch editor deps: ```libglfw3-dev``` (> 3.3.0)
 
 thirdparty libs:
 - nanovg deps: ```premake4```
