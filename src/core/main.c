@@ -89,12 +89,16 @@ void test_sum_node()
 {
 	load_library("./src/nodes/honix/patch_editor/number_io.so");
 
-	make_node(10, 10, get_function_note("number_io"));
-	make_node(200, 10, get_function_note("number_io"));
+	struct node *in1 = make_node(10, 10, get_function_note("number_io"));
+	struct node *in2 = make_node(200, 10, get_function_note("number_io"));
 
-	make_node(10, 100, get_function_note("add"));
+	struct node *add = make_node(10, 100, get_function_note("add"));
 
-	make_node(10, 200, get_function_note("number_io"));
+	struct node *out = make_node(10, 200, get_function_note("number_io"));
+
+	connect_nodes(in1, 0, add, 0);
+	connect_nodes(in2, 0, add, 1);
+	connect_nodes(add, 0, out, 0);
 }
 
 void init_subsystems()

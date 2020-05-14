@@ -15,7 +15,7 @@
 	{                                                     \
 		GET_PIN(node, PIN_OUTPUT, 0, double) =            \
 			GET_PIN(node, PIN_INPUT, 0, double) op        \
-				GET_PIN(node, PIN_INPUT, 0, double);      \
+				GET_PIN(node, PIN_INPUT, 1, double);      \
 	}
 
 DEFINE_MATH_OP(add, +);
