@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "sx/timer.h"
+#include "sx/os.h"
 
 #include "node.h"
 #include "link.h"
@@ -64,9 +65,6 @@ void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
 	}
 }
 
-struct timespec time_req;
-struct timespec time_rem;
-
 void loop_step()
 {
 	// printf("// loop step %f\n", current_time_secs());
@@ -89,9 +87,7 @@ void loop_step()
 
 	if (delay != 0)
 	{
-		time_req.tv_sec = (long)delay;
-		time_req.tv_nsec = (delay - time_req.tv_sec) * 1000000000;
-		nanosleep(&time_req, &time_rem);
+		sx_os_sleep(delay / 1000);
 	}
 
 	if (delayed_node_list.first_cell != NULL)
@@ -110,9 +106,6 @@ void init_loop_subsystem()
 {
 	sx_tm_init();
 	start_time = sx_tm_now();
-
-	time_req.tv_sec = 0;
-	time_req.tv_nsec = 0;
 }
 
 void loop_run()
