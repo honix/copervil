@@ -34,7 +34,6 @@ void test_patch_editor()
 
 void test_user_window()
 {
-	struct node *node_window = make_node(400, 125, get_function_note("window"));
 	// connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 
 	// double *h1 = malloc(sizeof(double));
@@ -44,16 +43,37 @@ void test_user_window()
 	// connect_nodes(make_link(NULL), node2, 0, node1, 0);
 	// connect_nodes(make_link(h1), NULL, 0, node2, 0);
 
-	struct node *node_loop = make_node(400, 10, get_function_note("loop"));
-	struct node *node_lfo = make_node(400, 75, get_function_note("lfo"));
+	struct node *node_on_open =
+		make_node(400, 10, get_function_note("on_open"));
+	struct node *node_loop =
+		make_node(400, 75, get_function_note("loop"));
+	struct node *node_lfo =
+		make_node(400, 125, get_function_note("lfo"));
 	GET_PIN(node_lfo, PIN_INPUT, 1, double) = 0.25;
+	struct node *node_window =
+		make_node(400, 175, get_function_note("window"));
+	struct node *node_number_io =
+		make_node(600, 175, get_function_note("number_io"));
+	GET_PIN(node_number_io, PIN_INPUT, 1, double) = 7;
+	struct node *node_do_times =
+		make_node(450, 275, get_function_note("do_times"));
+	struct node *node_add =
+		make_node(450, 325, get_function_note("add"));
+	struct node *node_draw_triangle =
+		make_node(450, 375, get_function_note("draw_triangle"));
 
-	struct node *node_draw_triangle = make_node(450, 200, get_function_note("draw_triangle"));
-
+	connect_nodes(node_on_open, 0, node_loop, 0);
+	connect_nodes(node_on_open, 0, node_number_io, 0);
 	connect_nodes(node_loop, 0, node_lfo, 0);
 	connect_nodes(node_lfo, 0, node_window, 0);
-	connect_nodes(node_lfo, 1, node_draw_triangle, 1);
-	connect_nodes(node_window, 0, node_draw_triangle, 0);
+	connect_nodes(node_lfo, 1, node_add, 1);
+	connect_nodes(node_number_io, 0, node_do_times, 0);
+	connect_nodes(node_number_io, 1, node_do_times, 1);
+	connect_nodes(node_window, 0, node_do_times, 0);
+	connect_nodes(node_do_times, 0, node_add, 0);
+	connect_nodes(node_do_times, 2, node_add, 2);
+	connect_nodes(node_add, 0, node_draw_triangle, 0);
+	connect_nodes(node_add, 1, node_draw_triangle, 1);
 
 	// direct_call_node(node2);
 }
@@ -131,7 +151,7 @@ int main(int acount, char **args)
 	// test_number_io();
 
 	test_patch_editor();
-	
+
 	loop_run();
 
 	printf("=== end ===\n");

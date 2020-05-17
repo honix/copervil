@@ -21,7 +21,7 @@ struct link *make_link(void *data)
 	// link->receiver = NULL;
 	link->sender_address.node = NULL;
 	link->sender_address.pin_number = -1;
-	link->receivers_addresses =
+	link->receivers_addresses = // TODO: replace with sx_array?
 		calloc(MAX_RECEIVERS_COUNT, sizeof(struct link_address));
 	link->receivers_count = 0;
 
@@ -83,7 +83,7 @@ void add_receiver(
 	link->receivers_addresses[link->receivers_count].pin_number = reciever_pin_number;
 	link->receivers_count++;
 
-	printf("link->receivers_count = %d\n", link->receivers_count); // TODO: bad code
+	// printf("link->receivers_count = %d\n", link->receivers_count); // TODO: bad code
 
 	if (link->receivers_count > MAX_RECEIVERS_COUNT)
 		printf("Error: MAX_RECEIVERS_COUNT exceeded\n"); // TODO: bad code

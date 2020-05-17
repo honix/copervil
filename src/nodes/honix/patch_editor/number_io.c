@@ -71,8 +71,6 @@ void number_io_input_key_func(
 #define change_number(op, value)                     \
 	GET_PIN(node, PIN_INPUT, in_number, double)      \
 	op value;                                        \
-	GET_PIN(node, PIN_OUTPUT, out_number, double) =  \
-		GET_PIN(node, PIN_INPUT, in_number, double); \
 	direct_call_node_self(node);
 
 	double step = 1;

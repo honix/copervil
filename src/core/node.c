@@ -167,7 +167,7 @@ void direct_call_node_on_pin(struct node *node, uint8_t pin_number)
 	struct link *link = pin->connected_link;
 	for (uint8_t i = 0; i < link->receivers_count; i++)
 	{
-		struct node *next_node = link->receivers_addresses[0].node;
+		struct node *next_node = link->receivers_addresses[i].node;
 		// if (next_node == NULL || next_node->only_self_trigger)
 		if (next_node == NULL)
 			return;

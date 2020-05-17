@@ -3,19 +3,19 @@
 
 #include "core/node_api.h"
 
-#define DEFINE_MATH_OP(name, op)                          \
-	void name##_op_init(struct node *node)                \
-	{                                                     \
-		init_pins(node, true, 2, 1);                            \
-		REG_PIN(node, PIN_INPUT, 1, "number a", double);  \
-		REG_PIN(node, PIN_INPUT, 2, "number b", double);  \
-		REG_PIN(node, PIN_OUTPUT, 1, "result", double);   \
-	}                                                     \
-	void name##_op(struct node *node)                     \
-	{                                                     \
-		GET_PIN(node, PIN_OUTPUT, 1, double) =            \
-			GET_PIN(node, PIN_INPUT, 1, double) op        \
-				GET_PIN(node, PIN_INPUT, 2, double);      \
+#define DEFINE_MATH_OP(name, op)                         \
+	void name##_op_init(struct node *node)               \
+	{                                                    \
+		init_pins(node, true, 2, 1);                     \
+		REG_PIN(node, PIN_INPUT, 1, "number a", double); \
+		REG_PIN(node, PIN_INPUT, 2, "number b", double); \
+		REG_PIN(node, PIN_OUTPUT, 1, "result", double);  \
+	}                                                    \
+	void name##_op(struct node *node)                    \
+	{                                                    \
+		GET_PIN(node, PIN_OUTPUT, 1, double) =           \
+			GET_PIN(node, PIN_INPUT, 1, double) op       \
+				GET_PIN(node, PIN_INPUT, 2, double);     \
 	}
 
 DEFINE_MATH_OP(add, +);
@@ -23,23 +23,20 @@ DEFINE_MATH_OP(sub, -);
 DEFINE_MATH_OP(mul, *);
 DEFINE_MATH_OP(div, /);
 
-// (int) -> ()
 void print_int_init(struct node *node)
 {
-	// node->in_pins_mask = 1 << 0;
 	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "number", int);
 }
 
 void print_int(struct node *node)
 {
-	int number = *(int *)get_link_on_pin(node, PIN_INPUT, 1)->data;
+	int number = GET_PIN(node, PIN_INPUT, 1, int);
 	printf("%d\n", number);
 }
 
 void print_number_init(struct node *node)
 {
-	// node->in_pins_mask = 1 << 0;
 	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "number", double);
 }
@@ -50,30 +47,36 @@ void print_number(struct node *node)
 	printf("%f\n", number);
 }
 
-// (int) -> (trigger, int)
 void do_times_init(struct node *node)
 {
-	// node->in_pins_mask = 1 << 0;
-	// node->out_pins_mask = 1 << 0 | 1 << 1;
 	init_pins(node, true, 1, 2);
-	// REG_PIN(node, PIN_INPUT, 1, "trigger", trigger);
 	REG_PIN(node, PIN_INPUT, 1, "count", double);
-	// REG_PIN(node, PIN_OUTPUT, 1, "trigger", trigger);
 	REG_PIN(node, PIN_OUTPUT, 1, "cycle", double);
 	REG_PIN(node, PIN_OUTPUT, 2, "cycle/count", double);
 
-	// node->auto_call_next = false;
+	node->auto_call_next = false;
 }
 
 void do_times(struct node *node)
 {
-	int count = (int)GET_PIN(node, PIN_INPUT, 2, double);
+	int count = (int)GET_PIN(node, PIN_INPUT, 1, double);
 	for (int i = 0; i < count; i++)
 	{
-		GET_PIN(node, PIN_OUTPUT, 2, double) = i;
-		GET_PIN(node, PIN_OUTPUT, 3, double) = (double)i / count;
-		// direct_call_node_on_pin(node, 0);
+		GET_PIN(node, PIN_OUTPUT, 1, double) = i;
+		GET_PIN(node, PIN_OUTPUT, 2, double) = (double)i / count;
+		direct_call_node_on_pin(node, 0);
 	}
+}
+
+void on_open_init(struct node *node)
+{
+	init_pins(node, true, 0, 0);
+
+	delayed_call_node_self(node, 0);
+}
+
+void on_open(struct node *node)
+{
 }
 
 // // (int, double) -> (int/trigger)
@@ -119,28 +122,20 @@ void do_times(struct node *node)
 // 	}
 // }
 
-// (double) -> (trigger)
 void loop_init(struct node *node)
 {
-	// node->in_pins_mask = 1 << 0;
-	// node->out_pins_mask = 1 << 0;
-
-	init_pins(node, true, 1, 1);
+	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "delay", double);
-	*(double *)get_link_on_pin(node, PIN_INPUT, 0)->data = 1.0 / 60;
-	REG_PIN(node, PIN_OUTPUT, 1, "trigger", trigger);
 
-	// node->only_self_trigger = true;
 	node->auto_call_next = false;
 
-	delayed_call_node_self(node, 0);
+	GET_PIN(node, PIN_INPUT, 1, double) = 1.0 / 60;
 }
 
 void loop(struct node *node)
 {
-	double time_step = *(double *)get_link_on_pin(node, PIN_INPUT, 0)->data;
+	double time_step = GET_PIN(node, PIN_INPUT, 1, double);
 
-	// direct_call_node(get_link_on_pin(node, PIN_OUTPUT, 0)->receiver);
 	direct_call_node_on_pin(node, 0);
 
 	delayed_call_node_self(node, time_step);
@@ -151,8 +146,6 @@ void lfo_init(struct node *node)
 	init_pins(node, true, 1, 1);
 	REG_PIN(node, PIN_INPUT, 1, "freq", double);
 	REG_PIN(node, PIN_OUTPUT, 1, "value", double);
-
-	// delayed_call_node_on_pin(node, 0);
 }
 
 void lfo(struct node *node)
@@ -162,9 +155,6 @@ void lfo(struct node *node)
 
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
-
-	// direct_call_node_on_pin(node, 0);
-	// delayed_call_node_on_pin(node, 1/60);
 }
 
 void double_to_int_init(struct node *node)
@@ -176,7 +166,8 @@ void double_to_int_init(struct node *node)
 
 void double_to_int(struct node *node)
 {
-	GET_PIN(node, PIN_OUTPUT, 1, int) = GET_PIN(node, PIN_INPUT, 1, double);
+	GET_PIN(node, PIN_OUTPUT, 1, int) =
+		GET_PIN(node, PIN_INPUT, 1, double);
 }
 
 void int_to_double_init(struct node *node)
@@ -188,7 +179,8 @@ void int_to_double_init(struct node *node)
 
 void int_to_double(struct node *node)
 {
-	GET_PIN(node, PIN_OUTPUT, 1, double) = GET_PIN(node, PIN_INPUT, 1, int);
+	GET_PIN(node, PIN_OUTPUT, 1, double) =
+		GET_PIN(node, PIN_INPUT, 1, int);
 }
 
 void register_library()
@@ -208,6 +200,8 @@ void register_library()
 		"print_number", print_number_init, print_number});
 	register_function((struct function_note){
 		"do_times", do_times_init, do_times});
+	register_function((struct function_note){
+		"on_open", on_open_init, on_open});
 	// register_function((struct function_note){
 	// 	"do_times_inderect", do_times_inderect_init, do_times_inderect});
 	register_function((struct function_note){
