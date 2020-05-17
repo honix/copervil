@@ -16,14 +16,37 @@ void init_nodes_subsystem()
 	nodes = NULL;
 }
 
-void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins)
+void init_pins(
+	struct node *node,
+	bool in_out_trigger,
+	uint8_t in_pins,
+	uint8_t out_pins)
 {
+	node->in_out_trigger = in_out_trigger;
+	if (in_out_trigger)
+	{
+		in_pins += 1;
+		out_pins += 1;
+	}
+
 	node->in_pins = (struct pin_array){
 		.array_size = in_pins,
-		.pins = calloc(in_pins, sizeof(struct pin))};
+		.pins =
+			node->in_pins.pins == NULL
+				? calloc(in_pins, sizeof(struct pin))
+				: realloc(node->in_pins.pins, in_pins * sizeof(struct pin))};
 	node->out_pins = (struct pin_array){
 		.array_size = out_pins,
-		.pins = calloc(out_pins, sizeof(struct pin))};
+		.pins =
+			node->out_pins.pins == NULL
+				? calloc(out_pins, sizeof(struct pin))
+				: realloc(node->out_pins.pins, out_pins * sizeof(struct pin))};
+
+	if (in_out_trigger)
+	{
+		REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+		REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
+	}
 }
 
 static void init_pin_link(
@@ -82,6 +105,7 @@ static void init_node(struct node *node)
 {
 	if (node->function_note.init_func == NULL)
 		return;
+
 	node->function_note.init_func(node);
 }
 
@@ -109,7 +133,7 @@ struct pin *get_pin(
 	}
 
 error:
-	// printf("error: bad pin\n");
+	printf("error: bad pin!\n");
 	return NULL;
 }
 
@@ -130,7 +154,7 @@ void direct_call_node_self(struct node *node)
 
 	node->function_note.main_func(node);
 
-	if (node->auto_call_next)
+	if (node->in_out_trigger && node->auto_call_next)
 		direct_call_node_on_pin(node, 0);
 }
 
@@ -143,8 +167,9 @@ void direct_call_node_on_pin(struct node *node, uint8_t pin_number)
 	struct link *link = pin->connected_link;
 	for (uint8_t i = 0; i < link->receivers_count; i++)
 	{
-		struct node *next_node = link->receivers_addresses[i].node;
-		if (next_node == NULL || next_node->only_self_trigger)
+		struct node *next_node = link->receivers_addresses[0].node;
+		// if (next_node == NULL || next_node->only_self_trigger)
+		if (next_node == NULL)
 			return;
 
 		direct_call_node_self(next_node);
@@ -169,7 +194,8 @@ struct node *make_node(
 	node->rect.size.x = NODE_WIDTH;
 	node->rect.size.y = NODE_HEIGHT;
 	node->function_note = *function_note;
-	node->only_self_trigger = false;
+	node->in_out_trigger = true;
+	// node->only_self_trigger = false;
 	node->auto_call_next = true;
 
 	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
@@ -237,8 +263,9 @@ void connect_nodes(
 	if (sender_pin != NULL && receiver_pin != NULL &&
 		sender_pin->type_id != receiver_pin->type_id)
 	{
-		printf("Error: connecting %s and %s nodes: types are not same\n",
-			   sender->function_note.name, receiver->function_note.name);
+		printf("Error: connecting %s and %s nodes: types are not same: %s != %s\n",
+			   sender->function_note.name, receiver->function_note.name, get_type_note_by_id(sender_pin->type_id)->name,
+			   get_type_note_by_id(receiver_pin->type_id)->name);
 		return;
 	}
 

@@ -10,18 +10,18 @@
 
 enum number_io_inputs
 {
-	in_number
+	in_number = 1
 };
 
 enum number_io_outputs
 {
-	out_number
+	out_number = 1
 };
 
 void number_io_init(struct node *node)
 {
 	// define in and out pins count
-	init_pins(node, 1, 1);
+	init_pins(node, true, 1, 1);
 	// reg pin
 	REG_PIN(node, PIN_INPUT, in_number, "number", double);
 	REG_PIN(node, PIN_OUTPUT, out_number, "number", double);
@@ -73,7 +73,7 @@ void number_io_input_key_func(
 	op value;                                        \
 	GET_PIN(node, PIN_OUTPUT, out_number, double) =  \
 		GET_PIN(node, PIN_INPUT, in_number, double); \
-	direct_call_node_on_pin(node, 0);
+	direct_call_node_self(node);
 
 	double step = 1;
 

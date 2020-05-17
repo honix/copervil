@@ -24,13 +24,11 @@ static struct window_state *get_state(struct node *node)
 
 void window_init(struct node *node)
 {
-	init_pins(node, 1, 2);
-	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
-	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
+	init_pins(node, true, 0, 1);
 	REG_PIN(node, PIN_OUTPUT, 1, "window", GLFWwindow *);
 
 	node->inner_state = malloc(sizeof(struct window_state));
-	node->auto_call_next = false;
+	// node->auto_call_next = false;
 	// get_state(node)->random_number = rand() % 360;
 
 	windows_count += 1;
@@ -105,7 +103,7 @@ void window(struct node *node)
 	glfwSwapBuffers(get_state(node)->window);
 
 	// *(GLFWwindow **)get_link_on_pin(node, PIN_OUTPUT, 0)->data = get_state(node)->window;
-	GET_PIN(node, PIN_OUTPUT, 0, GLFWwindow *) = get_state(node)->window;
+	GET_PIN(node, PIN_OUTPUT, 1, GLFWwindow *) = get_state(node)->window;
 }
 
 void window_deinit(struct node *node)
@@ -117,10 +115,8 @@ void window_deinit(struct node *node)
 
 void draw_triangle_init(struct node *node)
 {
-	init_pins(node, 2, 1);
-	REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
+	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "rotate", double);
-	REG_PIN(node, PIN_OUTPUT, 0, "trigger", trigger);
 }
 
 void draw_triangle(struct node *node)
@@ -140,24 +136,24 @@ void draw_triangle(struct node *node)
 	glVertex3f(-1, -1, 0);
 	glEnd();
 
-	direct_call_node_on_pin(node, 0);
+	// direct_call_node_on_pin(node, 0);
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 }
 
 void set_window_pos_init(struct node *node)
 {
-	init_pins(node, 3, 0);
-	REG_PIN(node, PIN_INPUT, 0, "window", GLFWwindow *);
-	REG_PIN(node, PIN_INPUT, 1, "x", double);
-	REG_PIN(node, PIN_INPUT, 2, "y", double);
+	init_pins(node, true, 3, 0);
+	REG_PIN(node, PIN_INPUT, 1, "window", GLFWwindow *);
+	REG_PIN(node, PIN_INPUT, 2, "x", double);
+	REG_PIN(node, PIN_INPUT, 3, "y", double);
 }
 
 void set_window_pos(struct node *node)
 {
 	glfwSetWindowPos(
-		GET_PIN(node, PIN_INPUT, 0, GLFWwindow *),
-		(int)GET_PIN(node, PIN_INPUT, 1, double),
-		(int)GET_PIN(node, PIN_INPUT, 2, double));
+		GET_PIN(node, PIN_INPUT, 1, GLFWwindow *),
+		(int)GET_PIN(node, PIN_INPUT, 2, double),
+		(int)GET_PIN(node, PIN_INPUT, 3, double));
 }
 
 void register_library()

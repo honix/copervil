@@ -58,7 +58,8 @@ void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
 	{
 		struct node *target = link->receivers_addresses[i].node;
 
-		if (target == NULL || target->only_self_trigger)
+		// if (target == NULL || target->only_self_trigger)
+		if (target == NULL)
 			return;
 
 		delayed_call_node_self(target, secs);

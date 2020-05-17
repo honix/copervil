@@ -55,7 +55,8 @@ struct node
 
 	void *inner_state;
 
-	bool only_self_trigger;
+	bool in_out_trigger;
+	// bool only_self_trigger;
 	bool auto_call_next;
 	// uint8_t flags;
 };
@@ -64,7 +65,11 @@ struct node **nodes;
 
 void init_nodes_subsystem();
 
-void init_pins(struct node *node, uint8_t in_pins, uint8_t out_pins);
+void init_pins(
+	struct node *node, 
+	bool in_out_trigger, 
+	uint8_t in_pins, 
+	uint8_t out_pins);
 
 #define REG_PIN(node, pin_type, pin, name, type) \
 	(reg_pin(node, pin_type, pin, name, #type, sizeof(type)))

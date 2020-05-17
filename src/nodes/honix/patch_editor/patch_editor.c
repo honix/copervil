@@ -582,9 +582,9 @@ void deinit()
 void patch_editor_init(struct node *node)
 {
 	// node->in_pins_mask = 1 << 0;
-	// init_pins(node, 0, 0);
+	init_pins(node, true, 0, 0);
 	// REG_PIN(node, PIN_INPUT, 0, "trigger", trigger);
-	node->only_self_trigger = true;
+	// node->only_self_trigger = true;
 
 	init_window();
 

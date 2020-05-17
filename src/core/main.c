@@ -13,8 +13,6 @@ void test_do_times()
 	// do_times_inderect = dlsym(handle, "do_times_inderect");
 	// print_int = dlsym(handle, "print_int");
 
-	load_library("./src/nodes/honix/test/utils.so");
-
 	// struct node *node1 = make_node("node1", do_times);
 	struct node *node1 = make_node(300, 300, get_function_note("do_times_inderect"));
 	GET_PIN(node1, PIN_INPUT, 0, int) = 10;
@@ -28,8 +26,6 @@ void test_do_times()
 
 void test_patch_editor()
 {
-	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
-
 	// struct node *node1 = make_node("node1", do_times);
 	make_node(200, 200, get_function_note("patch_editor"));
 
@@ -38,8 +34,6 @@ void test_patch_editor()
 
 void test_user_window()
 {
-	load_library("./src/nodes/honix/window/window.so");
-
 	struct node *node_window = make_node(400, 125, get_function_note("window"));
 	// connect_nodes(make_link(malloc(sizeof(int))), node1, 0, NULL, 0);
 
@@ -66,8 +60,6 @@ void test_user_window()
 
 void test_number_io()
 {
-	load_library("./src/nodes/honix/patch_editor/number_io.so");
-
 	int *h1 = malloc(sizeof(int));
 	*h1 = 100;
 
@@ -87,8 +79,6 @@ void test_number_io()
 
 void test_sum_node()
 {
-	load_library("./src/nodes/honix/patch_editor/number_io.so");
-
 	struct node *in1 = make_node(10, 10, get_function_note("number_io"));
 	struct node *in2 = make_node(200, 10, get_function_note("number_io"));
 
@@ -96,9 +86,17 @@ void test_sum_node()
 
 	struct node *out = make_node(10, 200, get_function_note("number_io"));
 
-	connect_nodes(in1, 0, add, 0);
-	connect_nodes(in2, 0, add, 1);
+	struct node *print = make_node(10, 300, get_function_note("print_number"));
+
+	connect_nodes(in1, 1, add, 1);
+	connect_nodes(in2, 1, add, 2);
+	connect_nodes(add, 1, out, 1);
+	connect_nodes(out, 1, print, 1);
+
+	connect_nodes(in1, 0, in2, 0);
+	connect_nodes(in2, 0, add, 0);
 	connect_nodes(add, 0, out, 0);
+	connect_nodes(out, 0, print, 0);
 }
 
 void init_subsystems()
@@ -115,9 +113,14 @@ int main(int acount, char **args)
 
 	init_subsystems();
 
+	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
+	load_library("./src/nodes/honix/patch_editor/number_io.so");
+	load_library("./src/nodes/honix/test/utils.so");
+	load_library("./src/nodes/honix/window/window.so");
+
 	//test_arrays();
 	//test_nodes();
-	test_do_times();
+	// test_do_times();
 	test_sum_node();
 
 	test_user_window();
@@ -125,7 +128,7 @@ int main(int acount, char **args)
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 
-	test_number_io();
+	// test_number_io();
 
 	test_patch_editor();
 	
