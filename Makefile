@@ -3,7 +3,6 @@ HEADERS_CORE = \
 	src/core/list.h \
 	src/core/loop.h \
 	src/core/node.h \
-	src/core/sized_array.h \
 	src/core/dl_loader.h \
 	src/core/geometry.h \
 	src/core/type_bank.h
