@@ -3,10 +3,11 @@ SRC = ../../..
 HEADERS_CORE = $(SRC)/core/node_api.h
 
 THIRDPARTY = ../../../../thirdparty
-NANOVG_OBJ = $(THIRDPARTY)/nanovg/build/obj/Debug/nanovg/nanovg.o
 
 LIBSX_INCLUDE = $(THIRDPARTY)/sx/include
 LIBSX_OBJ = $(THIRDPARTY)/sx/libsx.a
+
+NANOVG_OBJ = $(THIRDPARTY)/nanovg/build/obj/Debug/nanovg/nanovg.o
 
 all: patch_editor.so number_io.so
 
