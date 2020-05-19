@@ -13,6 +13,7 @@ typedef struct
 
 struct link;
 struct function_note;
+struct thread_note;
 
 // Do this field will be there? Node is abstract thing
 #define PIN_SIZE 10
@@ -48,7 +49,7 @@ struct node
 {
 	struct rect rect; // Is node abstract, or rect is ok?
 
-	struct function_note function_note;
+	struct function_note function_note; // TODO: maybe pointer?
 
 	struct pin_array in_pins;
 	struct pin_array out_pins;
@@ -59,6 +60,8 @@ struct node
 	// bool only_self_trigger;
 	bool auto_call_next;
 	// uint8_t flags;
+
+	struct thread_note *thread_note;
 };
 
 struct node **nodes;
@@ -100,7 +103,8 @@ struct link *get_link_on_pin(
 
 struct node *make_node(
 	int x, int y,
-	struct function_note *function_note);
+	struct function_note *function_note,
+	struct thread_note *thread_note);
 void free_node(struct node *node);
 void direct_call_node_self(struct node *node);
 void direct_call_node_on_pin(struct node *node, uint8_t pin_number);

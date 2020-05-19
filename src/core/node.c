@@ -6,14 +6,17 @@
 
 #include "sx/allocator.h"
 #include "sx/array.h"
+#include "sx/threads.h"
+#include "sx/os.h"
 
 #include "link.h"
 #include "dl_loader.h" // function_note
 #include "type_bank.h"
+#include "threads.h"
 
 void init_nodes_subsystem()
 {
-	nodes = NULL;
+	// nodes = NULL;
 }
 
 void init_pins(
@@ -101,14 +104,6 @@ void drop_link(
 	init_pin_link(node, pin_type, pin, pin_number);
 }
 
-static void init_node(struct node *node)
-{
-	if (node->function_note.init_func == NULL)
-		return;
-
-	node->function_note.init_func(node);
-}
-
 struct pin *get_pin(
 	struct node *node,
 	enum pin_type pin_type,
@@ -150,12 +145,29 @@ struct link *get_link_on_pin(
 
 void direct_call_node_self(struct node *node)
 {
-	// printf("// direct_call_node %s\n", node->name);
+	// if (node->function_note.name[0] != 'p')
+	// 	printf("direct_call_node %s\n", node->function_note.name);
+	// if (node->thread_note->node_to_run == NULL)
+	// {
+	if (node->thread_note->node_to_run == NULL)
+	{
+		send_func_to_thread(direct_call_node_self, node);
+	}
+	else
+	{
+		node->function_note.main_func(node);
 
-	node->function_note.main_func(node);
+		// if (node->function_note.name[0] != 'p')
+		// 	printf("send_func_to_thread(node->function_note.main_func, node)\n");
+		// sx_signal_wait(node->thread_note->signal_done, -1);
+		// if (node->function_note.name[0] != 'p')
+		// 	printf("sx_signal_wait(node->thread_note->signal_done, -1) done\n");
+		// return;
+		// }
 
-	if (node->in_out_trigger && node->auto_call_next)
-		direct_call_node_on_pin(node, 0);
+		if (node->in_out_trigger && node->auto_call_next)
+			direct_call_node_on_pin(node, 0);
+	}
 }
 
 void direct_call_node_on_pin(struct node *node, uint8_t pin_number)
@@ -185,8 +197,11 @@ void deinit_node(struct node *node)
 
 struct node *make_node(
 	int x, int y,
-	struct function_note *function_note)
+	struct function_note *function_note,
+	struct thread_note *thread_note)
 {
+	printf("Make node %s\n", function_note->name);
+
 	struct node *node = malloc(sizeof(struct node));
 
 	node->rect.pos.x = x;
@@ -197,13 +212,21 @@ struct node *make_node(
 	node->in_out_trigger = true;
 	// node->only_self_trigger = false;
 	node->auto_call_next = true;
+	node->thread_note =
+		thread_note == NULL ? &default_thread_note : thread_note;
 
 	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 	node->out_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 
-	sx_array_push(sx_alloc_malloc_leak_detect(), nodes, node);
+	sx_array_push(sx_alloc_malloc(), nodes, node);
 
-	init_node(node);
+	if (node->function_note.init_func != NULL)
+	{
+		send_func_to_thread(node->function_note.init_func, node);
+		// printf("send_func_to_thread(node->function_note.init_func, node)\n");
+		// sx_signal_wait(node->thread_note->signal_done, -1);
+		// printf("sx_signal_wait(node->thread_note->signal_done, -1) done\n");
+	}
 
 	return node;
 }

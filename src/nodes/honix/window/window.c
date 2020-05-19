@@ -53,6 +53,8 @@ void window_init(struct node *node)
 		return;
 	}
 
+	glfwMakeContextCurrent(get_state(node)->window);
+
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
 	glViewport(0, 0, 256, 256);
@@ -62,7 +64,7 @@ void window_init(struct node *node)
 
 	// printf("GL error at %s:%d: %x\n", __FILE__, __LINE__, glGetError());
 
-	direct_call_node_self(node); // draw one frame
+	delayed_call_node_self(node, 0); // draw one frame
 }
 
 unsigned int samples = 60;
@@ -74,7 +76,7 @@ void window(struct node *node)
 {
 	if (++t == samples)
 	{
-		printf("delta: %f\n", acc / samples);
+		// printf("delta: %f\n", acc / samples);
 		t = 0;
 		acc = 0;
 	}
@@ -84,7 +86,7 @@ void window(struct node *node)
 
 	// get_state(node)->random_number += 1;
 
-	glfwMakeContextCurrent(get_state(node)->window);
+	// glfwMakeContextCurrent(get_state(node)->window);
 
 	// Fill window with black
 	glClearColor(0.5, 0.5, 0.5, 1);

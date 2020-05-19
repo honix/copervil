@@ -25,7 +25,7 @@ struct link *make_link(void *data)
 		calloc(MAX_RECEIVERS_COUNT, sizeof(struct link_address));
 	link->receivers_count = 0;
 
-	sx_array_push(sx_alloc_malloc_leak_detect(), links, link);
+	sx_array_push(sx_alloc_malloc(), links, link);
 
 	return link;
 }

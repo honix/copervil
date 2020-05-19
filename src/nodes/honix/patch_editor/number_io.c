@@ -25,6 +25,7 @@ void number_io_init(struct node *node)
 	// reg pin
 	REG_PIN(node, PIN_INPUT, in_number, "number", double);
 	REG_PIN(node, PIN_OUTPUT, out_number, "number", double);
+	// puts("NUMBER_IO INIT");
 }
 
 void number_io(struct node *node)

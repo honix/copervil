@@ -311,7 +311,7 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 
 void draw_patch_editor()
 {
-	glfwMakeContextCurrent(window);
+	// glfwMakeContextCurrent(window);
 
 	glViewport(0, 0, window_width, window_height);
 	glClearColor(0.25f, 0.25f, 0.25f, 1);
@@ -342,7 +342,7 @@ void draw_patch_editor()
 
 void draw_patch_editor_custom_nodes()
 {
-	glfwMakeContextCurrent(window);
+	// glfwMakeContextCurrent(window);
 
 	glViewport(0, 0, window_width, window_height);
 
@@ -406,7 +406,7 @@ void key_callback(
 			if (note != NULL)
 			{
 				pos = get_cursor_pos();
-				make_node(pos.x, pos.y, note);
+				make_node(pos.x, pos.y, note, NULL);
 			}
 			if (!(mods & GLFW_MOD_SHIFT))
 				new_node_name[0] = '\0';
@@ -510,9 +510,9 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 	window_width = width;
 	window_height = height;
 
-	printf("window_size_callback: %d %d\n", width, height);
+	// printf("window_size_callback: %d %d\n", width, height);
 
-	glfwMakeContextCurrent(window);
+	// glfwMakeContextCurrent(window);
 	glViewport(0, 0, width, height);
 
 	redraw_patch_editor();
@@ -589,7 +589,7 @@ void patch_editor_init(struct node *node)
 
 	init_window();
 
-	direct_call_node_self(node);
+	delayed_call_node_self(node, 0);
 }
 
 int frame = 0;

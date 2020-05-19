@@ -5,7 +5,8 @@ HEADERS_CORE = \
 	src/core/node.h \
 	src/core/dl_loader.h \
 	src/core/geometry.h \
-	src/core/type_bank.h
+	src/core/type_bank.h \
+	src/core/threads.h
 
 NODE_API = src/core/node_api.h
 

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 
 #include "node_api.h"
 
@@ -14,11 +13,11 @@ void test_do_times()
 	// print_int = dlsym(handle, "print_int");
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node(300, 300, get_function_note("do_times_inderect"));
+	struct node *node1 = make_node(300, 300, get_function_note("do_times_inderect"), NULL);
 	GET_PIN(node1, PIN_INPUT, 0, int) = 10;
 	GET_PIN(node1, PIN_INPUT, 1, double) = 1.0;
 
-	struct node *node2 = make_node(400, 400, get_function_note("print_int"));
+	struct node *node2 = make_node(400, 400, get_function_note("print_int"), NULL);
 	connect_nodes(node1, 0, node2, 0);
 
 	direct_call_node_self(node1);
@@ -26,8 +25,11 @@ void test_do_times()
 
 void test_patch_editor()
 {
+	struct thread_note *thread_note = make_thread_note();
 	// struct node *node1 = make_node("node1", do_times);
-	make_node(200, 200, get_function_note("patch_editor"));
+	struct node *node = make_node(200, 200, get_function_note("patch_editor"), thread_note);
+
+	// node->thread_note = thread_note;
 
 	// direct_call_node(node1);
 }
@@ -42,25 +44,26 @@ void test_user_window()
 	// struct node *node2 = make_node(400, 10, get_function_note("loop"));
 	// connect_nodes(make_link(NULL), node2, 0, node1, 0);
 	// connect_nodes(make_link(h1), NULL, 0, node2, 0);
+	struct thread_note *thread_note = make_thread_note();
 
 	struct node *node_on_open =
-		make_node(400, 10, get_function_note("on_open"));
+		make_node(400, 10, get_function_note("on_open"), thread_note);
 	struct node *node_loop =
-		make_node(400, 75, get_function_note("loop"));
+		make_node(400, 75, get_function_note("loop"), thread_note);
 	struct node *node_lfo =
-		make_node(400, 125, get_function_note("lfo"));
+		make_node(400, 125, get_function_note("lfo"), thread_note);
 	GET_PIN(node_lfo, PIN_INPUT, 1, double) = 0.25;
 	struct node *node_window =
-		make_node(400, 175, get_function_note("window"));
+		make_node(400, 175, get_function_note("window"), thread_note);
 	struct node *node_number_io =
-		make_node(600, 175, get_function_note("number_io"));
+		make_node(600, 175, get_function_note("number_io"), thread_note);
 	GET_PIN(node_number_io, PIN_INPUT, 1, double) = 7;
 	struct node *node_do_times =
-		make_node(450, 275, get_function_note("do_times"));
+		make_node(450, 275, get_function_note("do_times"), thread_note);
 	struct node *node_add =
-		make_node(450, 325, get_function_note("add"));
+		make_node(450, 325, get_function_note("add"), thread_note);
 	struct node *node_draw_triangle =
-		make_node(450, 375, get_function_note("draw_triangle"));
+		make_node(450, 375, get_function_note("draw_triangle"), thread_note);
 
 	connect_nodes(node_on_open, 0, node_loop, 0);
 	connect_nodes(node_on_open, 0, node_number_io, 0);
@@ -75,6 +78,14 @@ void test_user_window()
 	connect_nodes(node_add, 0, node_draw_triangle, 0);
 	connect_nodes(node_add, 1, node_draw_triangle, 1);
 
+	// node_on_open->thread_note = thread_note;
+	// node_loop->thread_note = thread_note;
+	// node_lfo->thread_note = thread_note;
+	// node_window->thread_note = thread_note;
+	// node_number_io->thread_note = thread_note;
+	// node_do_times->thread_note = thread_note;
+	// node_add->thread_note = thread_note;
+	// node_draw_triangle->thread_note = thread_note;
 	// direct_call_node(node2);
 }
 
@@ -87,11 +98,11 @@ void test_number_io()
 	*h2 = 0.1;
 
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node1 = make_node(10, 300, get_function_note("do_times_inderect"));
+	struct node *node1 = make_node(10, 300, get_function_note("do_times_inderect"), NULL);
 	GET_PIN(node1, PIN_INPUT, 0, int) = 100;
 	GET_PIN(node1, PIN_INPUT, 1, double) = 0.1;
 
-	struct node *node2 = make_node(10, 450, get_function_note("number_io"));
+	struct node *node2 = make_node(10, 450, get_function_note("number_io"), NULL);
 	connect_nodes(node1, 0, node2, 0);
 
 	direct_call_node_self(node1);
@@ -99,14 +110,16 @@ void test_number_io()
 
 void test_sum_node()
 {
-	struct node *in1 = make_node(10, 10, get_function_note("number_io"));
-	struct node *in2 = make_node(200, 10, get_function_note("number_io"));
+	struct thread_note *thread_note = make_thread_note();
 
-	struct node *add = make_node(10, 100, get_function_note("add"));
+	struct node *in1 = make_node(10, 10, get_function_note("number_io"), thread_note);
+	struct node *in2 = make_node(200, 10, get_function_note("number_io"), thread_note);
 
-	struct node *out = make_node(10, 200, get_function_note("number_io"));
+	struct node *add = make_node(10, 100, get_function_note("add"), thread_note);
 
-	struct node *print = make_node(10, 300, get_function_note("print_number"));
+	struct node *out = make_node(10, 200, get_function_note("number_io"), thread_note);
+
+	struct node *print = make_node(10, 300, get_function_note("print_number"), thread_note);
 
 	connect_nodes(in1, 1, add, 1);
 	connect_nodes(in2, 1, add, 2);
@@ -121,6 +134,7 @@ void test_sum_node()
 
 void init_subsystems()
 {
+	init_threads_subsystem();
 	init_loop_subsystem();
 	init_nodes_subsystem();
 	init_links_subsystem();
@@ -129,14 +143,18 @@ void init_subsystems()
 
 int main(int acount, char **args)
 {
-	printf("=== start ===\n");
+	printf("=== init subsystems ===\n");
 
 	init_subsystems();
+
+	printf("=== loading libraries ===\n");
 
 	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
 	load_library("./src/nodes/honix/patch_editor/number_io.so");
 	load_library("./src/nodes/honix/test/utils.so");
 	load_library("./src/nodes/honix/window/window.so");
+
+	printf("=== spawn nodes ===\n");
 
 	//test_arrays();
 	//test_nodes();
@@ -144,7 +162,8 @@ int main(int acount, char **args)
 	test_sum_node();
 
 	test_user_window();
-	// test_user_window(); // make another one!
+	test_user_window(); // make another one!
+	test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 
@@ -152,9 +171,9 @@ int main(int acount, char **args)
 
 	test_patch_editor();
 
-	loop_run();
+	printf("=== loop ===\n");
 
-	printf("=== end ===\n");
+	loop_run();
 
 	// sx_dump_leaks();
 
