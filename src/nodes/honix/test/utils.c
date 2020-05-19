@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "sx/timer.h"
+
 #include "core/node_api.h"
 
 #define DEFINE_MATH_OP(name, op)                         \
@@ -141,20 +143,36 @@ void loop(struct node *node)
 	delayed_call_node_self(node, time_step);
 }
 
+struct lfo_state
+{
+	uint64_t previous_time;
+};
+
+struct lfo_state *get_lfo_state(struct node *node)
+{
+	return (struct lfo_state *)node->inner_state;
+}
+
 void lfo_init(struct node *node)
 {
 	init_pins(node, true, 1, 1);
 	REG_PIN(node, PIN_INPUT, 1, "freq", double);
 	REG_PIN(node, PIN_OUTPUT, 1, "value", double);
+
+	node->inner_state = malloc(sizeof(struct lfo_state));
+	get_lfo_state(node)->previous_time = sx_tm_now();
 }
 
 void lfo(struct node *node)
 {
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data +=
-		*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data * 1.0 / 60; // ignore relatime for now
+		*(double *)get_link_on_pin(node, PIN_INPUT, 1)->data *
+		sx_tm_sec(sx_tm_since(get_lfo_state(node)->previous_time));
 
 	*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data =
 		fmod(*(double *)get_link_on_pin(node, PIN_OUTPUT, 1)->data, 1.0);
+
+	get_lfo_state(node)->previous_time = sx_tm_now();
 }
 
 void double_to_int_init(struct node *node)
