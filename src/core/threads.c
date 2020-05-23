@@ -134,7 +134,6 @@ void send_func_to_thread(func_for_node *func_to_run, struct node *node)
     // sx_signal_raise(node->thread_note->signal);
 
     // puts("send >>>");
-    // WARNING: works only with sx/threads.c:296 patch     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
     sx_mutex_lock(node->thread_note->mutex_out);
     sx_mutex_unlock(node->thread_note->mutex_in);
 
