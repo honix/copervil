@@ -69,7 +69,7 @@ void number_io_input_key_func(
 	if (action != GLFW_PRESS && action != GLFW_REPEAT)
 		return;
 
-#define change_number(op, value)                     \
+#define CHANGE_NUMBER(op, value)                     \
 	GET_PIN(node, PIN_INPUT, in_number, double)      \
 	op value;                                        \
 	direct_call_node_self(node);
@@ -85,21 +85,23 @@ void number_io_input_key_func(
 	{
 	case GLFW_KEY_UP:
 	case GLFW_KEY_KP_8:
-		change_number(+=, step);
+		CHANGE_NUMBER(+=, step);
 		break;
 
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_KP_2:
-		change_number(-=, step);
+		CHANGE_NUMBER(-=, step);
 		break;
 
 	case GLFW_KEY_R:
-		change_number(=, 0);
+		CHANGE_NUMBER(=, 0);
 		break;
 
 	default:
 		break;
 	}
+	
+#undef CHANGE_NUMBER
 }
 
 void register_library()

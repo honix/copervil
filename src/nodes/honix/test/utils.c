@@ -25,6 +25,8 @@ DEFINE_MATH_OP(sub, -);
 DEFINE_MATH_OP(mul, *);
 DEFINE_MATH_OP(div, /);
 
+#undef DEFINE_MATH_OP
+
 void print_int_init(struct node *node)
 {
 	init_pins(node, true, 1, 0);
