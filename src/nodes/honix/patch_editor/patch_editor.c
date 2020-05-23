@@ -592,23 +592,22 @@ void patch_editor_init(struct node *node)
 	delayed_call_node_self(node, 0);
 }
 
-int frame = 0;
+// int frame = 0;
 
 void patch_editor(struct node *node)
 {
-	frame++;
+	// frame++;
 
 	if (need_to_redraw)
 	{
 		need_to_redraw = false;
 		draw_patch_editor();
 	}
-	else if (frame % 60 == 0)
+	// else if (frame % 60 == 0)
+	else
 	{
 		draw_patch_editor_custom_nodes();
 	}
-
-	glfwPollEvents();
 
 	if (glfwWindowShouldClose(window))
 	{
@@ -617,6 +616,15 @@ void patch_editor(struct node *node)
 	}
 
 	delayed_call_node_self(node, 1.0 / 60);
+
+	glfwPollEvents();
+}
+
+void patch_editor_deinit(struct node *node)
+{
+	printf("patch_editor_deinit\n");
+	glfwDestroyWindow(window);
+	// free(node->inner_state);
 }
 
 void register_library()
@@ -624,5 +632,6 @@ void register_library()
 	register_function((struct function_note){
 		.name = "patch_editor",
 		.init_func = patch_editor_init,
-		.main_func = patch_editor});
+		.main_func = patch_editor,
+		.deinit_func = patch_editor_deinit});
 }

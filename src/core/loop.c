@@ -54,7 +54,7 @@ void delayed_call_node_self(struct node *node, double delay_secs)
 		make_delayed_node(node, current_time_secs() + delay_secs));
 
 	// sx_mutex_lock(&mutex);
-	
+
 	if (delay_secs == 0)
 		insert_list_cell_at_top(&delayed_node_list, cell);
 	else
@@ -76,6 +76,27 @@ void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
 
 		delayed_call_node_self(target, secs);
 	}
+}
+
+void remove_node_from_delayed_list(struct node *node)
+{
+	struct list_cell *cell;
+
+	if (delayed_node_list.first_cell == NULL)
+		return;
+
+	cell = delayed_node_list.first_cell;
+	if (((struct delayed_node *)cell->data)->node == node)
+	{
+		cell = delayed_node_list.first_cell = cell->next;
+	}
+
+	do
+	{
+		if (cell->next != NULL &&
+			((struct delayed_node *)cell->next->data)->node == node)
+			remove_next_list_cell(cell);
+	} while ((cell = cell->next) != NULL);
 }
 
 void loop_step()

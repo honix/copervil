@@ -129,7 +129,7 @@ void loop_init(struct node *node)
 	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "delay", double);
 
-	node->auto_call_next = false;
+	// node->auto_call_next = false;
 
 	GET_PIN(node, PIN_INPUT, 1, double) = 1.0 / 60;
 }
@@ -138,9 +138,8 @@ void loop(struct node *node)
 {
 	double time_step = GET_PIN(node, PIN_INPUT, 1, double);
 
-	direct_call_node_on_pin(node, 0);
-
 	delayed_call_node_self(node, time_step);
+	// direct_call_node_on_pin(node, 0);
 }
 
 struct lfo_state
