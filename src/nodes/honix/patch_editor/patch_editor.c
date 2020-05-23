@@ -74,7 +74,7 @@ struct rect calc_pin_rect(struct node *node, enum pin_type pin_type, uint8_t pin
 struct node *node_under_cursor(struct vector2i cursor_pos)
 {
 	struct node *node = NULL;
-	for (int i = 0; i < sx_array_count(nodes); i++)
+	for (int i = sx_array_count(nodes) - 1; i >= 0; i--)
 	{
 		struct rect expanded_rect =
 			expand_rect(nodes[i]->rect, HIT_RECT_EXPAND_AMOUNT);
