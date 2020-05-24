@@ -228,6 +228,10 @@ struct node *make_node(
 		// sx_signal_wait(node->thread_note->signal_done, -1);
 		// printf("sx_signal_wait(node->thread_note->signal_done, -1) done\n");
 	}
+	else
+	{
+		init_pins(node, true, 0, 0);
+	}
 
 	return node;
 }

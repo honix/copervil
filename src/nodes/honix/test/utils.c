@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "sx/os.h"
 #include "sx/timer.h"
 
 #include "core/node_api.h"
@@ -126,6 +127,34 @@ void on_open(struct node *node)
 // 	}
 // }
 
+void sleep_init(struct node *node)
+{
+	init_pins(node, true, 1, 0);
+	REG_PIN(node, PIN_INPUT, 1, "seconds", float);
+
+	GET_PIN(node, PIN_INPUT, 1, float) = 1.0f;
+}
+
+void sleep(struct node *node)
+{
+	sx_os_sleep(GET_PIN(node, PIN_INPUT, 1, float) * 1000);
+}
+
+void delay_init(struct node *node)
+{
+	init_pins(node, true, 1, 0);
+	REG_PIN(node, PIN_INPUT, 1, "seconds", float);
+
+	GET_PIN(node, PIN_INPUT, 1, float) = 1.0f;
+	
+	node->auto_call_next = false;
+}
+
+void delay(struct node *node)
+{
+	delayed_call_node_on_pin(node, 0, GET_PIN(node, PIN_INPUT, 1, float));
+}
+
 void loop_init(struct node *node)
 {
 	init_pins(node, true, 1, 0);
@@ -223,6 +252,10 @@ void register_library()
 		"on_open", on_open_init, on_open});
 	// register_function((struct function_note){
 	// 	"do_times_inderect", do_times_inderect_init, do_times_inderect});
+	register_function((struct function_note){
+		"sleep", sleep_init, sleep});
+	register_function((struct function_note){
+		"delay", delay_init, delay});
 	register_function((struct function_note){
 		"loop", loop_init, loop});
 	register_function((struct function_note){

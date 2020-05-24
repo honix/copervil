@@ -132,6 +132,32 @@ void test_sum_node()
 	connect_nodes(out, 0, print, 0);
 }
 
+void test_sleep()
+{
+	struct thread_note *thread_note = make_thread_note("sleep");
+
+	struct node *number_io = make_node(200, 450, get_function_note("number_io"), thread_note);
+	struct node *sleep = make_node(200, 540, get_function_note("sleep"), thread_note);
+	struct node *print_number = make_node(250, 600, get_function_note("print_number"), thread_note);
+
+	connect_nodes(number_io, 0, sleep, 0);
+	connect_nodes(sleep, 0, print_number, 0);
+	connect_nodes(number_io, 1, print_number, 1);
+}
+
+void test_delay()
+{
+	struct thread_note *thread_note = make_thread_note("delay");
+
+	struct node *number_io = make_node(400, 450, get_function_note("number_io"), thread_note);
+	struct node *delay = make_node(400, 540, get_function_note("delay"), thread_note);
+	struct node *print_number = make_node(450, 600, get_function_note("print_number"), thread_note);
+
+	connect_nodes(number_io, 0, delay, 0);
+	connect_nodes(delay, 0, print_number, 0);
+	connect_nodes(number_io, 1, print_number, 1);
+}
+
 void init_subsystems()
 {
 	init_threads_subsystem();
@@ -163,11 +189,14 @@ int main(int acount, char **args)
 
 	test_user_window();
 	test_user_window(); // make another one!
-	test_user_window(); // make another one!
+	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 
 	// test_number_io();
+
+	test_sleep();
+	test_delay();
 
 	test_patch_editor();
 
