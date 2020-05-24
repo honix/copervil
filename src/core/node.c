@@ -234,7 +234,9 @@ struct node *make_node(
 
 void free_node(struct node *node)
 {
-	printf("Remove node %s @ 0x%lx\n", node->function_note.name, node);
+	printf("Remove node %s @ 0x%lx\n",
+		   node->function_note.name,
+		   (long unsigned int)node);
 
 	deinit_node(node);
 

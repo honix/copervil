@@ -49,15 +49,16 @@ obj/%.o: src/core/%.c $(HEADERS_CORE) | obj
 	gcc -Wall -g -c $< -o $@ -I thirdparty/sx/include
 
 
+
 thirdparty/sx/libsx.a: thirdparty/sx/Makefile
-	cd thirdparty/sx && make
+	cd thirdparty/sx && C_FLAGS=-fPIC make -e
 
 thirdparty/sx/Makefile: thirdparty/sx/CMakeLists.txt
-	cd thirdparty/sx && cmake CMakeLists.txt && make
+	cd thirdparty/sx && cmake CMakeLists.txt
 
 
 clean:
 	rm -rf bin
 	rm -rf obj
 	cd src/nodes && for m in `find | grep Makefile`; do make -C `dirname $$m` clean; done
-
+	make -C thirdparty/sx clean

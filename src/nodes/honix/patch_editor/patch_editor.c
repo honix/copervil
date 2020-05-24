@@ -8,6 +8,7 @@
 
 #include "sx/allocator.h"
 #include "sx/array.h"
+#include "sx/hash.h"
 
 #include "core/node_api.h"
 
@@ -142,6 +143,11 @@ struct vector2i get_cursor_pos()
 	return (struct vector2i){.x = x, .y = y};
 }
 
+float trigger_color(struct node *node)
+{
+	return (float)sx_hash_u64((uint64_t)node->thread_note->thread) / UINT64_MAX;
+}
+
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 {
 	struct vector2i pin_pos = calc_pin_pos(node, PIN_OUTPUT, pin);
@@ -169,9 +175,14 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 		nvgStrokeWidth(vg, 3);
 		unsigned long type_id = get_pin(node, PIN_OUTPUT, pin)->type_id;
 		if (type_id == trigger_type_note->id)
-			nvgStrokeColor(vg, nvgHSLA(0.6f, 1.0f, 0.5f, 220));
+		{
+			float hue = trigger_color(node);
+			nvgStrokeColor(vg, nvgHSLA(hue, 1.0f, 0.5f, 220));
+		}
 		else
+		{
 			nvgStrokeColor(vg, nvgHSLA(0, 0, 1.0f, 170));
+		}
 		nvgStroke(vg);
 	}
 }
@@ -248,7 +259,10 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 				PIN_SIZE, PIN_HALF_SIZE);
 		unsigned long type_id = get_pin(node, PIN_INPUT, i)->type_id;
 		if (type_id == trigger_type_note->id)
-			nvgFillColor(vg, nvgHSLA(0.6f, 1, 0.5f, 128));
+		{
+			float hue = trigger_color(node);
+			nvgFillColor(vg, nvgHSLA(hue, 1, 0.5f, 128));
+		}
 		else if (pin_hold.node != NULL && pin_hold.type_id == type_id)
 			nvgFillColor(vg, nvgHSLA(0.35f, 1, 0.5f, 128));
 		else
@@ -283,9 +297,14 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 				PIN_SIZE, PIN_HALF_SIZE);
 		unsigned long type_id = get_pin(node, PIN_OUTPUT, i)->type_id;
 		if (type_id == trigger_type_note->id)
-			nvgFillColor(vg, nvgHSLA(0.6f, 1, 0.5f, 128));
+		{
+			float hue = trigger_color(node);
+			nvgFillColor(vg, nvgHSLA(hue, 1, 0.5f, 128));
+		}
 		else
+		{
 			nvgFillColor(vg, nvgHSLA(0, 0, 0, 128));
+		}
 		nvgFill(vg);
 
 		if (!only_body)

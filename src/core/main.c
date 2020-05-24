@@ -27,7 +27,7 @@ void test_patch_editor()
 {
 	struct thread_note *thread_note = make_thread_note();
 	// struct node *node1 = make_node("node1", do_times);
-	struct node *node = make_node(200, 200, get_function_note("patch_editor"), thread_note);
+	make_node(200, 200, get_function_note("patch_editor"), thread_note);
 
 	// node->thread_note = thread_note;
 

@@ -13,4 +13,4 @@ all: utils.so
 
 
 clean:
-	rm *.so
+	rm -f *.so

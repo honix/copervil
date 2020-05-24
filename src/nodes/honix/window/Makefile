@@ -8,4 +8,4 @@ all: window.so
 
 
 clean:
-	rm *.so
+	rm -f *.so

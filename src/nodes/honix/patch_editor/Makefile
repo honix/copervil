@@ -27,4 +27,4 @@ $(NANOVG_MAKE): $(NANOVG_PREMAKE)
 
 
 clean:
-	rm *.so
+	rm -f *.so
