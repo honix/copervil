@@ -318,3 +318,9 @@ void connect_nodes(
 	// if (receiver_pin != NULL)
 	receiver_pin->connected_link = sender_link;
 }
+
+void set_thread_note(struct node *node, uint8_t thread_num)
+{
+	if (thread_num >= sx_array_count(thread_notes)) return;
+	node->thread_note = thread_notes[thread_num];
+}

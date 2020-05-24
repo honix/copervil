@@ -11,6 +11,7 @@ typedef void(func_for_node)(struct node *node);
 
 struct thread_note
 {
+    char name[64];
     sx_thread *thread;
     // sx_queue_spsc *to_queue;
     sx_mutex *mutex_in;
@@ -28,7 +29,7 @@ struct thread_note *default_thread_note;
 
 void init_threads_subsystem();
 
-struct thread_note *make_thread_note();
+struct thread_note *make_thread_note(char *name);
 
 void free_thread_note(struct thread_note *thread_note);
 

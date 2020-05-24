@@ -55,13 +55,14 @@ void sx_mutex_init_(sx_mutex *mutex)
 void init_threads_subsystem()
 {
     // TODO: default_thread_note will be main thread...
-    default_thread_note = make_thread_note();
+    default_thread_note = make_thread_note("default");
 }
 
-struct thread_note *make_thread_note()
+struct thread_note *make_thread_note(char *name)
 {
     struct thread_note *thread_note = malloc(sizeof(struct thread_note));
 
+    strncpy(thread_note->name, name, sizeof(thread_note->name));
     thread_note->mutex_in = malloc(sizeof(sx_mutex));
     thread_note->mutex_out = malloc(sizeof(sx_mutex));
     thread_note->signal = malloc(sizeof(sx_signal));

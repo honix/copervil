@@ -46,7 +46,7 @@ void window_init(struct node *node)
 
 	get_state(node)->window = glfwCreateWindow(256, 256, "Window", NULL, NULL);
 	glfwSetWindowPos(
-		get_state(node)->window, 100 + (windows_count - 1) * 280, 200);
+		get_state(node)->window, 60 + (windows_count - 1) * 260, 60);
 	if (!get_state(node)->window)
 	{
 		glfwTerminate();

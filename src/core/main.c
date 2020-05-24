@@ -25,7 +25,7 @@ void test_do_times()
 
 void test_patch_editor()
 {
-	struct thread_note *thread_note = make_thread_note();
+	struct thread_note *thread_note = make_thread_note("patch_editor");
 	// struct node *node1 = make_node("node1", do_times);
 	make_node(200, 200, get_function_note("patch_editor"), thread_note);
 
@@ -44,7 +44,7 @@ void test_user_window()
 	// struct node *node2 = make_node(400, 10, get_function_note("loop"));
 	// connect_nodes(make_link(NULL), node2, 0, node1, 0);
 	// connect_nodes(make_link(h1), NULL, 0, node2, 0);
-	struct thread_note *thread_note = make_thread_note();
+	struct thread_note *thread_note = make_thread_note("window");
 
 	struct node *node_on_open =
 		make_node(400, 10, get_function_note("on_open"), thread_note);
@@ -110,7 +110,7 @@ void test_number_io()
 
 void test_sum_node()
 {
-	struct thread_note *thread_note = make_thread_note();
+	struct thread_note *thread_note = make_thread_note("numbers");
 
 	struct node *in1 = make_node(10, 10, get_function_note("number_io"), thread_note);
 	struct node *in2 = make_node(200, 10, get_function_note("number_io"), thread_note);

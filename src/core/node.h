@@ -113,3 +113,4 @@ void connect_nodes(
 	uint8_t sender_pin_number,
 	struct node *receiver,
 	uint8_t reciever_pin_number);
+void set_thread_note(struct node *node, uint8_t thread_num);

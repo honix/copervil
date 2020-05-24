@@ -19,8 +19,8 @@ struct type_note *trigger_type_note;
 // struct node *patch_editor_node; // needed to call it from glfw callbacks
 
 // TODO: move this data to local node starage
-int window_width = 700;
-int window_height = 512;
+int window_width = 1024;
+int window_height = 768;
 
 bool need_to_redraw = false;
 
@@ -143,9 +143,9 @@ struct vector2i get_cursor_pos()
 	return (struct vector2i){.x = x, .y = y};
 }
 
-float trigger_color(struct node *node)
+float thread_color(struct thread_note *thread_note)
 {
-	return (float)sx_hash_u64((uint64_t)node->thread_note->thread) / UINT64_MAX;
+	return (float)sx_hash_u64((uint64_t)thread_note->thread) / UINT64_MAX;
 }
 
 void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
@@ -176,7 +176,7 @@ void draw_node_link(struct NVGcontext *vg, struct node *node, uint8_t pin)
 		unsigned long type_id = get_pin(node, PIN_OUTPUT, pin)->type_id;
 		if (type_id == trigger_type_note->id)
 		{
-			float hue = trigger_color(node);
+			float hue = thread_color(node->thread_note);
 			nvgStrokeColor(vg, nvgHSLA(hue, 1.0f, 0.5f, 220));
 		}
 		else
@@ -260,7 +260,7 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 		unsigned long type_id = get_pin(node, PIN_INPUT, i)->type_id;
 		if (type_id == trigger_type_note->id)
 		{
-			float hue = trigger_color(node);
+			float hue = thread_color(node->thread_note);
 			nvgFillColor(vg, nvgHSLA(hue, 1, 0.5f, 128));
 		}
 		else if (pin_hold.node != NULL && pin_hold.type_id == type_id)
@@ -298,7 +298,7 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 		unsigned long type_id = get_pin(node, PIN_OUTPUT, i)->type_id;
 		if (type_id == trigger_type_note->id)
 		{
-			float hue = trigger_color(node);
+			float hue = thread_color(node->thread_note);
 			nvgFillColor(vg, nvgHSLA(hue, 1, 0.5f, 128));
 		}
 		else
@@ -344,8 +344,35 @@ void draw_patch_editor()
 	}
 
 	if (pin_hold.node != NULL)
-	{
 		draw_pin_hold(vg);
+
+	nvgFontSize(vg, 15.0f);
+	nvgFontFace(vg, "sans");
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+	nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
+	nvgText(vg, window_width - 120, 10, "THREADS", NULL);
+
+	for (int i = 0; i < sx_array_count(thread_notes); i++)
+	{
+		struct thread_note *thread_note = thread_notes[i];
+
+		nvgBeginPath(vg);
+		float hue = thread_color(thread_note);
+		nvgRect(vg, window_width - 128, 20 + i * 25, 128, 17);
+		nvgFillColor(vg, nvgHSLA(hue, 1, 0.5f, 200));
+		nvgFill(vg);
+		nvgLineJoin(vg, NVG_BUTT);
+		nvgStrokeWidth(vg, 2);
+		nvgStrokeColor(vg, nvgHSLA(0, 0, 0, 100));
+		nvgStroke(vg);
+
+		nvgFontSize(vg, 15.0f);
+		nvgFontFace(vg, "sans");
+		nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+		nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
+		char s[128];
+		sprintf(s, "#%d %s", i, thread_note->name);
+		nvgText(vg, window_width - 128 + 5, 20 + i * 25 + 10, s, NULL);
 	}
 
 	nvgFontSize(vg, 15.0f);
@@ -388,6 +415,8 @@ void character_callback(GLFWwindow *window, unsigned int codepoint)
 	uint8_t p = -1;
 	while (new_node_name[++p] != '\0')
 		;
+	if (p > sizeof(new_node_name) - 2)
+		return;
 	new_node_name[p] = (char)codepoint;
 	new_node_name[p + 1] = '\0';
 }
@@ -406,9 +435,19 @@ void key_callback(
 
 	if (action & (GLFW_PRESS | GLFW_REPEAT))
 	{
+		if (selected_node != NULL)
+		{
+			if (key == GLFW_KEY_0)
+				set_thread_note(selected_node, 0);
+			else if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9)
+				set_thread_note(selected_node, key - (GLFW_KEY_1 - 1));
+		}
 
 		switch (key)
 		{
+		case GLFW_KEY_INSERT:
+			make_thread_note("new");
+			break;
 		case GLFW_KEY_DELETE:
 			if (action == GLFW_PRESS && selected_node != NULL)
 			{
@@ -421,6 +460,7 @@ void key_callback(
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 			break;
 		case GLFW_KEY_ENTER:
+		case GLFW_KEY_KP_ENTER:
 			note = get_function_note(new_node_name);
 			if (note != NULL)
 			{
