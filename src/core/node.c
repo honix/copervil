@@ -214,7 +214,7 @@ struct node *make_node(
 	// node->only_self_trigger = false;
 	node->auto_call_next = true;
 	node->thread_note =
-		thread_note == NULL ? &default_thread_note : thread_note;
+		thread_note == NULL ? default_thread_note : thread_note;
 
 	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 	node->out_pins = (struct pin_array){.array_size = 0, .pins = NULL};

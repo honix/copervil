@@ -55,31 +55,7 @@ void sx_mutex_init_(sx_mutex *mutex)
 void init_threads_subsystem()
 {
     // TODO: default_thread_note will be main thread...
-    default_thread_note.mutex_in = malloc(sizeof(sx_mutex));
-    default_thread_note.mutex_out = malloc(sizeof(sx_mutex));
-    default_thread_note.signal = malloc(sizeof(sx_signal));
-    default_thread_note.signal_done = malloc(sizeof(sx_signal));
-
-#if SX_PLATFORM_POSIX
-    sx_mutex_init_(default_thread_note.mutex_in);
-    sx_mutex_init_(default_thread_note.mutex_out);
-#else
-    sx_mutex_init(default_thread_note.mutex_in);
-    sx_mutex_init(default_thread_note.mutex_out);
-#endif
-    sx_signal_init(default_thread_note.signal);
-    sx_signal_init(default_thread_note.signal_done);
-    sx_mutex_lock(default_thread_note.mutex_in);
-    default_thread_note.thread = sx_thread_create(
-        sx_alloc_malloc(),
-        thread_cb,
-        &default_thread_note,
-        0,
-        "user-thread-c",
-        NULL);
-
-    sx_array_push(sx_alloc_malloc(),
-                  thread_notes, &default_thread_note);
+    default_thread_note = make_thread_note();
 }
 
 struct thread_note *make_thread_note()

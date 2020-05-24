@@ -23,7 +23,7 @@ struct thread_note
 
 struct thread_note **thread_notes;
 
-struct thread_note default_thread_note;
+struct thread_note *default_thread_note;
 
 
 void init_threads_subsystem();
