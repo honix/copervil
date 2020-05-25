@@ -95,9 +95,13 @@ void free_thread_note(struct thread_note *thread_note)
 {
     sx_thread_destroy(thread_note->thread, sx_alloc_malloc());
     sx_mutex_release(thread_note->mutex_in);
+    free(thread_note->mutex_in);
     sx_mutex_release(thread_note->mutex_out);
+    free(thread_note->mutex_out);
     sx_signal_release(thread_note->signal);
+    free(thread_note->signal);
     sx_signal_release(thread_note->signal_done);
+    free(thread_note->signal_done);
     free(thread_note->signal);
     free(thread_note);
 }
