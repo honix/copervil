@@ -135,9 +135,9 @@ void sleep_init(struct node *node)
 	GET_PIN(node, PIN_INPUT, 1, double) = 1.0f;
 }
 
-void sleep(struct node *node)
+void sleep_main(struct node *node)
 {
-	sx_os_sleep(GET_PIN(node, PIN_INPUT, 1, double) * 1000);
+	sx_os_sleep((int) (GET_PIN(node, PIN_INPUT, 1, double) * 1000));
 }
 
 void delay_init(struct node *node)
@@ -253,7 +253,7 @@ void register_library()
 	// register_function((struct function_note){
 	// 	"do_times_inderect", do_times_inderect_init, do_times_inderect});
 	register_function((struct function_note){
-		"sleep", sleep_init, sleep});
+		"sleep", sleep_init, sleep_main});
 	register_function((struct function_note){
 		"delay", delay_init, delay});
 	register_function((struct function_note){

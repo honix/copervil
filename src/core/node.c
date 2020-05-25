@@ -15,6 +15,8 @@
 #include "threads.h"
 #include "loop.h"
 
+#define PRINT_NODE_CALLS false
+
 void init_nodes_subsystem()
 {
 	// nodes = NULL;
@@ -146,25 +148,26 @@ struct link *get_link_on_pin(
 
 void direct_call_node_self(struct node *node)
 {
-	// if (node->function_note.name[0] != 'p')
-	// 	printf("direct_call_node %s\n", node->function_note.name);
-	// if (node->thread_note->node_to_run == NULL)
-	// {
 	if (node->thread_note->node_to_run == NULL)
 	{
 		send_func_to_thread(direct_call_node_self, node);
 	}
 	else
 	{
+#if PRINT_NODE_CALLS
+		bool patch_editor =
+			strncmp(node->function_note.name, "patch_editor", 12) == 0;
+
+		if (!patch_editor)
+			printf(">>> %s\n", node->function_note.name);
+#endif
+
 		node->function_note.main_func(node);
 
-		// if (node->function_note.name[0] != 'p')
-		// 	printf("send_func_to_thread(node->function_note.main_func, node)\n");
-		// sx_signal_wait(node->thread_note->signal_done, -1);
-		// if (node->function_note.name[0] != 'p')
-		// 	printf("sx_signal_wait(node->thread_note->signal_done, -1) done\n");
-		// return;
-		// }
+#if PRINT_NODE_CALLS
+		if (!patch_editor)
+			printf("<<< %s\n", node->function_note.name);
+#endif
 
 		if (node->in_out_trigger && node->auto_call_next)
 			direct_call_node_on_pin(node, 0);
@@ -325,6 +328,7 @@ void connect_nodes(
 
 void set_thread_note(struct node *node, uint8_t thread_num)
 {
-	if (thread_num >= sx_array_count(thread_notes)) return;
+	if (thread_num >= sx_array_count(thread_notes))
+		return;
 	node->thread_note = thread_notes[thread_num];
 }

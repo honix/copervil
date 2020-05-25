@@ -116,10 +116,10 @@ void loop_step()
 		delay = 1.0 / 30;
 	}
 
-	delay = MAX(0, delay);
+	// delay = MAX(0, delay);
 	// printf("// sleep for %f\n", delay);
 
-	if (delay != 0)
+	if (delay > 0)
 	{
 		sx_os_sleep(delay / 1000);
 	}
