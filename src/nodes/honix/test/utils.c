@@ -130,29 +130,29 @@ void on_open(struct node *node)
 void sleep_init(struct node *node)
 {
 	init_pins(node, true, 1, 0);
-	REG_PIN(node, PIN_INPUT, 1, "seconds", float);
+	REG_PIN(node, PIN_INPUT, 1, "seconds", double);
 
-	GET_PIN(node, PIN_INPUT, 1, float) = 1.0f;
+	GET_PIN(node, PIN_INPUT, 1, double) = 1.0f;
 }
 
 void sleep(struct node *node)
 {
-	sx_os_sleep(GET_PIN(node, PIN_INPUT, 1, float) * 1000);
+	sx_os_sleep(GET_PIN(node, PIN_INPUT, 1, double) * 1000);
 }
 
 void delay_init(struct node *node)
 {
 	init_pins(node, true, 1, 0);
-	REG_PIN(node, PIN_INPUT, 1, "seconds", float);
+	REG_PIN(node, PIN_INPUT, 1, "seconds", double);
 
-	GET_PIN(node, PIN_INPUT, 1, float) = 1.0f;
+	GET_PIN(node, PIN_INPUT, 1, double) = 1.0f;
 	
 	node->auto_call_next = false;
 }
 
 void delay(struct node *node)
 {
-	delayed_call_node_on_pin(node, 0, GET_PIN(node, PIN_INPUT, 1, float));
+	delayed_call_node_on_pin(node, 0, GET_PIN(node, PIN_INPUT, 1, double));
 }
 
 void loop_init(struct node *node)
