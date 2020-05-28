@@ -26,11 +26,8 @@ struct thread_note **thread_notes;
 
 struct thread_note *default_thread_note;
 
-
 void init_threads_subsystem();
-
 struct thread_note *make_thread_note(char *name);
-
 void free_thread_note(struct thread_note *thread_note);
-
 void send_func_to_thread(func_for_node *func_to_run, struct node *node);
+void wait_thread(struct thread_note *thread_note);

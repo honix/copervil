@@ -224,9 +224,12 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 	int height = node->rect.size.y;
 
 	// Draw body
+	double time_from_last_call = current_time_secs() - node->last_call_time;
+	time_from_last_call = 1 - sx_clamp(time_from_last_call, 0, 1);
+
 	nvgBeginPath(vg);
 	nvgRect(vg, x, y, NODE_WIDTH, NODE_HEIGHT);
-	nvgFillColor(vg, nvgRGBA(255, 192, 0, 255));
+	nvgFillColor(vg, nvgRGBA(255, 192, time_from_last_call * 255, 255));
 	nvgFill(vg);
 	nvgLineJoin(vg, NVG_BUTT);
 	nvgStrokeWidth(vg, 2);
@@ -328,24 +331,8 @@ void draw_node(struct NVGcontext *vg, struct node *node, bool only_body)
 	}
 }
 
-void draw_patch_editor()
+void draw_threads_info()
 {
-	// glfwMakeContextCurrent(window);
-
-	glViewport(0, 0, window_width, window_height);
-	glClearColor(0.25f, 0.25f, 0.25f, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	nvgBeginFrame(vg, window_width, window_height, 1);
-
-	for (int i = 0; i < sx_array_count(nodes); i++)
-	{
-		draw_node(vg, nodes[i], false);
-	}
-
-	if (pin_hold.node != NULL)
-		draw_pin_hold(vg);
-
 	nvgFontSize(vg, 15.0f);
 	nvgFontFace(vg, "sans");
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
@@ -386,6 +373,27 @@ void draw_patch_editor()
 		// 	nvgStroke(vg);
 		// }
 	}
+}
+
+void draw_patch_editor()
+{
+	// glfwMakeContextCurrent(window);
+
+	glViewport(0, 0, window_width, window_height);
+	glClearColor(0.25f, 0.25f, 0.25f, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	nvgBeginFrame(vg, window_width, window_height, 1);
+
+	for (int i = 0; i < sx_array_count(nodes); i++)
+	{
+		draw_node(vg, nodes[i], false);
+	}
+
+	if (pin_hold.node != NULL)
+		draw_pin_hold(vg);
+
+	draw_threads_info();
 
 	nvgFontSize(vg, 15.0f);
 	nvgFontFace(vg, "sans");
@@ -660,7 +668,8 @@ void patch_editor_init(struct node *node)
 
 	init_window();
 
-	delayed_call_node_self(node, 0);
+	// delayed_call_node_self(node, 0);
+	direct_call_node_self(node); // draw one frame
 }
 
 // int frame = 0;
@@ -669,16 +678,15 @@ void patch_editor(struct node *node)
 {
 	// frame++;
 
-	if (need_to_redraw)
-	{
-		need_to_redraw = false;
+	// if (need_to_redraw)
+	// {
+		// need_to_redraw = false;
 		draw_patch_editor();
-	}
-	// else if (frame % 60 == 0)
-	else
-	{
-		draw_patch_editor_custom_nodes();
-	}
+	// }
+	// else
+	// {
+		// draw_patch_editor_custom_nodes();
+	// }
 
 	if (glfwWindowShouldClose(window))
 	{
@@ -686,7 +694,7 @@ void patch_editor(struct node *node)
 		exit(0);
 	}
 
-	delayed_call_node_self(node, 1.0 / 60);
+	// delayed_call_node_self(node, 1.0 / 60);
 
 	glfwPollEvents();
 }

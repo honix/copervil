@@ -155,12 +155,32 @@ void delay(struct node *node)
 	delayed_call_node_on_pin(node, 0, GET_PIN(node, PIN_INPUT, 1, double));
 }
 
-void loop_init(struct node *node)
+void loop_sleep_init(struct node *node)
 {
 	init_pins(node, true, 1, 0);
 	REG_PIN(node, PIN_INPUT, 1, "delay", double);
 
-	// node->auto_call_next = false;
+	GET_PIN(node, PIN_INPUT, 1, double) = 1.0 / 60;
+
+	node->auto_call_next = false;
+}
+
+void loop_sleep(struct node *node)
+{
+	double time_step;
+
+	while (1)
+	{
+		direct_call_node_on_pin(node, 0);
+		time_step = GET_PIN(node, PIN_INPUT, 1, double);
+		sx_os_sleep(time_step * 1000);
+	}
+}
+
+void loop_init(struct node *node)
+{
+	init_pins(node, true, 1, 0);
+	REG_PIN(node, PIN_INPUT, 1, "delay", double);
 
 	GET_PIN(node, PIN_INPUT, 1, double) = 1.0 / 60;
 }
@@ -170,7 +190,6 @@ void loop(struct node *node)
 	double time_step = GET_PIN(node, PIN_INPUT, 1, double);
 
 	delayed_call_node_self(node, time_step);
-	// direct_call_node_on_pin(node, 0);
 }
 
 struct lfo_state
@@ -256,6 +275,8 @@ void register_library()
 		"sleep", sleep_init, sleep_main});
 	register_function((struct function_note){
 		"delay", delay_init, delay});
+	register_function((struct function_note){
+		"loop_sleep", loop_sleep_init, loop_sleep});
 	register_function((struct function_note){
 		"loop", loop_init, loop});
 	register_function((struct function_note){

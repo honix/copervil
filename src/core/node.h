@@ -62,6 +62,8 @@ struct node
 	// uint8_t flags;
 
 	struct thread_note *thread_note;
+
+	double last_call_time;
 };
 
 struct node **nodes;

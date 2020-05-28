@@ -14,17 +14,12 @@ int thread_cb(void *user_data1, void *user_data2)
 
     while (true)
     {
-        // sx_signal_wait(thread_note->signal, -1);
         sx_mutex_lock(thread_note->mutex_in);
 
-        // sx_os_sleep(100);
         thread_note->func_to_run(thread_note->node_to_run);
-        // puts("asd");
-
         thread_note->node_to_run = NULL;
-        // sx_signal_raise(thread_note->signal_done);
+
         sx_mutex_unlock(thread_note->mutex_out);
-        // sx_thread_yield();
     }
 }
 
@@ -108,18 +103,22 @@ void free_thread_note(struct thread_note *thread_note)
 
 void send_func_to_thread(func_for_node *func_to_run, struct node *node)
 {
-    // sx_mutex_lock(node->thread_note->mutex);
+    wait_thread(node->thread_note);
 
     node->thread_note->func_to_run = func_to_run;
     node->thread_note->node_to_run = node;
-    // sx_signal_raise(node->thread_note->signal);
 
-    // puts("send >>>");
-    sx_mutex_lock(node->thread_note->mutex_out);
-    sx_mutex_unlock(node->thread_note->mutex_in);
+    resume_thread(node->thread_note);
+}
 
-    // sx_thread_yield();
-    sx_mutex_lock(node->thread_note->mutex_out);
-    sx_mutex_unlock(node->thread_note->mutex_out);
-    // puts("received <<<");
+void resume_thread(struct thread_note *thread_note)
+{
+    sx_mutex_lock(thread_note->mutex_out);
+    sx_mutex_unlock(thread_note->mutex_in);
+}
+
+void wait_thread(struct thread_note *thread_note)
+{
+    sx_mutex_lock(thread_note->mutex_out);
+    sx_mutex_unlock(thread_note->mutex_out);
 }

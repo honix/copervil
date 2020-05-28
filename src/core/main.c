@@ -27,8 +27,12 @@ void test_patch_editor()
 {
 	struct thread_note *thread_note = make_thread_note("patch_editor");
 	// struct node *node1 = make_node("node1", do_times);
-	make_node(200, 200, get_function_note("patch_editor"), thread_note);
+	struct node *on_open = make_node(200, 100, get_function_note("on_open"), thread_note);
+	struct node *loop = make_node(200, 150, get_function_note("loop_sleep"), thread_note);
+	struct node *patch_editor = make_node(200, 200, get_function_note("patch_editor"), thread_note);
 
+	connect_nodes(on_open, 0, loop, 0);
+	connect_nodes(loop, 0, patch_editor, 0);
 	// node->thread_note = thread_note;
 
 	// direct_call_node(node1);
@@ -48,8 +52,11 @@ void test_user_window()
 
 	struct node *node_on_open =
 		make_node(400, 10, get_function_note("on_open"), thread_note);
+	struct node *node_number_io_freq = 
+		make_node(600, 10, get_function_note("number_io"), thread_note);
+	GET_PIN(node_number_io_freq, PIN_INPUT, 1, double) = 1.0 / 60;
 	struct node *node_loop =
-		make_node(400, 75, get_function_note("loop"), thread_note);
+		make_node(400, 75, get_function_note("loop_sleep"), thread_note);
 	struct node *node_lfo =
 		make_node(400, 125, get_function_note("lfo"), thread_note);
 	GET_PIN(node_lfo, PIN_INPUT, 1, double) = 0.25;
@@ -65,8 +72,9 @@ void test_user_window()
 	struct node *node_draw_triangle =
 		make_node(450, 375, get_function_note("draw_triangle"), thread_note);
 
-	connect_nodes(node_on_open, 0, node_loop, 0);
 	connect_nodes(node_on_open, 0, node_number_io, 0);
+	connect_nodes(node_on_open, 0, node_loop, 0);
+	connect_nodes(node_number_io_freq, 1, node_loop, 1);
 	connect_nodes(node_loop, 0, node_lfo, 0);
 	connect_nodes(node_lfo, 0, node_window, 0);
 	connect_nodes(node_lfo, 1, node_add, 1);
@@ -188,7 +196,7 @@ int main(int acount, char **args)
 	test_sum_node();
 
 	test_user_window();
-	test_user_window(); // make another one!
+	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!
 	// test_user_window(); // make another one!

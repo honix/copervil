@@ -70,18 +70,25 @@ void window_init(struct node *node)
 unsigned int samples = 60;
 double prev_time = 0;
 double acc = 0;
+double min = 99;
+double max = 0;
 int t = 0;
 
 void window(struct node *node)
 {
 	if (++t == samples)
 	{
-		// printf("delta: %f\n", acc / samples);
+		printf("delta: %f\nmin: %f\nmax: %f\n\n", acc / samples, min, max);
 		t = 0;
 		acc = 0;
+		min = 99;
+		max = 0;
 	}
 	double curr_time = current_time_secs();
-	acc += curr_time - prev_time;
+	double delta = curr_time - prev_time;
+	min = MIN(min, delta);
+	max = MAX(max, delta);
+	acc += delta;
 	prev_time = curr_time;
 
 	// get_state(node)->random_number += 1;

@@ -12,10 +12,11 @@
 #include "link.h"
 #include "list.h"
 #include "utils.h"
+#include "threads.h"
 
 // this list will be always sorted by > call_time
 struct list delayed_node_list;
-// sx_mutex mutex;
+sx_mutex mutex;
 
 uint64_t start_time;
 
@@ -47,20 +48,17 @@ int ord(struct list_cell *a, struct list_cell *b)
 
 void delayed_call_node_self(struct node *node, double delay_secs)
 {
-	// sx_os_sleep(secs * 1000);
-	// direct_call_node_self(node);
-
 	struct list_cell *cell = make_list_cell(
 		make_delayed_node(node, current_time_secs() + delay_secs));
 
-	// sx_mutex_lock(&mutex);
+	sx_mutex_lock(&mutex);
 
 	if (delay_secs == 0)
 		insert_list_cell_at_top(&delayed_node_list, cell);
 	else
 		insert_list_cell_ordered(&delayed_node_list, cell, ord);
 
-	// sx_mutex_unlock(&mutex);
+	sx_mutex_unlock(&mutex);
 }
 
 void delayed_call_node_on_pin(struct node *node, uint8_t pin, double secs)
@@ -113,7 +111,8 @@ void loop_step()
 	}
 	else
 	{
-		delay = 1.0 / 30;
+		delay = 1.0 / 60; // idle loop
+		// delay = 1000; // dead
 	}
 
 	// delay = MAX(0, delay);
@@ -121,7 +120,7 @@ void loop_step()
 
 	if (delay > 0)
 	{
-		sx_os_sleep(delay / 1000);
+		sx_os_sleep(delay * 1000);
 	}
 
 	if (delayed_node_list.first_cell != NULL)
@@ -129,14 +128,16 @@ void loop_step()
 		struct delayed_node *delayed_node =
 			delayed_node_list.first_cell->data;
 
-		// sx_mutex_unlock(&mutex);
-		direct_call_node_self(delayed_node->node);
-		// sx_mutex_lock(&mutex);
+		send_func_to_thread(direct_call_node_self, delayed_node->node);
+
+		sx_mutex_lock(&mutex);
 
 		// TODO: implement as list function
 		struct list_cell *next = delayed_node_list.first_cell->next;
 		free(delayed_node_list.first_cell);
 		delayed_node_list.first_cell = next;
+
+		sx_mutex_unlock(&mutex);
 	}
 }
 
@@ -145,12 +146,11 @@ void init_loop_subsystem()
 	sx_tm_init();
 	start_time = sx_tm_now();
 
-	// sx_mutex_init(&mutex);
+	sx_mutex_init(&mutex);
 }
 
 void loop_run()
 {
-	// sx_mutex_lock(&mutex);
 	while (1)
 	{
 		loop_step();

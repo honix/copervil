@@ -162,6 +162,7 @@ void direct_call_node_self(struct node *node)
 			printf(">>> %s\n", node->function_note.name);
 #endif
 
+		node->last_call_time = current_time_secs();
 		node->function_note.main_func(node);
 
 #if PRINT_NODE_CALLS
@@ -222,14 +223,14 @@ struct node *make_node(
 	node->in_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 	node->out_pins = (struct pin_array){.array_size = 0, .pins = NULL};
 
+	node->last_call_time = -99;
+
 	sx_array_push(sx_alloc_malloc(), nodes, node);
 
 	if (node->function_note.init_func != NULL)
 	{
 		send_func_to_thread(node->function_note.init_func, node);
-		// printf("send_func_to_thread(node->function_note.init_func, node)\n");
-		// sx_signal_wait(node->thread_note->signal_done, -1);
-		// printf("sx_signal_wait(node->thread_note->signal_done, -1) done\n");
+		wait_thread(node->thread_note); // return ready to go node
 	}
 	else
 	{
@@ -287,11 +288,13 @@ void connect_nodes(
 
 	if (sender != NULL)
 	{
+		wait_thread(sender->thread_note);
 		sender_pin = get_pin(sender, PIN_OUTPUT, sender_pin_number);
 		size = get_type_note_by_id(sender_pin->type_id)->size;
 	}
 	if (receiver != NULL)
 	{
+		wait_thread(sender->thread_note);
 		receiver_pin = get_pin(receiver, PIN_INPUT, reciever_pin_number);
 		if (size == -1)
 			size = get_type_note_by_id(receiver_pin->type_id)->size;
