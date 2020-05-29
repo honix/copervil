@@ -425,10 +425,10 @@ void draw_patch_editor_custom_nodes()
 	glfwSwapBuffers(window);
 }
 
-void redraw_patch_editor()
-{
-	need_to_redraw = true;
-}
+// void redraw_patch_editor()
+// {
+	// need_to_redraw = true;
+// }
 
 void character_callback(GLFWwindow *window, unsigned int codepoint)
 {
@@ -507,7 +507,7 @@ void key_callback(
 			selected_node, key, scancode, action, mods);
 	}
 
-	redraw_patch_editor();
+	// redraw_patch_editor();
 }
 
 void cursor_pos_callback(GLFWwindow *window, double x, double y)
@@ -521,11 +521,11 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
 		struct vector2i cursor_pos = {.x = x, .y = y};
 		dragged_node->rect.pos = vector_add(cursor_pos, dragged_node_offset);
 
-		redraw_patch_editor();
+		// redraw_patch_editor();
 	}
 
-	if (pin_hold.node != NULL)
-		redraw_patch_editor();
+	// if (pin_hold.node != NULL)
+		// redraw_patch_editor();
 }
 
 void clear_pin_hold()
@@ -576,7 +576,7 @@ void mouse_button_callback(
 		{
 			clear_pin_hold();
 		}
-		redraw_patch_editor();
+		// redraw_patch_editor();
 		break;
 	case GLFW_RELEASE:
 		dragged_node = NULL;
@@ -594,7 +594,7 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 	// glfwMakeContextCurrent(window);
 	glViewport(0, 0, width, height);
 
-	redraw_patch_editor();
+	// redraw_patch_editor();
 }
 
 void init_window()
@@ -651,7 +651,7 @@ void init_window()
 	// glDisable(GL_DEPTH_TEST);
 	// end initialization
 
-	redraw_patch_editor();
+	// redraw_patch_editor();
 }
 
 void deinit()
