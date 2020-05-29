@@ -361,17 +361,17 @@ void draw_threads_info()
 		sprintf(s, "#%d %s", i, thread_note->name);
 		nvgText(vg, window_width - 128 + 5, 20 + i * 25 + 10, s, NULL);
 
-		// if (thread_note->node_to_run != NULL)
-		// {
-		// 	struct vector2i pos = thread_note->node_to_run->rect.pos;
-		// 	nvgBeginPath(vg);
-		// 	nvgMoveTo(vg, window_width - 128 + 5, 20 + i * 25 + 10);
-		// 	nvgLineTo(vg, pos.x, pos.y);
-		// 	nvgLineJoin(vg, NVG_BUTT);
-		// 	nvgStrokeWidth(vg, 2);
-		// 	nvgStrokeColor(vg, nvgHSLA(hue, 1, 0.5f, 200));
-		// 	nvgStroke(vg);
-		// }
+		if (thread_note->node_to_run != NULL)
+		{
+			struct vector2i pos = thread_note->node_to_run->rect.pos;
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, window_width - 128 + 5, 20 + i * 25 + 10);
+			nvgLineTo(vg, pos.x, pos.y);
+			nvgLineJoin(vg, NVG_BUTT);
+			nvgStrokeWidth(vg, 1);
+			nvgStrokeColor(vg, nvgHSLA(hue, 1, 0.5f, 200));
+			nvgStroke(vg);
+		}
 	}
 }
 

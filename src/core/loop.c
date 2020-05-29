@@ -112,7 +112,6 @@ void loop_step()
 	else
 	{
 		delay = 1.0 / 60; // idle loop
-		// delay = 1000; // dead
 	}
 
 	// delay = MAX(0, delay);

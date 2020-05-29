@@ -137,7 +137,8 @@ void sleep_init(struct node *node)
 
 void sleep_main(struct node *node)
 {
-	sx_os_sleep((int) (GET_PIN(node, PIN_INPUT, 1, double) * 1000));
+	// sx_os_sleep((int) (GET_PIN(node, PIN_INPUT, 1, double) * 1000));
+	node_sleep(node, GET_PIN(node, PIN_INPUT, 1, double));
 }
 
 void delay_init(struct node *node)
@@ -173,7 +174,8 @@ void loop_sleep(struct node *node)
 	{
 		direct_call_node_on_pin(node, 0);
 		time_step = GET_PIN(node, PIN_INPUT, 1, double);
-		sx_os_sleep(time_step * 1000);
+		if (node_sleep(node, time_step))
+			break;
 	}
 }
 

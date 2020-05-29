@@ -1,9 +1,12 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct sx__thread_s sx_thread;
 // typedef struct sx_queue_spsc sx_queue_spsc;
 typedef struct sx_mutex_s sx_mutex;
-typedef struct sx_signal_s sx_signal;
+// typedef struct sx_signal_s sx_signal;
+typedef struct sx_sem_s sx_sem;
 
 struct node;
 
@@ -16,8 +19,8 @@ struct thread_note
     // sx_queue_spsc *to_queue;
     sx_mutex *mutex_in;
     sx_mutex *mutex_out;
-    sx_signal *signal;
-    sx_signal *signal_done;
+    sx_sem *semaphore_stop;
+    // sx_signal *signal_done;
     struct node *node_to_run;
     func_for_node *func_to_run;
 };
@@ -30,4 +33,6 @@ void init_threads_subsystem();
 struct thread_note *make_thread_note(char *name);
 void free_thread_note(struct thread_note *thread_note);
 void send_func_to_thread(func_for_node *func_to_run, struct node *node);
+bool node_sleep(struct node *node, double secs);
 void wait_thread(struct thread_note *thread_note);
+void stop_and_wait_thread(struct thread_note *thread_note);

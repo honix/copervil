@@ -60,8 +60,8 @@ struct thread_note *make_thread_note(char *name)
     strncpy(thread_note->name, name, sizeof(thread_note->name));
     thread_note->mutex_in = malloc(sizeof(sx_mutex));
     thread_note->mutex_out = malloc(sizeof(sx_mutex));
-    thread_note->signal = malloc(sizeof(sx_signal));
-    thread_note->signal_done = malloc(sizeof(sx_signal));
+    thread_note->semaphore_stop = malloc(sizeof(sx_sem));
+    // thread_note->signal_done = malloc(sizeof(sx_signal));
 
 #if SX_PLATFORM_POSIX
     sx_mutex_init_(thread_note->mutex_in);
@@ -70,8 +70,9 @@ struct thread_note *make_thread_note(char *name)
     sx_mutex_init(thread_note->mutex_in);
     sx_mutex_init(thread_note->mutex_out);
 #endif
-    sx_signal_init(thread_note->signal);
-    sx_signal_init(thread_note->signal_done);
+    // sx_signal_init(thread_note->signal_stop);
+    // sx_signal_init(thread_note->signal_done);
+    sx_semaphore_init(thread_note->semaphore_stop);
     sx_mutex_lock(thread_note->mutex_in);
     thread_note->thread = sx_thread_create(
         sx_alloc_malloc(),
@@ -93,22 +94,12 @@ void free_thread_note(struct thread_note *thread_note)
     free(thread_note->mutex_in);
     sx_mutex_release(thread_note->mutex_out);
     free(thread_note->mutex_out);
-    sx_signal_release(thread_note->signal);
-    free(thread_note->signal);
-    sx_signal_release(thread_note->signal_done);
-    free(thread_note->signal_done);
-    free(thread_note->signal);
+    sx_semaphore_release(thread_note->semaphore_stop);
+    free(thread_note->semaphore_stop);
+    // sx_signal_release(thread_note->signal_done);
+    // free(thread_note->signal_done);
+    // free(thread_note->signal_stop);
     free(thread_note);
-}
-
-void send_func_to_thread(func_for_node *func_to_run, struct node *node)
-{
-    wait_thread(node->thread_note);
-
-    node->thread_note->func_to_run = func_to_run;
-    node->thread_note->node_to_run = node;
-
-    resume_thread(node->thread_note);
 }
 
 void resume_thread(struct thread_note *thread_note)
@@ -122,3 +113,26 @@ void wait_thread(struct thread_note *thread_note)
     sx_mutex_lock(thread_note->mutex_out);
     sx_mutex_unlock(thread_note->mutex_out);
 }
+
+bool node_sleep(struct node *node, double secs)
+{
+    return sx_semaphore_wait(node->thread_note->semaphore_stop, secs * 1000);
+}
+
+void stop_and_wait_thread(struct thread_note *thread_note)
+{
+    sx_semaphore_post(thread_note->semaphore_stop, 1);
+    wait_thread(thread_note);
+}
+
+void send_func_to_thread(func_for_node *func_to_run, struct node *node)
+{
+    wait_thread(node->thread_note);
+    // stop_and_wait_thread(node->thread_note);
+
+    node->thread_note->func_to_run = func_to_run;
+    node->thread_note->node_to_run = node;
+
+    resume_thread(node->thread_note);
+}
+

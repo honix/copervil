@@ -148,6 +148,10 @@ struct link *get_link_on_pin(
 
 void direct_call_node_self(struct node *node)
 {
+	// TODO: rally need to check what thread is calling
+	// if cally thread != node->thread_note
+	// then stop_and_wait_thread; send_func_to_thread
+	// else direct_call_node_self
 	if (node->thread_note->node_to_run == NULL)
 	{
 		send_func_to_thread(direct_call_node_self, node);
@@ -245,6 +249,8 @@ void free_node(struct node *node)
 	printf("Remove node %s @ 0x%lx\n",
 		   node->function_note.name,
 		   (long unsigned int)node);
+
+	stop_and_wait_thread(node->thread_note);
 
 	deinit_node(node);
 
