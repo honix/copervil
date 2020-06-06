@@ -17,3 +17,7 @@ void register_library()
 }
 ```
 (see ```struct function_note``` (src/core/dl_loader.h) for more callback options)
+
+### loop.c
+
+loop is time tracking node queue. it execute node with time == current_time or sleeps until it happends. loop works inside main thread after main initialization. as we started using time independed threads, loop is really needless (see sleep node for time controll), after that main thread can be utilized as default working thread for nodes.
