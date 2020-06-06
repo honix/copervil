@@ -12,6 +12,8 @@ patch editor (src/nodes/honix/patch_editor/patch_editor.so) is a representation 
 - switch nodes thread - number key of thread
 
 ### number_io
+![](Number%20io.png)
+
 number_io is a example of custom drawn node, it shows current number, draws bar, and allows to change value using keyboard:
 - increment number - arrow up key
 - decrement number - arrow down key
