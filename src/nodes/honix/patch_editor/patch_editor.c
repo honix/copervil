@@ -427,7 +427,7 @@ void draw_patch_editor_custom_nodes()
 
 // void redraw_patch_editor()
 // {
-	// need_to_redraw = true;
+// need_to_redraw = true;
 // }
 
 void character_callback(GLFWwindow *window, unsigned int codepoint)
@@ -465,6 +465,10 @@ void key_callback(
 
 		switch (key)
 		{
+		case GLFW_KEY_TAB:
+			if (selected_node != NULL)
+				direct_call_node_self(selected_node);
+			break;
 		case GLFW_KEY_INSERT:
 			make_thread_note("new");
 			break;
@@ -525,7 +529,7 @@ void cursor_pos_callback(GLFWwindow *window, double x, double y)
 	}
 
 	// if (pin_hold.node != NULL)
-		// redraw_patch_editor();
+	// redraw_patch_editor();
 }
 
 void clear_pin_hold()
@@ -680,12 +684,12 @@ void patch_editor(struct node *node)
 
 	// if (need_to_redraw)
 	// {
-		// need_to_redraw = false;
-		draw_patch_editor();
+	// need_to_redraw = false;
+	draw_patch_editor();
 	// }
 	// else
 	// {
-		// draw_patch_editor_custom_nodes();
+	// draw_patch_editor_custom_nodes();
 	// }
 
 	if (glfwWindowShouldClose(window))

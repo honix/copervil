@@ -10,12 +10,13 @@ unsigned int loaded_functions_pointer;
 
 void init_dl_loader_subsystem()
 {
-	loaded_functions = malloc(sizeof(struct function_note *) * 16);
+	loaded_functions = malloc(sizeof(struct function_note *) * 128); // TODO: rewrite with sx_arrays
 	loaded_functions_pointer = 0;
 }
 
 void register_function(struct function_note function_note)
 {
+	printf("Registering function %s\n", function_note.name);
 	struct function_note *copy = malloc(sizeof(struct function_note));
 	memcpy(copy, &function_note, sizeof(struct function_note));
 	loaded_functions[loaded_functions_pointer] = copy;
@@ -24,13 +25,14 @@ void register_function(struct function_note function_note)
 
 void load_library(char *path)
 {
+	printf("Loading library %s\n", path);
 	// TODO: try to refactor it using thirdparty/sx/include/os.h
 	void *handle = dlopen(path, RTLD_LAZY);
 	void (*register_library)();
 	register_library = dlsym(handle, "register_library");
 	if (register_library == NULL)
 	{
-		printf("Error: No register function in %s\n", path);
+		printf("Error: No register_library function in %s\n", path);
 		return;
 	}
 	register_library();

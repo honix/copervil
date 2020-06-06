@@ -166,6 +166,11 @@ void test_delay()
 	connect_nodes(number_io, 1, print_number, 1);
 }
 
+void test_cpp()
+{
+	struct node *cpp_test = make_node(700, 500, get_function_note("cpp_test"), NULL);
+}
+
 void init_subsystems()
 {
 	init_threads_subsystem();
@@ -187,6 +192,8 @@ int main(int acount, char **args)
 	load_library("./src/nodes/honix/patch_editor/number_io.so");
 	load_library("./src/nodes/honix/test/utils.so");
 	load_library("./src/nodes/honix/window/window.so");
+	load_library("./src/nodes/honix/cpp_test/cpp_test.so");
+	// load_library("./src/nodes/honix/rtaudio/rtaudio.so");
 
 	printf("=== spawn nodes ===\n");
 
@@ -205,6 +212,7 @@ int main(int acount, char **args)
 
 	test_sleep();
 	test_delay();
+	test_cpp();
 
 	test_patch_editor();
 

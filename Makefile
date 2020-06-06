@@ -31,7 +31,7 @@ bin:
 	mkdir bin
 
 bin/core: src/core/main.c $(OBJECTS) thirdparty/sx/libsx.a | bin
-	gcc -Wall -g -rdynamic $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl -pthread
+	gcc -Wall -g -rdynamic -I thirdparty/sx/include $< $(OBJECTS) thirdparty/sx/libsx.a -o $@ -lm -ldl -pthread
 
 
 nodes: $(NODE_API) thirdparty/sx/libsx.a
