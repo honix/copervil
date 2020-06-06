@@ -8,7 +8,6 @@ patch editor (src/nodes/honix/patch_editor/patch_editor.so) is a representation 
 - execute node - tab key
 - remove node - delete key
 - link nodes - left mouse click on pin, then left mouse click on another pin
-
 - spawn new thread - insert key
 - switch nodes thread - number key of thread
 
