@@ -7,6 +7,7 @@ patch editor (src/nodes/honix/patch_editor/patch_editor.so) is a representation 
 - move node - left mouse drag
 - execute node - tab key
 - remove node - delete key
+- link nodes - left mouse click on pin, then left mouse click on another pin
 
 ### number_io
 number_io is a example of custom drawn node, it shows current number, draws bar, and allows to change value using keyboard:
