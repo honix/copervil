@@ -35,7 +35,7 @@ make run
 ```
 
 ### todo (topmost is priority)
-- messaging over threads using signals
+- messaging over threads using signals?
 - multi-selection and panning in patch editor
 - save load patches (maybe using non-c high-level language)
 - maybe loop.h (scheduler) will be dropped after (loop works in main thread, and oply helpful on delayed node execution when opening patch (see on_open node))
