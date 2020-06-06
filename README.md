@@ -1,5 +1,4 @@
 # c (temporary name)
-Node-based programming in C language
 
 ![](docs/Screenshot.png)
 
@@ -10,6 +9,11 @@ lets bring power and flexibility to visual programming world
 work in progress, early prototype
 
 developed and tested to work on linux, but will be easy to port on windows and other platforms
+
+### docs
+- [Node](docs/Node.md) - basic information on nodes
+- [Patch editor](docs/Patch%20editor.md) - patch editor controlls
+- [System](docs/System.md) - advanced information, new nodes programming
 
 ### dependencies to run from sources
 
