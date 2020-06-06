@@ -1,8 +1,8 @@
-### node registration
+### new node registration
 
-nodes defined as .so objects in C calling format.
+nodes are defined as .so objects in C calling format. they can be loaded in runtime.
 
-node will define ```void register_library()``` function to export nodes definitions by calling ```void register_function(struct function_note)``` for each node:
+.so file will define ```void register_library()``` function to export nodes definitions by calling ```void register_function(struct function_note)``` for each node:
 ```c
 void register_library()
 {
