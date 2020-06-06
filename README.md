@@ -1,4 +1,4 @@
-# covil - C Operated VIsual Language
+# copervil - C OPERated VIsual Language
 
 ![](docs/Screenshot.png)
 
