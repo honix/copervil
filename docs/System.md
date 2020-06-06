@@ -1,4 +1,4 @@
-### system
+### node registration
 
 nodes defined as .so objects in C calling format.
 
@@ -18,6 +18,11 @@ void register_library()
 ```
 (see ```struct function_note``` (src/core/dl_loader.h) for more callback options)
 
+to load library use ```void load_library(char*)```:
+```c
+load_library("./src/nodes/honix/utils/utils.so");
+```
+
 ### loop.c
 
-loop is time tracking node queue. it execute node with time == current_time or sleeps until it happends. loop works inside main thread after main initialization. as we started using time independed threads, loop is really needless (see sleep node for time controll), after that main thread can be utilized as default working thread for nodes.
+loop is time tracking node queue. it execute node with time == current_time or sleeps until it happends. loop works inside main thread after main initialization. as we started using time independed threads, loop is really needless (see sleep node for time controll), after that main thread can be utilized as default working thread for nodes. right now loop only helps for delayed start for on_open node.
