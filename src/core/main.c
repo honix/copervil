@@ -190,7 +190,7 @@ int main(int acount, char **args)
 
 	load_library("./src/nodes/honix/patch_editor/patch_editor.so");
 	load_library("./src/nodes/honix/patch_editor/number_io.so");
-	load_library("./src/nodes/honix/test/utils.so");
+	load_library("./src/nodes/honix/utils/utils.so");
 	load_library("./src/nodes/honix/window/window.so");
 	load_library("./src/nodes/honix/cpp_test/cpp_test.so");
 	// load_library("./src/nodes/honix/rtaudio/rtaudio.so");
