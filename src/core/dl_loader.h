@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct node;
 struct NVGcontext;
 
@@ -36,7 +32,3 @@ void register_function(struct function_note function_note);
 void load_library(char *path);
 
 struct function_note *get_function_note(char *name);
-
-#ifdef __cplusplus
-}
-#endif
