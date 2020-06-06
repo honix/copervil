@@ -32,7 +32,7 @@ make run
 
 ### todo (topmost is priority)
 - messaging over threads using signals
-- maybe loop.h (scheduler) will be dropped after (already possible but main thread will turn into default working thread)
+- maybe loop.h (scheduler) will be dropped after (loop works in main thread, and oply helpful on delayed node execution when opening patch (see on_open node))
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - rethink node creation API from C
 - better, systematic error logging
