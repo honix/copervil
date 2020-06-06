@@ -8,7 +8,7 @@ lets bring power and flexibility to visual programming world
 ### status
 work in progress, early prototype
 
-developed and tested to work on linux, but will be easy to port on windows and other platforms
+developed and tested to work on linux (latest Ubuntu), but will be easy to port on windows and other platforms
 
 ### docs
 - [Node](docs/Node.md) - basic information on nodes
