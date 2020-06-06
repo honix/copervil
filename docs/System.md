@@ -16,7 +16,11 @@ void register_library()
 		"div", div_op_init, div_op});
 }
 ```
-(see ```struct function_note``` (src/core/dl_loader.h) for more callback options)
+see ```struct function_note``` *(src/core/dl_loader.h)* for more callback options
+
+see *src/nodes/honix/patch_editor/number_io.c* for custom node representation/controls example
+
+see *src/nodes/honix/cpp_test/cpp_test.cpp* for basic cpp interop example
 
 to load library use ```void load_library(char*)```:
 ```c
