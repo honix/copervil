@@ -1,7 +1,7 @@
 # c (temporary name)
 Node-based programming in C language
 
-![](docs/Screenshot%20from%202020-06-06%2014-01-28.png)
+![](docs/Screenshot.png)
 
 ### slogan
 lets bring power and flexibility to visual programming world
