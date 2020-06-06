@@ -1,6 +1,8 @@
 ### node
 node executes itself in corresponding thread when someone calls it (another node, loop or user from patch editor).
 
+![](Do%20times.png)
+
 when executes node works with input data (upper pins) and produces output data (lower pins), and can call following nodes. by default node call following node on pin 0 (default trigger pin).
 
 ### trigger
