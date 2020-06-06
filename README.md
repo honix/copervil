@@ -1,4 +1,4 @@
-# c (temporary name)
+# covil - C Operated VIsual Language
 
 ![](docs/Screenshot.png)
 
