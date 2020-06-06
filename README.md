@@ -32,6 +32,8 @@ make run
 
 ### todo (topmost is priority)
 - messaging over threads using signals
+- multi-selection and panning in patch editor
+- save load patches (maybe using non-c high-level language)
 - maybe loop.h (scheduler) will be dropped after (loop works in main thread, and oply helpful on delayed node execution when opening patch (see on_open node))
 - patch_editor custom user nodes (inputboxes, buttons, graphs and etc)
 - rethink node creation API from C
@@ -41,5 +43,5 @@ make run
 - thirdparty libraries auto-wrap? (use header files to generate node functions)
 
 ### strange ideas
-- lua (or janet) interpreter as node, can be used as command line; such interpreter can be used as patch file definition using interpreter syntax
+- lua or janet or python interpreter as node, can be used as command line; such interpreter can be used as patch file definition using interpreter syntax
 - pin nodes to the screen space, and use them as part of ui
