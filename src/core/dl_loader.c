@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <dlfcn.h>
+#include "sx/os.h"
 
 struct function_note **loaded_functions;
 unsigned int loaded_functions_pointer;
@@ -26,10 +26,9 @@ void register_function(struct function_note function_note)
 void load_library(char *path)
 {
 	printf("Loading library %s\n", path);
-	// TODO: try to refactor it using thirdparty/sx/include/os.h
-	void *handle = dlopen(path, RTLD_LAZY);
+	void *handle = sx_os_dlopen(path);
 	void (*register_library)();
-	register_library = dlsym(handle, "register_library");
+	register_library = sx_os_dlsym(handle, "register_library");
 	if (register_library == NULL)
 	{
 		printf("Error: No register_library function in %s\n", path);
