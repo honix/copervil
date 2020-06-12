@@ -1,6 +1,6 @@
 [submodule "thirdparty/nanovg"]
 	path = thirdparty/nanovg
-	url = git@github.com:memononen/nanovg.git
+	url = https://github.com/memononen/nanovg.git
 [submodule "thirdparty/sx"]
 	path = thirdparty/sx
-	url = git@github.com:septag/sx.git
+	url = https://github.com/septag/sx.git
