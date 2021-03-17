@@ -26,7 +26,7 @@ thirdparty libs:
 ### build and run
 clone with submodiles:
 ```
-git clone --recurse-submodules git@github.com:honix/c.git
+git clone --recurse-submodules git@github.com:honix/copervil.git
 ```
 run this commands in project root folder:
 ```
